@@ -1,0 +1,18 @@
+{
+  "packageManager": "yarn",
+  "parallel": true,
+  "hooks": {
+    "pre-push": [
+      {
+        "name": "TypeScript",
+        "script": "test:tsc"
+      },
+      {
+        "name": "Formatting",
+        "script": "test:format"
+      }
+    ],
+    "pre-commit": [],
+    "post-commit": []
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "name": "gtk-web",
+  "version": "1.0.0",
+  "main": "./dist/index.js",
+  "keywords": [],
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "description": "",
+  "license": "MIT",
+  "author": {
+    "name": "Szymon Bretner",
+    "email": ""
+  },
+  "scripts": {
+    "fix:format": "prettier -w ./src/**/*.ts",
+    "test:format": "prettier -c ./src/**/*.ts",
+    "test:tsc": "tsc --noEmit",
+    "build": "node ./scripts/build.mjs"
+  },
+  "packageManager": "yarn@1.22.19",
+  "devDependencies": {
+    "esbuild": "^0.19.2",
+    "git-hook-tasks": "ncpa0cpl/git-hook-tasks",
+    "husky": "^8.0.3",
+    "prettier": "^3.0.2",
+    "prettier-plugin-jsdoc": "^1.0.1",
+    "typescript": "^5.1.6"
+  },
+  "dependencies": {
+    "jsxte": "3.0.1",
+    "lit": "^2.8.0"
+  }
+}
