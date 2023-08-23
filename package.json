@@ -29,7 +29,7 @@
     "typescript": "^5.1.6"
   },
   "dependencies": {
-    "jsxte": "3.0.1",
-    "lit": "^2.8.0"
+    "@ncpa0cpl/nodepack": "^2.2.2",
+    "jsxte": "^3.1.0"
   }
 }

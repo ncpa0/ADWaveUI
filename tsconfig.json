@@ -15,7 +15,6 @@
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
     "noImplicitAny": true,
-    "experimentalDecorators": true,
     "jsxImportSource": "jsxte",
     "jsx": "react-jsx",
     "useDefineForClassFields": false

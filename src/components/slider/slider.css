@@ -4,30 +4,30 @@ g-slider {
   align-items: center;
   margin-left: 0.3em;
   margin-right: 0.3em;
+  touch-action: none;
 }
 
-.g_slider {
+g-slider .g_slider {
   flex: 1;
   position: relative;
-
   min-height: 1em;
 }
 
-.g_slider > .slider-track {
+g-slider .g_slider > .slider-track {
   position: absolute;
   top: 0.3em;
   left: 0px;
   right: 0px;
 }
 
-.g_slider > .slider-progress {
+g-slider .g_slider > .slider-progress {
   position: absolute;
   top: 0.3em;
   left: 0px;
   right: 100%;
 }
 
-.g_slider > .slider-thumb {
+g-slider .g_slider > .slider-thumb {
   position: absolute;
   top: 0.1em;
   left: calc(0% - 0.3em);

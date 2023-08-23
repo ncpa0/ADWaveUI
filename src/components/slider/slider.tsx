@@ -1,11 +1,16 @@
 import { Slider } from "gtk-css-web";
-import { InterpolateTag } from "jsxte";
-import { customElement, property } from "lit/decorators.js";
-import { BaseElement } from "../../base-element";
-import { render } from "../../decorators/render";
+import {
+  Attribute,
+  CustomElement,
+  CustomElementEvent,
+  Element,
+} from "jsxte-dom-diff";
 import { cls } from "../../utils/cls";
 import { changeWithStep, clamp, toPrecision } from "../../utils/math";
+import { createRef } from "../../utils/ref";
 import "./slider.css";
+
+const preventDefault = (e: Event) => e.preventDefault();
 
 class SliderChangeEvent extends CustomEvent<{ value: number }> {
   constructor(value: number) {
@@ -17,71 +22,68 @@ class SliderChangeEvent extends CustomEvent<{ value: number }> {
   }
 }
 
-@customElement("g-slider")
-export class GSliderElement extends BaseElement {
-  @property({ reflect: true, type: Number })
-  value: number = 0;
+@CustomElement("g-slider")
+export class GSliderElement extends Element {
+  @Attribute({ type: "number" })
+  accessor value: number = 0;
 
-  @property({ reflect: true, type: Number })
-  min: number = 0;
+  @Attribute({ type: "number" })
+  accessor min: number = 0;
 
-  @property({ reflect: true, type: Number })
-  max: number = 100;
+  @Attribute({ type: "number" })
+  accessor max: number = 100;
 
-  @property({ reflect: true, type: Number })
-  step: number = 1;
+  @Attribute({ type: "number" })
+  accessor step: number = 1;
 
-  @property({ reflect: true, type: Number })
-  precision: number = 4;
+  @Attribute({ type: "number" })
+  accessor precision: number = 4;
 
-  @property({ reflect: true, type: Boolean })
-  disabled: boolean = false;
+  @Attribute({ type: "boolean" })
+  accessor disabled: boolean | undefined = undefined;
 
-  @property({ reflect: true })
-  name: string = "";
+  @Attribute()
+  accessor name: string | undefined = undefined;
+
+  private progress = createRef<HTMLDivElement>();
+  private thumb = createRef<HTMLDivElement>();
+  protected isPressed = false;
 
   constructor() {
     super();
-  }
 
-  protected firstUpdated(): void {
-    this.moveThumb(clamp(this.value, this.min, this.max));
+    this.lifecycle.once(CustomElementEvent.DidMount, () => {
+      this.moveThumb(this.value);
+    });
   }
 
   private moveThumb(value: number) {
     const percent =
       ((value - this.min) / (this.max - this.min)) * 100;
 
-    const progress = this.querySelector(
-      `.${Slider.progress}`,
-    ) as HTMLElement;
-    const thumb = this.querySelector(
-      `.${Slider.thumb}`,
-    ) as HTMLElement;
-
-    progress.style.right = `${100 - percent}%`;
-    thumb.style.left = `calc(${percent}% - 0.3em)`;
+    this.progress.current!.style.right = `${100 - percent}%`;
+    this.thumb.current!.style.left = `calc(${percent}% - 0.3em)`;
   }
 
-  isPressed = false;
-
-  private handleMouseDown = (e: MouseEvent) => {
+  private handlePointerDown = (e: PointerEvent) => {
     e.stopPropagation();
     if (this.disabled) return;
 
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+
     this.isPressed = true;
-    this.handleMouseMove(e);
+    this.handlePointerEventMove(e);
     return false;
   };
 
-  private handleMouseUp = (e: MouseEvent) => {
+  private handlePointerEventUp = (e: PointerEvent) => {
     e.stopPropagation();
     if (this.disabled) return;
 
     this.isPressed = false;
   };
 
-  private handleMouseMove = (e: MouseEvent) => {
+  private handlePointerEventMove = (e: PointerEvent) => {
     e.stopPropagation();
     if (this.disabled) return;
 
@@ -109,12 +111,14 @@ export class GSliderElement extends BaseElement {
   connectedCallback() {
     super.connectedCallback();
     if (document) {
-      document.addEventListener("mouseup", this.handleMouseUp);
-      document.addEventListener("mousemove", this.handleMouseMove);
+      window.addEventListener("pointerup", this.handlePointerEventUp);
+      window.addEventListener(
+        "pointermove",
+        this.handlePointerEventMove,
+      );
     }
   }
 
-  @render
   render() {
     return (
       <div
@@ -123,28 +127,40 @@ export class GSliderElement extends BaseElement {
           g_slider: true,
           disabled: this.disabled,
         })}
-        onmousedown={this.handleMouseDown}
+        onpointerdown={this.handlePointerDown}
+        onpointermove={preventDefault}
+        ondrag={preventDefault}
       >
         <div
           draggable="false"
           class={Slider.track}
+          onpointermove={preventDefault}
+          ondrag={preventDefault}
         ></div>
         <div
+          ref={this.progress}
           draggable="false"
           class={Slider.progress}
+          onpointermove={preventDefault}
+          ondrag={preventDefault}
         ></div>
         <div
+          ref={this.thumb}
           draggable="false"
           class={Slider.thumb}
+          onpointermove={preventDefault}
+          ondrag={preventDefault}
         ></div>
-        <InterpolateTag>
-          <input
-            type="range"
-            class="_g_hidden"
-            disabled={this.disabled}
-            name={this.name}
-          />
-        </InterpolateTag>
+        <input
+          type="range"
+          class="_g_hidden"
+          disabled={this.disabled}
+          name={this.name}
+          min={this.min}
+          max={this.max}
+          step={this.step.toString()}
+          value={this.value.toString()}
+        />
       </div>
     );
   }

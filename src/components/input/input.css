@@ -1,0 +1,12 @@
+g-input .input-container {
+  display: flex;
+  flex-direction: column;
+}
+
+g-input .input-msg-box {
+  margin: 0.2em 0px 0px 0.5em;
+}
+
+g-input .input-msg-box span {
+  font-size: 0.7em;
+}

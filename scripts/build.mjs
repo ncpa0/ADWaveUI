@@ -1,4 +1,4 @@
-import esbuild from "esbuild";
+import { build } from "@ncpa0cpl/nodepack";
 import path from "node:path";
 import { fileURLToPath } from "url";
 
@@ -10,25 +10,26 @@ const watch = process.argv.includes("--watch");
 
 async function main() {
   /**
-   * @type {import("esbuild").BuildOptions}
+   * @type {import("@ncpa0cpl/nodepack").BuildConfig}
    */
   const bldOptions = {
-    tsconfig: p("tsconfig.json"),
-    entryPoints: [p("src/index.ts")],
-    outdir: p("dist"),
+    tsConfig: p("tsconfig.json"),
+    srcDir: p("src"),
+    outDir: p("dist"),
+    entrypoint: p("src/index.ts"),
+    target: "ESNext",
+    formats: ["esm"],
+    esDecorators: true,
     bundle: true,
-    keepNames: true,
-    treeShaking: true,
-    minify: !isDev,
-    jsxImportSource: "jsxte",
+    watch: watch,
+    esbuildOptions: {
+      minify: !isDev,
+      treeShaking: !isDev,
+      sourcemap: isDev ? "inline" : false,
+    },
   };
 
-  if (watch) {
-    const buildCtx = await esbuild.context(bldOptions);
-    await buildCtx.watch();
-  } else {
-    await esbuild.build(bldOptions);
-  }
+  await build(bldOptions);
 }
 
 main().catch((err) => {

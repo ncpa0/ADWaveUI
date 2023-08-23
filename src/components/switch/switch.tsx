@@ -1,8 +1,5 @@
 import { Switch } from "gtk-css-web";
-import { InterpolateTag } from "jsxte";
-import { customElement, property } from "lit/decorators.js";
-import { BaseElement } from "../../base-element";
-import { render } from "../../decorators/render";
+import { Attribute, CustomElement, Element } from "jsxte-dom-diff";
 import { cls } from "../../utils/cls";
 import "./switch.css";
 
@@ -16,16 +13,16 @@ class SwitchChangeEvent extends CustomEvent<{ active: boolean }> {
   }
 }
 
-@customElement("g-switch")
-export class GSwitchElement extends BaseElement {
-  @property({ reflect: true, type: Boolean })
-  active: boolean = false;
+@CustomElement("g-switch")
+export class GSwitchElement extends Element {
+  @Attribute({ type: "boolean" })
+  accessor active: boolean = false;
 
-  @property({ reflect: true, type: Boolean })
-  disabled: boolean = false;
+  @Attribute({ type: "boolean" })
+  accessor disabled: boolean = false;
 
-  @property({ reflect: true })
-  name: string = "";
+  @Attribute()
+  accessor name: string = "";
 
   private onClick = (e: Event) => {
     e.stopPropagation();
@@ -35,7 +32,6 @@ export class GSwitchElement extends BaseElement {
     this.dispatchEvent(new SwitchChangeEvent(this.active));
   };
 
-  @render
   render() {
     return (
       <div
@@ -47,16 +43,14 @@ export class GSwitchElement extends BaseElement {
         onclick={this.onClick}
       >
         <div class={Switch.knob}></div>
-        <InterpolateTag>
-          <input
-            type="checkbox"
-            class="_g_hidden"
-            disabled={this.disabled}
-            checked={this.active}
-            name={this.name}
-            onclick={this.onClick}
-          />
-        </InterpolateTag>
+        <input
+          type="checkbox"
+          class="_g_hidden"
+          disabled={this.disabled}
+          checked={this.active}
+          name={this.name}
+          onclick={this.onClick}
+        />
       </div>
     );
   }

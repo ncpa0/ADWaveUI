@@ -1,3 +1,7 @@
 ._g_hidden {
-    display: none;
+  display: none;
+}
+
+._g_col {
+  flex-direction: column;
 }
