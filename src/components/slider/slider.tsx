@@ -2,9 +2,9 @@ import { Slider } from "gtk-css-web";
 import {
   Attribute,
   CustomElement,
-  CustomElementEvent,
   Element,
-} from "jsxte-dom-diff";
+  ElementLifecycleEvent,
+} from "jsxte-wc";
 import { cls } from "../../utils/cls";
 import { changeWithStep, clamp, toPrecision } from "../../utils/math";
 import { createRef } from "../../utils/ref";
@@ -52,7 +52,7 @@ export class GSliderElement extends Element {
   constructor() {
     super();
 
-    this.lifecycle.once(CustomElementEvent.DidMount, () => {
+    this.lifecycle.once(ElementLifecycleEvent.DidMount, () => {
       this.moveThumb(this.value);
     });
   }

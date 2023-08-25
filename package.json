@@ -29,7 +29,8 @@
     "typescript": "^5.1.6"
   },
   "dependencies": {
-    "@ncpa0cpl/nodepack": "^2.2.2",
-    "jsxte": "^3.1.0"
+    "@ncpa0cpl/nodepack": "^2.3.0",
+    "jsxte": "^3.1.1",
+    "jsxte-wc": "^1.0.0"
   }
 }

@@ -119,10 +119,10 @@
   dependencies:
     uuid "^9.0.0"
 
-"@ncpa0cpl/nodepack@^2.2.2":
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/@ncpa0cpl/nodepack/-/nodepack-2.2.2.tgz#1e518023f1b8c967d4f8905bbe768402ebab804c"
-  integrity sha512-HGQyoksTzrSHBoiniJajNtTG84vOLInJw7YLTAyvx47phntEQ9oComq8K1j5OtFQsVfOG6EVkjN7OT5xUosYvw==
+"@ncpa0cpl/nodepack@^2.3.0":
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@ncpa0cpl/nodepack/-/nodepack-2.3.0.tgz#58f1d4a4eef1ce0f9f534875cbf238465f7457d4"
+  integrity sha512-RXHmyylBsCA4AVLd8HHjls69oHP3LSz546nGS1CJnwzszXiIaMGIxQtP0EZsvNnnyCKSh4NgD7XIiJKC4r2VSQ==
   dependencies:
     "@ncpa0cpl/node-worker-bridge" "^0.0.3"
     "@ts-morph/bootstrap" "^0.20.0"
@@ -854,10 +854,15 @@ json-to-ts@^1.7.0:
     hash.js "^1.0.3"
     pluralize "^3.1.0"
 
-jsxte@^3.1.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/jsxte/-/jsxte-3.1.0.tgz#62e3605fec2c1441b724ee67bef3f6ac969cf862"
-  integrity sha512-w+5R/0ZqPMSzo0owQ4LxoKr6bCZTZx/lE6F79c5TbLgd3rzZQuUiilnKgFmm1HAa1yfi8t5QspYEn+IWZ5ikzA==
+jsxte-wc@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/jsxte-wc/-/jsxte-wc-1.0.0.tgz#3feef7ab9f7e66776d16598dbf40734cd7ee9c19"
+  integrity sha512-V+vc4wlvLKqLJ5i51MPcA+Vy1AoVfOB1098ul1iQtjxMEc4hIgZFjmRQnLW+nUWJ6p0p1/thusgL5REaALTVfQ==
+
+jsxte@^3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/jsxte/-/jsxte-3.1.1.tgz#26556ff2144e1c2df82e8d68c93e536547b6c1e5"
+  integrity sha512-YKI8Hy2UljBK6zQyyLj2VKmgTa6Wbp3TzpYhzIni029sKmbvE/AhP1EM2HOleTX3rJnrKB0v6F4D8u8NvSK5Xg==
 
 kleur@^4.0.3:
   version "4.1.5"

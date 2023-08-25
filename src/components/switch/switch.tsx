@@ -1,5 +1,5 @@
 import { Switch } from "gtk-css-web";
-import { Attribute, CustomElement, Element } from "jsxte-dom-diff";
+import { Attribute, CustomElement, Element } from "jsxte-wc";
 import { cls } from "../../utils/cls";
 import "./switch.css";
 
