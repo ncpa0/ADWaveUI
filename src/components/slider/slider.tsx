@@ -57,6 +57,16 @@ export class GSliderElement extends Element {
     });
   }
 
+  private setValue(newValue: number) {
+    const value = clamp(newValue, this.min, this.max);
+
+    if (this.value === value) return;
+
+    this.value = value;
+    this.moveThumb(value);
+    this.dispatchEvent(new SliderChangeEvent(value));
+  }
+
   private moveThumb(value: number) {
     const percent =
       ((value - this.min) / (this.max - this.min)) * 100;
@@ -73,6 +83,7 @@ export class GSliderElement extends Element {
 
     this.isPressed = true;
     this.handlePointerEventMove(e);
+
     return false;
   };
 
@@ -98,13 +109,20 @@ export class GSliderElement extends Element {
         ),
         this.step,
       );
-      const value = clamp(tmpValue, this.min, this.max);
+      this.setValue(tmpValue);
+    }
+  };
 
-      if (this.value === value) return;
+  handleKeyUp = (e: KeyboardEvent) => {
+    if (this.disabled) return;
 
-      this.value = value;
-      this.moveThumb(value);
-      this.dispatchEvent(new SliderChangeEvent(value));
+    switch (e.key) {
+      case "ArrowLeft":
+        this.setValue(this.value - this.step);
+        break;
+      case "ArrowRight":
+        this.setValue(this.value + this.step);
+        break;
     }
   };
 
@@ -124,12 +142,19 @@ export class GSliderElement extends Element {
       <div
         draggable="false"
         class={cls({
-          g_slider: true,
+          [Slider.slider]: true,
           disabled: this.disabled,
         })}
         onpointerdown={this.handlePointerDown}
         onpointermove={preventDefault}
         ondrag={preventDefault}
+        onkeyup={this.handleKeyUp}
+        tabindex="0"
+        role="slider"
+        aria-valuemin={this.min.toString()}
+        aria-valuemax={this.max.toString()}
+        aria-valuenow={this.value.toString()}
+        aria-disabled={this.disabled ? "true" : "false"}
       >
         <div
           draggable="false"

@@ -11,16 +11,23 @@ g-input .input-msg-box span {
   font-size: 0.7em;
 }
 
-g-input .autocomplete-options {
+g-input .suggestions-options {
   position: absolute;
   left: 0px;
   right: 0px;
-  top: calc(100% - 0.6em);
   max-height: 8em;
   overflow-y: scroll;
   font-size: 0.8em;
 }
 
-g-input .autocomplete-options * {
+g-input .suggestions-options.orientation-down {
+  top: calc(100% - 0.6em);
+}
+
+g-input .suggestions-options.orientation-up {
+  bottom: calc(100% - 0.45em);
+}
+
+g-input .suggestions-options * {
   cursor: pointer;
 }

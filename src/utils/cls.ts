@@ -13,12 +13,22 @@ export function cls(classNames: ClassName): string {
     return classNames;
   }
 
+  let result = "";
+
   if (Array.isArray(classNames)) {
-    return classNames.map(cls).join(" ");
+    for (let i = 0; i < classNames.length; i++) {
+      result += cls(classNames[i]!) + " ";
+    }
+  } else {
+    const entries = Object.entries(classNames);
+
+    for (let i = 0; i < entries.length; i++) {
+      const [key, value] = entries[i]!;
+      if (value) {
+        result += key + " ";
+      }
+    }
   }
 
-  return Object.entries(classNames)
-    .filter(([, value]) => value)
-    .map(([key]) => key)
-    .join(" ");
+  return result.substring(0, result.length - 1);
 }

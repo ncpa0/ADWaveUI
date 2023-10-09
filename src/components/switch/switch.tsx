@@ -24,12 +24,18 @@ export class GSwitchElement extends Element {
   @Attribute()
   accessor name: string = "";
 
-  private onClick = (e: Event) => {
+  private handleClick = (e: Event) => {
     e.stopPropagation();
     if (this.disabled) return;
 
     this.active = !this.active;
     this.dispatchEvent(new SwitchChangeEvent(this.active));
+  };
+
+  private handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === " ") {
+      this.handleClick(e);
+    }
   };
 
   render() {
@@ -40,7 +46,12 @@ export class GSwitchElement extends Element {
           disabled: this.disabled,
           active: this.active,
         })}
-        onclick={this.onClick}
+        onclick={this.handleClick}
+        onkeydown={this.handleKeyDown}
+        tabindex="0"
+        role="switch"
+        aria-checked={this.active}
+        aria-disabled={this.disabled ? "true" : "false"}
       >
         <div class={Switch.knob}></div>
         <input
@@ -49,7 +60,7 @@ export class GSwitchElement extends Element {
           disabled={this.disabled}
           checked={this.active}
           name={this.name}
-          onclick={this.onClick}
+          onclick={this.handleClick}
         />
       </div>
     );

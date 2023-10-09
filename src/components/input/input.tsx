@@ -1,4 +1,4 @@
-import { Autocomplete, Input } from "gtk-css-web";
+import { Suggestions, Input } from "gtk-css-web";
 import { Attribute, CustomElement, State } from "jsxte-wc";
 import { InputType } from "jsxte/dist/types/jsx/prop-types/input-jsx-props";
 import { BaseElement } from "../../base-elements";
@@ -6,6 +6,7 @@ import { cls } from "../../utils/cls";
 import { forceClassName } from "../../utils/force-class-name";
 import { preventDefault } from "../../utils/prevent-default";
 import "./input.css";
+import { fuzzyCmp } from "../../utils/fuzzy-search";
 
 @CustomElement("g-input")
 export class GInputElement extends BaseElement {
@@ -37,10 +38,16 @@ export class GInputElement extends BaseElement {
   accessor alertLabel: string | undefined = undefined;
 
   @Attribute()
-  accessor autocomplete: string | undefined = undefined;
+  accessor suggestions: string | undefined = undefined;
 
   @Attribute({ type: "boolean" })
-  accessor autocompleteShowAll: boolean = false;
+  accessor suggestionsShowAll: boolean = false;
+
+  @Attribute()
+  accessor suggestionsOrientation: string = "down";
+
+  @Attribute({ type: "boolean" })
+  accessor fuzzy: boolean = false;
 
   @State()
   accessor availableOptions: string[] = [];
@@ -49,7 +56,7 @@ export class GInputElement extends BaseElement {
   accessor selectedOption: number = 0;
 
   @State()
-  accessor isAutocompleteOpen = false;
+  accessor isSuggestionsOpen = false;
 
   constructor() {
     super();
@@ -61,25 +68,21 @@ export class GInputElement extends BaseElement {
     this.immediateEffect(
       () => {
         this.availableOptions = this.getMatchingOptions();
+        this.selectedOption = 0;
       },
-      (s) => [
-        s.inputValue,
-        s.autocomplete,
-        s.autocompleteShowAll,
-        s.inputValue,
-      ],
+      (s) => [s.inputValue, s.suggestions, s.suggestionsShowAll],
     );
 
     this.immediateEffect(
       () => {
         this.selectedOption = 0;
       },
-      (s) => [s.isAutocompleteOpen],
+      (s) => [s.isSuggestionsOpen],
     );
 
     this.effect(
       () => {
-        if (this.isAutocompleteOpen) {
+        if (this.isSuggestionsOpen) {
           this.scrollActiveToView();
         }
       },
@@ -87,60 +90,64 @@ export class GInputElement extends BaseElement {
     );
   }
 
-  getMatchingOptions(): string[] {
-    if (this.autocomplete == null) {
+  private search(options: string[], query: string): string[] {
+    const results: string[] = [];
+
+    for (let i = 0; i < options.length; i++) {
+      const option = options[i]!;
+      if (option.startsWith(query)) {
+        results.push(option);
+      }
+    }
+
+    return results;
+  }
+
+  private fuzzySearch(options: string[], query: string): string[] {
+    const results: string[] = [];
+
+    for (let i = 0; i < options.length; i++) {
+      const option = options[i]!;
+      if (fuzzyCmp(query, option)) {
+        results.push(option);
+      }
+    }
+
+    return results;
+  }
+
+  private getMatchingOptions(): string[] {
+    if (this.suggestions == null) {
       return [];
     }
 
-    const options = this.autocomplete
-      .split(";")
-      .map((opt) => opt.toLowerCase());
+    let options = this.suggestions.split(";");
 
-    if (this.autocompleteShowAll) {
+    for (let i = 0; i < options.length; i++) {
+      options[i] = options[i]!.toLowerCase();
+    }
+
+    if (this.suggestionsShowAll) {
       return options;
     }
 
     const value = this.inputValue?.toLowerCase();
 
-    if (!value) {
+    if (value == null) {
       return options;
     }
 
-    const containsSubString = (
-      str: string,
-      lookFor: string,
-    ): boolean => {
-      const substr1 = lookFor.substring(1, lookFor.length - 1);
-      const substr2 = lookFor.substring(0, lookFor.length - 2);
-
-      return str.includes(substr1) || str.includes(substr2);
-    };
-
-    const resultsPrio1: string[] = [];
-    const resultsPrio2: string[] = [];
-    const resultsPrio3: string[] = [];
-
-    for (const option of options) {
-      if (option === value) {
-        continue;
-      }
-
-      if (option.startsWith(value)) {
-        resultsPrio1.push(option);
-      } else if (option.includes(value)) {
-        resultsPrio2.push(option);
-      }
-      // else if (containsSubString(value, option)) {
-      //   resultsPrio3.push(option);
-      // }
+    if (this.fuzzy) {
+      return this.fuzzySearch(options, value);
+    } else {
+      return this.search(options, value);
     }
-
-    return resultsPrio1.concat(resultsPrio2).concat(resultsPrio3);
   }
 
-  scrollActiveToView() {
+  private lastScrollIntoView = 0;
+  private scrollActiveToView() {
     const autocomplete = this.querySelector(
-      `.${Autocomplete.autocomplete}`,
+      `.${Suggestions.suggestions}`,
     );
 
     if (autocomplete == null) {
@@ -148,7 +155,7 @@ export class GInputElement extends BaseElement {
     }
 
     const activeOption = autocomplete?.querySelector(
-      `.${Autocomplete.active}`,
+      `.${Suggestions.active}`,
     ) as HTMLElement;
 
     if (activeOption == null) {
@@ -162,111 +169,155 @@ export class GInputElement extends BaseElement {
       activeOptionRect.top < autocompleteRect.top ||
       activeOptionRect.bottom > autocompleteRect.bottom
     ) {
-      activeOption.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-      });
+      const now = Date.now();
+
+      if (now - this.lastScrollIntoView > 100) {
+        activeOption.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+        });
+      } else {
+        activeOption.scrollIntoView({
+          behavior: "instant",
+          block: "nearest",
+        });
+      }
+
+      this.lastScrollIntoView = now;
     }
   }
 
-  Completions = () => {
+  private Suggestions = () => {
     if (
-      this.autocomplete == null ||
+      this.suggestions == null ||
       this.availableOptions.length === 0 ||
-      this.isAutocompleteOpen === false
+      this.isSuggestionsOpen === false
     ) {
       return <></>;
     }
 
+    const reversed = this.suggestionsOrientation == "up";
+
+    const options = this.availableOptions.map((option, idx) => {
+      return (
+        <div
+          data-opt={idx}
+          class={cls({
+            [Suggestions.option]: true,
+            [Suggestions.active]: idx === this.selectedOption,
+          })}
+          onclick={this.handleOptionClick}
+          onmousedown={preventDefault}
+        >
+          <span
+            data-opt={idx}
+            class="text"
+          >
+            {option}
+          </span>
+        </div>
+      );
+    });
+
+    if (reversed) {
+      options.reverse();
+    }
+
     return (
       <div
-        class={cls({
-          [Autocomplete.autocomplete]: true,
-          "autocomplete-options": true,
-        })}
+        class={cls([
+          {
+            [Suggestions.suggestions]: true,
+            "suggestions-options": true,
+          },
+          this.suggestionsOrientation === "up"
+            ? ["orientation-up", "top"]
+            : "orientation-down",
+        ])}
       >
-        {this.availableOptions.map((option, idx) => (
-          <div
-            data-opt={idx}
-            class={cls({
-              [Autocomplete.option]: true,
-              [Autocomplete.active]: idx === this.selectedOption,
-            })}
-            onclick={this.handleOptionClick}
-            onmousedown={preventDefault}
-          >
-            <span
-              data-opt={idx}
-              class="text"
-            >
-              {option}
-            </span>
-          </div>
-        ))}
+        {options}
       </div>
     );
   };
 
-  handleOptionClick = (ev: Event) => {
+  private handleOptionClick = (ev: Event) => {
     ev.preventDefault();
     const target = ev.target as HTMLElement;
     const idx = target.dataset.opt;
     if (idx) {
       this.inputValue = this.availableOptions[parseInt(idx!)];
-      this.isAutocompleteOpen = false;
+      this.isSuggestionsOpen = false;
     }
   };
 
-  handleChange = (ev: Event) => {
+  private handleChange = (ev: Event) => {
     const inputElem = ev.target as HTMLInputElement;
     this.inputValue = inputElem.value;
   };
 
-  handleKeyPress = (ev: KeyboardEvent) => {
+  private selectNextOption() {
+    this.selectedOption = Math.max(0, this.selectedOption! - 1);
+  }
+
+  private selectPreviousOption() {
+    this.selectedOption = Math.min(
+      this.availableOptions.length - 1,
+      this.selectedOption! + 1,
+    );
+  }
+
+  private handleKeyPress = (ev: KeyboardEvent) => {
     switch (ev.key) {
-      case "ArrowDown":
-        if (this.isAutocompleteOpen) {
+      case "ArrowUp":
+        if (this.isSuggestionsOpen) {
           ev.preventDefault();
-          this.selectedOption = Math.min(
-            this.availableOptions.length - 1,
-            this.selectedOption! + 1,
-          );
+          if (this.suggestionsOrientation == "up") {
+            this.selectPreviousOption();
+          } else {
+            this.selectNextOption();
+          }
         }
         break;
-      case "ArrowUp":
-        if (this.isAutocompleteOpen) {
+      case "ArrowDown":
+        if (this.isSuggestionsOpen) {
           ev.preventDefault();
-          this.selectedOption = Math.max(0, this.selectedOption! - 1);
+          if (this.suggestionsOrientation == "up") {
+            this.selectNextOption();
+          } else {
+            this.selectPreviousOption();
+          }
         }
         break;
       case "Enter":
-        if (this.isAutocompleteOpen) {
+        if (this.isSuggestionsOpen) {
           ev.preventDefault();
-          this.inputValue =
-            this.availableOptions[this.selectedOption];
-          this.isAutocompleteOpen = false;
+          const opt = this.availableOptions[this.selectedOption];
+          if (opt) {
+            this.inputValue = opt;
+            this.isSuggestionsOpen = false;
+          }
         }
         break;
       case "Backspace":
-        this.isAutocompleteOpen = true;
+        this.isSuggestionsOpen = true;
         break;
       case "Escape":
-        if (this.isAutocompleteOpen) {
+        if (this.isSuggestionsOpen) {
           ev.preventDefault();
-          this.isAutocompleteOpen = false;
+          this.isSuggestionsOpen = false;
         }
         break;
     }
   };
 
-  handleFocus = () => {
+  private handleFocus = () => {
     if (this.availableOptions.length) {
-      this.isAutocompleteOpen = true;
+      this.isSuggestionsOpen = true;
     }
   };
 
-  handleBlur = () => {
-    this.isAutocompleteOpen = false;
+  private handleBlur = () => {
+    this.isSuggestionsOpen = false;
   };
 
   render() {
@@ -288,7 +339,7 @@ export class GInputElement extends BaseElement {
           minlength={this.minLength}
           maxlength={this.maxLength}
         ></input>
-        <this.Completions />
+        <this.Suggestions />
       </>
     );
   }
