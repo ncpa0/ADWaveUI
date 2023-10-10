@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@ncpa0cpl/nodepack": "^2.3.0",
-    "jsxte": "^3.1.1",
-    "jsxte-wc": "^1.0.0"
+    "jsxte": "^3.1.4",
+    "jsxte-wc": "^1.1.0"
   }
 }

@@ -22,8 +22,8 @@ class SliderChangeEvent extends CustomEvent<{ value: number }> {
   }
 }
 
-@CustomElement("g-slider")
-export class GSliderElement extends Element {
+@CustomElement("adw-slider")
+export class ADWaveSliderElement extends Element {
   @Attribute({ type: "number" })
   accessor value: number = 0;
 
@@ -178,7 +178,7 @@ export class GSliderElement extends Element {
         ></div>
         <input
           type="range"
-          class="_g_hidden"
+          class="_adw_hidden"
           disabled={this.disabled}
           name={this.name}
           min={this.min}

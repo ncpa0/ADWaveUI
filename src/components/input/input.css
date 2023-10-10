@@ -1,33 +1,38 @@
-g-input {
+adw-input {
   position: relative;
   display: flex;
 }
 
-g-input .input-msg-box {
+adw-input input {
+  width: 100%;
+}
+
+adw-input .input-msg-box {
   margin: 0.2em 0px 0px 0.5em;
 }
 
-g-input .input-msg-box span {
+adw-input .input-msg-box span {
   font-size: 0.7em;
 }
 
-g-input .suggestions-options {
+adw-input .suggestions-options {
   position: absolute;
   left: 0px;
   right: 0px;
-  max-height: 8em;
+  max-height: min(16em, 80vh);
   overflow-y: scroll;
   font-size: 0.8em;
+  z-index: 10;
 }
 
-g-input .suggestions-options.orientation-down {
+adw-input .suggestions-options.orientation-down {
   top: calc(100% - 0.6em);
 }
 
-g-input .suggestions-options.orientation-up {
+adw-input .suggestions-options.orientation-up {
   bottom: calc(100% - 0.45em);
 }
 
-g-input .suggestions-options * {
+adw-input .suggestions-options * {
   cursor: pointer;
 }

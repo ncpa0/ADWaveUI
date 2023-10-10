@@ -1,0 +1,46 @@
+adw-selector {
+  display: flex;
+}
+
+adw-selector .selector {
+  flex: 1;
+}
+
+adw-selector .selector .options-list {
+  display: none;
+  z-index: 10;
+  max-height: min(20em, 80vh);
+  overflow-y: scroll;
+}
+
+adw-selector .selector.opened .options-list {
+  display: flex;
+}
+
+adw-selector dialog {
+  border: unset;
+  margin: unset;
+  background: transparent;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+adw-selector dialog[open] {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+adw-selector .selector dialog .options-list {
+  margin: unset;
+  padding: 0.4em;
+  width: calc(100% - 0.8em);
+  max-height: calc(100% - 0.8em);
+  font-size: 1.35em;
+}
+
+adw-selector dialog .option {
+  padding: 0.5em;
+}

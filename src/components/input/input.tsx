@@ -8,8 +8,8 @@ import { preventDefault } from "../../utils/prevent-default";
 import "./input.css";
 import { fuzzyCmp } from "../../utils/fuzzy-search";
 
-@CustomElement("g-input")
-export class GInputElement extends BaseElement {
+@CustomElement("adw-input")
+export class ADWaveInputElement extends BaseElement {
   @Attribute()
   accessor inputValue: string | undefined = undefined;
 
@@ -18,6 +18,9 @@ export class GInputElement extends BaseElement {
 
   @Attribute()
   accessor name: string | undefined = undefined;
+
+  @Attribute()
+  accessor form: string | undefined = undefined;
 
   @Attribute()
   accessor type: InputType = "text";
@@ -335,6 +338,7 @@ export class GInputElement extends BaseElement {
           value={this.inputValue}
           disabled={this.disabled}
           name={this.name}
+          form={this.form}
           placeholder={this.placeholder}
           minlength={this.minLength}
           maxlength={this.maxLength}

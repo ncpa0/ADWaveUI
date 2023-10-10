@@ -13,8 +13,8 @@ class SwitchChangeEvent extends CustomEvent<{ active: boolean }> {
   }
 }
 
-@CustomElement("g-switch")
-export class GSwitchElement extends Element {
+@CustomElement("adw-switch")
+export class ADWaveSwitchElement extends Element {
   @Attribute({ type: "boolean" })
   accessor active: boolean = false;
 
@@ -22,7 +22,10 @@ export class GSwitchElement extends Element {
   accessor disabled: boolean = false;
 
   @Attribute()
-  accessor name: string = "";
+  accessor name: string | undefined = undefined;
+
+  @Attribute()
+  accessor form: string | undefined = undefined;
 
   private handleClick = (e: Event) => {
     e.stopPropagation();
@@ -56,10 +59,11 @@ export class GSwitchElement extends Element {
         <div class={Switch.knob}></div>
         <input
           type="checkbox"
-          class="_g_hidden"
+          class="_adw_hidden"
           disabled={this.disabled}
           checked={this.active}
           name={this.name}
+          form={this.form}
           onclick={this.handleClick}
         />
       </div>
