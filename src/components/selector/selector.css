@@ -6,6 +6,10 @@ adw-selector .selector {
   flex: 1;
 }
 
+adw-selector .selected-option.with-placeholder {
+  opacity: 0.4;
+}
+
 adw-selector .selector .options-list {
   display: none;
   z-index: 10;

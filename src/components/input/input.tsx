@@ -1,5 +1,10 @@
 import { Suggestions, Input } from "gtk-css-web";
-import { Attribute, CustomElement, State } from "jsxte-wc";
+import {
+  Attribute,
+  CustomElement,
+  ElementLifecycleEvent,
+  State,
+} from "jsxte-wc";
 import { InputType } from "jsxte/dist/types/jsx/prop-types/input-jsx-props";
 import { BaseElement } from "../../base-elements";
 import { cls } from "../../utils/cls";
@@ -7,6 +12,7 @@ import { forceClassName } from "../../utils/force-class-name";
 import { preventDefault } from "../../utils/prevent-default";
 import "./input.css";
 import { fuzzyCmp } from "../../utils/fuzzy-search";
+import { getUid } from "../../utils/get-uid";
 
 @CustomElement("adw-input")
 export class ADWaveInputElement extends BaseElement {
@@ -61,10 +67,14 @@ export class ADWaveInputElement extends BaseElement {
   @State()
   accessor isSuggestionsOpen = false;
 
+  private uid = getUid();
+
   constructor() {
     super();
 
-    forceClassName(this, Input.wrapper);
+    this.lifecycle.once(ElementLifecycleEvent.WillMount, () => {
+      forceClassName(this, Input.wrapper);
+    });
 
     this.availableOptions = this.getMatchingOptions();
 
@@ -190,59 +200,6 @@ export class ADWaveInputElement extends BaseElement {
     }
   }
 
-  private Suggestions = () => {
-    if (
-      this.suggestions == null ||
-      this.availableOptions.length === 0 ||
-      this.isSuggestionsOpen === false
-    ) {
-      return <></>;
-    }
-
-    const reversed = this.suggestionsOrientation == "up";
-
-    const options = this.availableOptions.map((option, idx) => {
-      return (
-        <div
-          data-opt={idx}
-          class={cls({
-            [Suggestions.option]: true,
-            [Suggestions.active]: idx === this.selectedOption,
-          })}
-          onclick={this.handleOptionClick}
-          onmousedown={preventDefault}
-        >
-          <span
-            data-opt={idx}
-            class="text"
-          >
-            {option}
-          </span>
-        </div>
-      );
-    });
-
-    if (reversed) {
-      options.reverse();
-    }
-
-    return (
-      <div
-        class={cls([
-          {
-            [Suggestions.suggestions]: true,
-            "suggestions-options": true,
-          },
-          this.suggestionsOrientation === "up"
-            ? ["orientation-up", "top"]
-            : "orientation-down",
-        ])}
-      >
-        {options}
-      </div>
-    );
-  };
-
   private handleOptionClick = (ev: Event) => {
     ev.preventDefault();
     const target = ev.target as HTMLElement;
@@ -258,14 +215,14 @@ export class ADWaveInputElement extends BaseElement {
     this.inputValue = inputElem.value;
   };
 
-  private selectNextOption() {
-    this.selectedOption = Math.max(0, this.selectedOption! - 1);
+  private selectNextOption(offset = 1) {
+    this.selectedOption = Math.max(0, this.selectedOption! - offset);
   }
 
-  private selectPreviousOption() {
+  private selectPreviousOption(offset = 1) {
     this.selectedOption = Math.min(
       this.availableOptions.length - 1,
-      this.selectedOption! + 1,
+      this.selectedOption! + offset,
     );
   }
 
@@ -288,6 +245,50 @@ export class ADWaveInputElement extends BaseElement {
             this.selectNextOption();
           } else {
             this.selectPreviousOption();
+          }
+        }
+        break;
+      case "PageUp":
+        if (this.isSuggestionsOpen) {
+          ev.preventDefault();
+          if (this.suggestionsOrientation == "up") {
+            this.selectPreviousOption(8);
+          } else {
+            this.selectNextOption(8);
+          }
+        }
+        break;
+      case "PageDown":
+        if (this.isSuggestionsOpen) {
+          ev.preventDefault();
+          if (this.suggestionsOrientation == "up") {
+            this.selectNextOption(8);
+          } else {
+            this.selectPreviousOption(8);
+          }
+        }
+        break;
+      case "Home":
+        if (this.isSuggestionsOpen) {
+          ev.preventDefault();
+          if (this.suggestionsOrientation == "up") {
+            this.selectPreviousOption(
+              this.availableOptions.length - 1,
+            );
+          } else {
+            this.selectNextOption(this.availableOptions.length - 1);
+          }
+        }
+        break;
+      case "End":
+        if (this.isSuggestionsOpen) {
+          ev.preventDefault();
+          if (this.suggestionsOrientation == "up") {
+            this.selectNextOption(this.availableOptions.length - 1);
+          } else {
+            this.selectPreviousOption(
+              this.availableOptions.length - 1,
+            );
           }
         }
         break;
@@ -323,6 +324,64 @@ export class ADWaveInputElement extends BaseElement {
     this.isSuggestionsOpen = false;
   };
 
+  private Suggestions = () => {
+    if (
+      this.suggestions == null ||
+      this.availableOptions.length === 0 ||
+      this.isSuggestionsOpen === false
+    ) {
+      return <></>;
+    }
+
+    const reversed = this.suggestionsOrientation == "up";
+
+    const options = this.availableOptions.map((option, idx) => {
+      const isActive = idx === this.selectedOption;
+      return (
+        <div
+          data-opt={idx}
+          class={cls({
+            [Suggestions.option]: true,
+            [Suggestions.active]: isActive,
+          })}
+          onclick={this.handleOptionClick}
+          onmousedown={preventDefault}
+          role="option"
+          aria-selected={isActive}
+        >
+          <span
+            data-opt={idx}
+            class="text"
+          >
+            {option}
+          </span>
+        </div>
+      );
+    });
+
+    if (reversed) {
+      options.reverse();
+    }
+
+    return (
+      <div
+        id={this.uid}
+        class={cls([
+          {
+            [Suggestions.suggestions]: true,
+            "suggestions-options": true,
+          },
+          this.suggestionsOrientation === "up"
+            ? ["orientation-up", "top"]
+            : "orientation-down",
+        ])}
+        role="listbox"
+      >
+        {options}
+      </div>
+    );
+  };
+
   render() {
     return (
       <>
@@ -342,6 +401,12 @@ export class ADWaveInputElement extends BaseElement {
           placeholder={this.placeholder}
           minlength={this.minLength}
           maxlength={this.maxLength}
+          aria-placeholder={this.placeholder}
+          aria-label={this.placeholder}
+          aria-invalid={this.errorLabel != null}
+          aria-haspopup="listbox"
+          aria-expanded={this.isSuggestionsOpen}
+          aria-controls={this.uid}
         ></input>
         <this.Suggestions />
       </>

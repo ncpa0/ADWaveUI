@@ -9,6 +9,7 @@ import { cls } from "../../utils/cls";
 import { changeWithStep, clamp, toPrecision } from "../../utils/math";
 import { createRef } from "../../utils/ref";
 import "./slider.css";
+import { BaseElement } from "../../base-elements";
 
 const preventDefault = (e: Event) => e.preventDefault();
 
@@ -23,7 +24,7 @@ class SliderChangeEvent extends CustomEvent<{ value: number }> {
 }
 
 @CustomElement("adw-slider")
-export class ADWaveSliderElement extends Element {
+export class ADWaveSliderElement extends BaseElement {
   @Attribute({ type: "number" })
   accessor value: number = 0;
 
@@ -53,6 +54,17 @@ export class ADWaveSliderElement extends Element {
     super();
 
     this.lifecycle.once(ElementLifecycleEvent.DidMount, () => {
+      if (document) {
+        window.addEventListener(
+          "pointerup",
+          this.handlePointerEventUp,
+        );
+        window.addEventListener(
+          "pointermove",
+          this.handlePointerEventMove,
+        );
+      }
+
       this.moveThumb(this.value);
     });
   }
@@ -113,7 +125,7 @@ export class ADWaveSliderElement extends Element {
     }
   };
 
-  handleKeyUp = (e: KeyboardEvent) => {
+  handleKeyDown = (e: KeyboardEvent) => {
     if (this.disabled) return;
 
     switch (e.key) {
@@ -126,17 +138,6 @@ export class ADWaveSliderElement extends Element {
     }
   };
 
-  connectedCallback() {
-    super.connectedCallback();
-    if (document) {
-      window.addEventListener("pointerup", this.handlePointerEventUp);
-      window.addEventListener(
-        "pointermove",
-        this.handlePointerEventMove,
-      );
-    }
-  }
-
   render() {
     return (
       <div
@@ -148,7 +149,7 @@ export class ADWaveSliderElement extends Element {
         onpointerdown={this.handlePointerDown}
         onpointermove={preventDefault}
         ondrag={preventDefault}
-        onkeyup={this.handleKeyUp}
+        onkeydown={this.handleKeyDown}
         tabindex="0"
         role="slider"
         aria-valuemin={this.min.toString()}
@@ -185,6 +186,7 @@ export class ADWaveSliderElement extends Element {
           max={this.max}
           step={this.step.toString()}
           value={this.value.toString()}
+          aria-hidden="true"
         />
       </div>
     );

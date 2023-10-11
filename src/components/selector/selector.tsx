@@ -9,6 +9,7 @@ import { cls } from "../../utils/cls";
 import { Selector } from "gtk-css-web";
 import { BaseElement } from "../../base-elements";
 import "./selector.css";
+import { getUid } from "../../utils/get-uid";
 
 type Ref<T> = { current: T | null };
 
@@ -27,6 +28,9 @@ const IS_MOBILE =
 
 @CustomElement("adw-selector")
 export class ADWaveSelector extends BaseElement {
+  @Attribute()
+  accessor placeholder: string | undefined = undefined;
+
   @Attribute({ type: "boolean" })
   accessor disabled: boolean | undefined = undefined;
 
@@ -36,20 +40,45 @@ export class ADWaveSelector extends BaseElement {
   @Attribute()
   accessor form: string | undefined = undefined;
 
+  @Attribute()
+  accessor orientation: string = "down";
+
   @State()
   accessor isOpen: boolean = false;
 
   @State()
   accessor currentOption: string | undefined = undefined;
 
-  @Slotted()
-  accessor slots: ADWaveSelectorOption[] = [];
+  @Slotted({ filter: "adw-option" })
+  accessor options: ADWaveSelectorOption[] = [];
 
+  private uid = getUid();
   private dialogElem: Ref<HTMLDialogElement> = { current: null };
   private optionsListElem: Ref<HTMLDivElement> = { current: null };
 
   constructor() {
     super();
+
+    this.effect(
+      () => {
+        const optionsList = this.optionsListElem.current;
+        if (optionsList) {
+          const reverse = this.orientation === "up";
+          if (reverse) {
+            optionsList.scrollTo({
+              top: optionsList.scrollHeight,
+              behavior: "instant",
+            });
+          } else {
+            optionsList.scrollTo({
+              top: 0,
+              behavior: "instant",
+            });
+          }
+        }
+      },
+      (s) => [s.isOpen],
+    );
 
     this.effect(
       () => {
@@ -72,6 +101,52 @@ export class ADWaveSelector extends BaseElement {
       },
       (s) => [s.isOpen],
     );
+  }
+
+  private focusSelf() {
+    // @ts-expect-error
+    this.querySelector(`.${Selector.selector}`)?.focus();
+  }
+
+  private focusOption(offset: number) {
+    const options = this.optionsListElem.current;
+
+    if (!options) {
+      return;
+    }
+
+    const currentOption = options.querySelector(
+      `.${Selector.option}:focus`,
+    ) as HTMLButtonElement | undefined;
+
+    if (!currentOption) {
+      if (this.isOpen) {
+        const reverse = this.orientation === "up";
+        const firstOption = options.querySelector(
+          reverse
+            ? `.${Selector.option}:last-child`
+            : `.${Selector.option}:first-child`,
+        ) as HTMLButtonElement | undefined;
+        firstOption?.focus();
+      }
+      return;
+    }
+
+    let target = currentOption;
+
+    const direction =
+      offset > 0 ? "nextElementSibling" : "previousElementSibling";
+    for (let i = 0; i < Math.abs(offset); i++) {
+      const next = target[direction] as HTMLButtonElement | undefined;
+      if (!next) {
+        break;
+      }
+      target = next;
+    }
+
+    if (target) {
+      target.focus();
+    }
   }
 
   private handleClick = (e: MouseEvent) => {
@@ -111,6 +186,7 @@ export class ADWaveSelector extends BaseElement {
       this.currentOption = option;
       dialog?.close();
       this.isOpen = false;
+      this.focusSelf();
     }
   };
 
@@ -123,24 +199,92 @@ export class ADWaveSelector extends BaseElement {
       return;
     }
 
-    if (e.key === " ") {
-      if (!this.isOpen) {
-        this.dialogElem.current?.showModal();
-        this.isOpen = true;
-      } else {
-        this.dialogElem.current?.close();
-        this.isOpen = false;
+    switch (e.key) {
+      case " ":
+      case "Enter": {
+        if (!this.isOpen) {
+          this.dialogElem.current?.showModal();
+          this.isOpen = true;
+        } else {
+          const target = e.target as HTMLElement;
+          if ((target as HTMLElement).tagName === "BUTTON") {
+            if (e.key === "Enter") target.click();
+          } else {
+            this.dialogElem.current?.close();
+            this.isOpen = false;
+          }
+        }
+        e.preventDefault();
+        e.stopPropagation();
+        break;
       }
-      e.preventDefault();
-      e.stopPropagation();
+      case "ArrowUp": {
+        this.focusOption(-1);
+        e.preventDefault();
+        e.stopPropagation();
+        break;
+      }
+      case "ArrowDown": {
+        this.focusOption(+1);
+        e.preventDefault();
+        e.stopPropagation();
+        break;
+      }
+      case "PageUp": {
+        this.focusOption(-10);
+        e.preventDefault();
+        e.stopPropagation();
+        break;
+      }
+      case "PageDown": {
+        this.focusOption(+10);
+        e.preventDefault();
+        e.stopPropagation();
+        break;
+      }
+      case "Home": {
+        this.focusOption(-this.options.length);
+        e.preventDefault();
+        e.stopPropagation();
+        break;
+      }
+      case "End": {
+        this.focusOption(+this.options.length);
+        e.preventDefault();
+        e.stopPropagation();
+        break;
+      }
+      case "Escape": {
+        if (this.isOpen) {
+          this.isOpen = false;
+          this.focusSelf();
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        break;
+      }
     }
   };
 
   private getSelectedOption() {
-    return this.slots.find((option) =>
+    return this.options.find((option) =>
       option.isEqualTo(this.currentOption),
     );
   }
+
+  private Option = (props: { option: ADWaveSelectorOption }) => {
+    return (
+      <button
+        class={Selector.option}
+        onclick={this.handleOptionClick}
+        data-option={props.option.getValue()}
+        role="option"
+        aria-selected={props.option.isEqualTo(this.currentOption)}
+      >
+        {props.option.getLabel()}
+      </button>
+    );
+  };
 
   private OptionsListMobile = () => {
     return (
@@ -150,42 +294,40 @@ export class ADWaveSelector extends BaseElement {
         oncancel={this.handleModalCancel}
       >
         <div
+          id={this.uid}
           class={cls([Selector.optionsList, Selector.noPosition])}
           ref={this.optionsListElem}
+          role="listbox"
         >
-          {this.slots.map((option, index) => {
-            return (
-              <button
-                class={Selector.option}
-                onclick={this.handleOptionClick}
-                data-option={option.getValue()}
-              >
-                {option.getLabel()}
-              </button>
-            );
-          })}
+          {this.options.map((option) => (
+            <this.Option option={option} />
+          ))}
         </div>
       </dialog>
     );
   };
 
   private OptionsListDesktop = () => {
+    const reverse = this.orientation === "up";
+
+    let options = this.options;
+
+    if (reverse) {
+      options = options.toReversed();
+    }
+
     return (
       <div
-        class={Selector.optionsList}
+        id={this.uid}
+        class={cls({
+          [Selector.optionsList]: true,
+          [Selector.top]: reverse,
+        })}
         ref={this.optionsListElem}
       >
-        {this.slots.map((option, index) => {
-          return (
-            <button
-              class={Selector.option}
-              onclick={this.handleOptionClick}
-              data-option={option.getValue()}
-            >
-              {option.getLabel()}
-            </button>
-          );
-        })}
+        {options.map((option) => (
+          <this.Option option={option} />
+        ))}
       </div>
     );
   };
@@ -197,13 +339,14 @@ export class ADWaveSelector extends BaseElement {
         name={this.name}
         form={this.form}
         disabled={this.disabled}
+        aria-hidden="true"
       >
-        {this.slots.map((option, index) => {
+        {this.options.map((option, index) => {
           return (
             <option
               value={option.getValue()}
               selected={option.isEqualTo(this.currentOption)}
-            ></option>
+            />
           );
         })}
       </select>
@@ -211,6 +354,7 @@ export class ADWaveSelector extends BaseElement {
   };
 
   render() {
+    const label = this.getSelectedOption()?.getLabel();
     return (
       <div
         class={cls({
@@ -221,9 +365,19 @@ export class ADWaveSelector extends BaseElement {
         onclick={this.handleClick}
         onkeydown={this.handleKeyDown}
         tabindex="0"
+        role="combobox"
+        aria-haspopup="listbox"
+        aria-expanded={this.isOpen}
+        aria-controls={this.uid}
+        aria-placeholder={this.placeholder}
       >
-        <span class={Selector.selectedOption}>
-          {this.getSelectedOption()?.getLabel() ?? ""}
+        <span
+          class={cls({
+            [Selector.selectedOption]: true,
+            "with-placeholder": !label,
+          })}
+        >
+          {label ? label : this.placeholder}
         </span>
         <span class={Selector.downButton}></span>
         {IS_MOBILE ? (

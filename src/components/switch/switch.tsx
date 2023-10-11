@@ -2,6 +2,7 @@ import { Switch } from "gtk-css-web";
 import { Attribute, CustomElement, Element } from "jsxte-wc";
 import { cls } from "../../utils/cls";
 import "./switch.css";
+import { BaseElement } from "../../base-elements";
 
 class SwitchChangeEvent extends CustomEvent<{ active: boolean }> {
   constructor(active: boolean) {
@@ -14,7 +15,7 @@ class SwitchChangeEvent extends CustomEvent<{ active: boolean }> {
 }
 
 @CustomElement("adw-switch")
-export class ADWaveSwitchElement extends Element {
+export class ADWaveSwitchElement extends BaseElement {
   @Attribute({ type: "boolean" })
   accessor active: boolean = false;
 
@@ -65,6 +66,7 @@ export class ADWaveSwitchElement extends Element {
           name={this.name}
           form={this.form}
           onclick={this.handleClick}
+          aria-hidden="true"
         />
       </div>
     );
