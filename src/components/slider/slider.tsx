@@ -2,14 +2,34 @@ import { Slider } from "gtk-css-web";
 import {
   Attribute,
   CustomElement,
-  Element,
   ElementLifecycleEvent,
 } from "jsxte-wc";
+import { BaseElement } from "../../base-elements";
 import { cls } from "../../utils/cls";
 import { changeWithStep, clamp, toPrecision } from "../../utils/math";
 import { createRef } from "../../utils/ref";
 import "./slider.css";
-import { BaseElement } from "../../base-elements";
+
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      "adw-slider": {
+        class?: string;
+        id?: string;
+        slot?: string;
+        style?: string;
+        value?: number;
+        min?: number;
+        max?: number;
+        step?: number;
+        precision?: number;
+        disabled?: boolean;
+        name?: string;
+        form?: string;
+      };
+    }
+  }
+}
 
 const preventDefault = (e: Event) => e.preventDefault();
 
@@ -45,6 +65,9 @@ export class ADWaveSliderElement extends BaseElement {
 
   @Attribute()
   accessor name: string | undefined = undefined;
+
+  @Attribute()
+  accessor form: string | undefined = undefined;
 
   private progress = createRef<HTMLDivElement>();
   private thumb = createRef<HTMLDivElement>();
@@ -182,6 +205,7 @@ export class ADWaveSliderElement extends BaseElement {
           class="_adw_hidden"
           disabled={this.disabled}
           name={this.name}
+          form={this.form}
           min={this.min}
           max={this.max}
           step={this.step.toString()}

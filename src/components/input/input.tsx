@@ -1,4 +1,4 @@
-import { Suggestions, Input } from "gtk-css-web";
+import { Input, Suggestions } from "gtk-css-web";
 import {
   Attribute,
   CustomElement,
@@ -9,15 +9,42 @@ import { InputType } from "jsxte/dist/types/jsx/prop-types/input-jsx-props";
 import { BaseElement } from "../../base-elements";
 import { cls } from "../../utils/cls";
 import { forceClassName } from "../../utils/force-class-name";
-import { preventDefault } from "../../utils/prevent-default";
-import "./input.css";
 import { fuzzyCmp } from "../../utils/fuzzy-search";
 import { getUid } from "../../utils/get-uid";
+import { preventDefault } from "../../utils/prevent-default";
+import "./input.css";
+
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      "adw-input": {
+        class?: string;
+        id?: string;
+        slot?: string;
+        style?: string;
+        value?: string;
+        disabled?: boolean;
+        name?: string;
+        form?: string;
+        type?: InputType;
+        placeholder?: string;
+        minlength?: number;
+        maxlength?: number;
+        errorlabel?: string;
+        alertlabel?: string;
+        suggestions?: string;
+        suggestionsshowall?: boolean;
+        suggestionsorientation?: string;
+        fuzzy?: boolean;
+      };
+    }
+  }
+}
 
 @CustomElement("adw-input")
 export class ADWaveInputElement extends BaseElement {
   @Attribute()
-  accessor inputValue: string | undefined = undefined;
+  accessor value: string | undefined = undefined;
 
   @Attribute({ type: "boolean" })
   accessor disabled: boolean | undefined = undefined;
@@ -72,18 +99,18 @@ export class ADWaveInputElement extends BaseElement {
   constructor() {
     super();
 
+    this.availableOptions = this.getMatchingOptions();
+
     this.lifecycle.once(ElementLifecycleEvent.WillMount, () => {
       forceClassName(this, Input.wrapper);
     });
-
-    this.availableOptions = this.getMatchingOptions();
 
     this.immediateEffect(
       () => {
         this.availableOptions = this.getMatchingOptions();
         this.selectedOption = 0;
       },
-      (s) => [s.inputValue, s.suggestions, s.suggestionsShowAll],
+      (s) => [s.value, s.suggestions, s.suggestionsShowAll],
     );
 
     this.immediateEffect(
@@ -103,6 +130,11 @@ export class ADWaveInputElement extends BaseElement {
     );
   }
 
+  /**
+   * Performs a simple search through options with the provided query,
+   * if the option starts with the exact same string as the query, it
+   * is considered a match.
+   */
   private search(options: string[], query: string): string[] {
     const results: string[] = [];
 
@@ -116,6 +148,11 @@ export class ADWaveInputElement extends BaseElement {
     return results;
   }
 
+  /**
+   * Performs a fuzzy search through options with the provided query,
+   * if the option is similar enough to the query, it is considered a
+   * match.
+   */
   private fuzzySearch(options: string[], query: string): string[] {
     const results: string[] = [];
 
@@ -144,7 +181,7 @@ export class ADWaveInputElement extends BaseElement {
       return options;
     }
 
-    const value = this.inputValue?.toLowerCase();
+    const value = this.value?.toLowerCase();
 
     if (value == null) {
       return options;
@@ -158,16 +195,20 @@ export class ADWaveInputElement extends BaseElement {
   }
 
   private lastScrollIntoView = 0;
+
+  /**
+   * Scrolls into view the currently highlighted suggestion.
+   */
   private scrollActiveToView() {
-    const autocomplete = this.querySelector(
+    const suggestions = this.querySelector(
       `.${Suggestions.suggestions}`,
     );
 
-    if (autocomplete == null) {
+    if (suggestions == null) {
       return;
     }
 
-    const activeOption = autocomplete?.querySelector(
+    const activeOption = suggestions?.querySelector(
       `.${Suggestions.active}`,
     ) as HTMLElement;
 
@@ -175,7 +216,7 @@ export class ADWaveInputElement extends BaseElement {
       return;
     }
 
-    const autocompleteRect = autocomplete.getBoundingClientRect();
+    const autocompleteRect = suggestions.getBoundingClientRect();
     const activeOptionRect = activeOption.getBoundingClientRect();
 
     if (
@@ -184,6 +225,15 @@ export class ADWaveInputElement extends BaseElement {
     ) {
       const now = Date.now();
 
+      /**
+       * If the behavior is smooth and the arrow key is being held
+       * down, the scrolling won't happen until the key is released.
+       *
+       * In order to have smooth scrolling when the key is tapped, but
+       * also have instant scrolling when the key is held down, we
+       * check the time difference between the last scroll and the
+       * current scroll, and chose an appropriate behavior.
+       */
       if (now - this.lastScrollIntoView > 100) {
         activeOption.scrollIntoView({
           behavior: "smooth",
@@ -205,21 +255,21 @@ export class ADWaveInputElement extends BaseElement {
     const target = ev.target as HTMLElement;
     const idx = target.dataset.opt;
     if (idx) {
-      this.inputValue = this.availableOptions[parseInt(idx!)];
+      this.value = this.availableOptions[parseInt(idx!)];
       this.isSuggestionsOpen = false;
     }
   };
 
-  private handleChange = (ev: Event) => {
+  private handleInputChange = (ev: Event) => {
     const inputElem = ev.target as HTMLInputElement;
-    this.inputValue = inputElem.value;
+    this.value = inputElem.value;
   };
 
-  private selectNextOption(offset = 1) {
+  private highlightNextOption(offset = 1) {
     this.selectedOption = Math.max(0, this.selectedOption! - offset);
   }
 
-  private selectPreviousOption(offset = 1) {
+  private highlightPreviousOption(offset = 1) {
     this.selectedOption = Math.min(
       this.availableOptions.length - 1,
       this.selectedOption! + offset,
@@ -232,9 +282,9 @@ export class ADWaveInputElement extends BaseElement {
         if (this.isSuggestionsOpen) {
           ev.preventDefault();
           if (this.suggestionsOrientation == "up") {
-            this.selectPreviousOption();
+            this.highlightPreviousOption();
           } else {
-            this.selectNextOption();
+            this.highlightNextOption();
           }
         }
         break;
@@ -242,9 +292,9 @@ export class ADWaveInputElement extends BaseElement {
         if (this.isSuggestionsOpen) {
           ev.preventDefault();
           if (this.suggestionsOrientation == "up") {
-            this.selectNextOption();
+            this.highlightNextOption();
           } else {
-            this.selectPreviousOption();
+            this.highlightPreviousOption();
           }
         }
         break;
@@ -252,9 +302,9 @@ export class ADWaveInputElement extends BaseElement {
         if (this.isSuggestionsOpen) {
           ev.preventDefault();
           if (this.suggestionsOrientation == "up") {
-            this.selectPreviousOption(8);
+            this.highlightPreviousOption(8);
           } else {
-            this.selectNextOption(8);
+            this.highlightNextOption(8);
           }
         }
         break;
@@ -262,9 +312,9 @@ export class ADWaveInputElement extends BaseElement {
         if (this.isSuggestionsOpen) {
           ev.preventDefault();
           if (this.suggestionsOrientation == "up") {
-            this.selectNextOption(8);
+            this.highlightNextOption(8);
           } else {
-            this.selectPreviousOption(8);
+            this.highlightPreviousOption(8);
           }
         }
         break;
@@ -272,11 +322,13 @@ export class ADWaveInputElement extends BaseElement {
         if (this.isSuggestionsOpen) {
           ev.preventDefault();
           if (this.suggestionsOrientation == "up") {
-            this.selectPreviousOption(
+            this.highlightPreviousOption(
               this.availableOptions.length - 1,
             );
           } else {
-            this.selectNextOption(this.availableOptions.length - 1);
+            this.highlightNextOption(
+              this.availableOptions.length - 1,
+            );
           }
         }
         break;
@@ -284,9 +336,11 @@ export class ADWaveInputElement extends BaseElement {
         if (this.isSuggestionsOpen) {
           ev.preventDefault();
           if (this.suggestionsOrientation == "up") {
-            this.selectNextOption(this.availableOptions.length - 1);
+            this.highlightNextOption(
+              this.availableOptions.length - 1,
+            );
           } else {
-            this.selectPreviousOption(
+            this.highlightPreviousOption(
               this.availableOptions.length - 1,
             );
           }
@@ -297,7 +351,7 @@ export class ADWaveInputElement extends BaseElement {
           ev.preventDefault();
           const opt = this.availableOptions[this.selectedOption];
           if (opt) {
-            this.inputValue = opt;
+            this.value = opt;
             this.isSuggestionsOpen = false;
           }
         }
@@ -347,7 +401,6 @@ export class ADWaveInputElement extends BaseElement {
           onclick={this.handleOptionClick}
           onmousedown={preventDefault}
           role="option"
-          aria-selected={isActive}
         >
           <span
             data-opt={idx}
@@ -389,12 +442,12 @@ export class ADWaveInputElement extends BaseElement {
           class={cls({
             [Input.input]: true,
           })}
-          oninput={this.handleChange}
+          oninput={this.handleInputChange}
           onkeydown={this.handleKeyPress}
           onfocus={this.handleFocus}
           onblur={this.handleBlur}
           type={this.type}
-          value={this.inputValue}
+          value={this.value}
           disabled={this.disabled}
           name={this.name}
           form={this.form}

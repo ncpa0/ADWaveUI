@@ -1,3 +1,4 @@
+import { Selector } from "gtk-css-web";
 import {
   Attribute,
   CustomElement,
@@ -5,11 +6,10 @@ import {
   State,
   WcSlot,
 } from "jsxte-wc";
-import { cls } from "../../utils/cls";
-import { Selector } from "gtk-css-web";
 import { BaseElement } from "../../base-elements";
-import "./selector.css";
+import { cls } from "../../utils/cls";
 import { getUid } from "../../utils/get-uid";
+import "./selector.css";
 
 type Ref<T> = { current: T | null };
 
@@ -17,6 +17,22 @@ declare global {
   namespace JSXTE {
     interface DialogTagProps {
       oncancel?: (e: Event) => void;
+    }
+  }
+
+  namespace JSX {
+    interface IntrinsicElements {
+      "adw-selector": {
+        class?: string;
+        id?: string;
+        slot?: string;
+        style?: string;
+        placeholder?: string;
+        disabled?: boolean;
+        name?: string;
+        form?: string;
+        orientation?: string;
+      };
     }
   }
 }
@@ -59,8 +75,16 @@ export class ADWaveSelector extends BaseElement {
   constructor() {
     super();
 
+    /**
+     * When opening the selector, scroll into view to the first
+     * option.
+     */
     this.effect(
       () => {
+        if (!this.isOpen) {
+          return;
+        }
+
         const optionsList = this.optionsListElem.current;
         if (optionsList) {
           const reverse = this.orientation === "up";
@@ -80,6 +104,10 @@ export class ADWaveSelector extends BaseElement {
       (s) => [s.isOpen],
     );
 
+    /**
+     * For mobile devices, when clicking outside of the visible modal,
+     * close it.
+     */
     this.effect(
       () => {
         if (!IS_MOBILE && this.isOpen) {
@@ -101,6 +129,24 @@ export class ADWaveSelector extends BaseElement {
       },
       (s) => [s.isOpen],
     );
+
+    /**
+     * The list of <ADWaveSelectorOption> elements is the source of
+     * truth for the selector. Whenever that list changes update the
+     * currentOption to the first selected option.
+     */
+    this.immediateEffect(
+      () => {
+        const shouldSelectOpt = this.options.find((option) => {
+          return option.isSelected();
+        });
+
+        if (shouldSelectOpt) {
+          this.currentOption = shouldSelectOpt.getValue();
+        }
+      },
+      (s) => [s.options],
+    );
   }
 
   private focusSelf() {
@@ -108,6 +154,12 @@ export class ADWaveSelector extends BaseElement {
     this.querySelector(`.${Selector.selector}`)?.focus();
   }
 
+  /**
+   * Selects the option that is offset from the currently focused
+   * option. (e.g. focusOption(1) should select the option following
+   * the currently focused one whereas focusOption(-2) should select
+   * the second option that's behind the focused option)
+   */
   private focusOption(offset: number) {
     const options = this.optionsListElem.current;
 
@@ -149,6 +201,26 @@ export class ADWaveSelector extends BaseElement {
     }
   }
 
+  private select(optionValue?: string): boolean {
+    if (optionValue == null) {
+      return false;
+    }
+
+    let success = false;
+
+    for (let i = 0; i < this.options.length; i++) {
+      const option = this.options[i]!;
+      const isSelected = option.isEqualTo(optionValue);
+      option.setSelected(isSelected);
+
+      if (isSelected) {
+        success = true;
+      }
+    }
+
+    return success;
+  }
+
   private handleClick = (e: MouseEvent) => {
     if (this.disabled) {
       return;
@@ -164,8 +236,8 @@ export class ADWaveSelector extends BaseElement {
 
   private handleDialogClick = (e: MouseEvent) => {
     // close the modal if the click is outside the dialog
-    if (this.isOpen && this.dialogElem.current) {
-      const dialog = this.dialogElem.current;
+    const dialog = this.dialogElem.current;
+    if (this.isOpen && dialog) {
       if (!this.optionsListElem.current?.contains(e.target as Node)) {
         dialog.close();
         this.isOpen = false;
@@ -180,10 +252,16 @@ export class ADWaveSelector extends BaseElement {
     e.stopPropagation();
 
     const btn = e.target as HTMLButtonElement | undefined;
-    const { option } = btn?.dataset ?? {};
-    if (option) {
+    const { option: optValue } = btn?.dataset ?? {};
+
+    if (optValue == null) {
+      return;
+    }
+
+    const success = this.select(optValue);
+
+    if (success) {
       const dialog = this.dialogElem.current;
-      this.currentOption = option;
       dialog?.close();
       this.isOpen = false;
       this.focusSelf();
@@ -411,5 +489,13 @@ export class ADWaveSelectorOption extends WcSlot {
 
   getLabel() {
     return this.innerText;
+  }
+
+  setSelected(selected: boolean) {
+    this.setAttribute("selected", selected.toString());
+  }
+
+  isSelected() {
+    return this.getAttribute("selected") === "true";
   }
 }

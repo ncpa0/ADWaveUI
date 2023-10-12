@@ -1,8 +1,25 @@
 import { Switch } from "gtk-css-web";
-import { Attribute, CustomElement, Element } from "jsxte-wc";
+import { Attribute, CustomElement } from "jsxte-wc";
+import { BaseElement } from "../../base-elements";
 import { cls } from "../../utils/cls";
 import "./switch.css";
-import { BaseElement } from "../../base-elements";
+
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      "adw-switch": {
+        class?: string;
+        id?: string;
+        slot?: string;
+        style?: string;
+        active?: boolean;
+        disabled?: boolean;
+        name?: string;
+        form?: string;
+      };
+    }
+  }
+}
 
 class SwitchChangeEvent extends CustomEvent<{ active: boolean }> {
   constructor(active: boolean) {

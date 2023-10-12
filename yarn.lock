@@ -200,6 +200,11 @@
   resolved "https://registry.yarnpkg.com/@types/unist/-/unist-2.0.7.tgz#5b06ad6894b236a1d2bd6b2f07850ca5c59cf4d6"
   integrity sha512-cputDpIbFgLUaGQn6Vqg3/YsJwxUwHLO13v3i5ouxT4lat0khip9AEWxtERujXV9wxIB1EyF97BSJFt6vpdI8g==
 
+adwavecss@^0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/adwavecss/-/adwavecss-0.0.1.tgz#d9529b362f04243b4afc85e32a9859e5f4e21ef5"
+  integrity sha512-bc2+VsJXgU8j0bOWBlCk6HFtBthwB2mTUm9yqjywqgJrXx+Y75Je3YeVo4fKAUz3Z1AG2OeCuroKPXhqBpljyg==
+
 ansi-regex@^5.0.1:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-5.0.1.tgz#082cb2c89c9fe8659a311a53bd6a4dc5301db304"
@@ -854,10 +859,10 @@ json-to-ts@^1.7.0:
     hash.js "^1.0.3"
     pluralize "^3.1.0"
 
-jsxte-wc@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/jsxte-wc/-/jsxte-wc-1.1.0.tgz#7a6929d3734ff5358d9b0046389e6bcdaebd4b16"
-  integrity sha512-+d4ZYPFSShiJGgAfgiMC5lcsRYS3H9/mO0waAwPnguaaVIqLMjGmehnXu36FLQaAX9+ahLjHE+Z8fEtsQoZrag==
+jsxte-wc@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/jsxte-wc/-/jsxte-wc-1.1.1.tgz#bea05b51557696665bc545368e10e1acc3ace304"
+  integrity sha512-l29cdPyFMjIHgad2p2eR0wmYdAB8Z/CkDf4/EcrXAo0PGofKOMkkUZl3aEi2Ic55JjchIhQBjOKvppTuouZIYA==
 
 jsxte@^3.1.4:
   version "3.1.4"
