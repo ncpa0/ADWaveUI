@@ -40,11 +40,11 @@ adw-selector dialog[open] {
 adw-selector .selector dialog .options-list {
   margin: unset;
   padding: 0.4em;
-  width: calc(100% - 0.8em);
-  max-height: calc(100% - 0.8em);
-  font-size: 1.35em;
+  width: calc(95% - 0.8em);
+  max-height: calc(85% - 0.8em);
+  font-size: 1.25em;
 }
 
-adw-selector dialog .option {
+adw-selector .selector dialog .options-list .option {
   padding: 0.5em;
 }

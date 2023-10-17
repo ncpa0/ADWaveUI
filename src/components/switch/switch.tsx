@@ -1,7 +1,16 @@
 import { Switch } from "gtk-css-web";
-import { Attribute, CustomElement } from "jsxte-wc";
+import {
+  Attribute,
+  CustomElement,
+  ElementLifecycleEvent,
+} from "jsxte-wc";
 import { BaseElement } from "../../base-elements";
 import { cls } from "../../utils/cls";
+import {
+  CustomKeyboardEvent,
+  CustomMouseEvent,
+} from "../../utils/events";
+import { stopEvent } from "../../utils/prevent-default";
 import "./switch.css";
 
 declare global {
@@ -45,17 +54,41 @@ export class ADWaveSwitchElement extends BaseElement {
   @Attribute()
   accessor form: string | undefined = undefined;
 
-  private handleClick = (e: Event) => {
+  constructor() {
+    super();
+
+    this.lifecycle.on(
+      ElementLifecycleEvent.AttributeDidChange,
+      (c) => {
+        if (c.detail.attributeName === "active") {
+          this.dispatchEvent(
+            new SwitchChangeEvent(c.detail.newValue as any),
+          );
+        }
+      },
+    );
+  }
+
+  private handleClick = (e: MouseEvent) => {
     e.stopPropagation();
-    if (this.disabled) return;
+    const shouldContinue = this.dispatchEvent(
+      new CustomMouseEvent("click", {}, e),
+    );
+
+    if (this.disabled || !shouldContinue) return;
 
     this.active = !this.active;
-    this.dispatchEvent(new SwitchChangeEvent(this.active));
   };
 
   private handleKeyDown = (e: KeyboardEvent) => {
-    if (e.key === " ") {
-      this.handleClick(e);
+    e.stopPropagation();
+    const shouldContinue = this.dispatchEvent(
+      new CustomKeyboardEvent("keydown", {}, e),
+    );
+    if (shouldContinue && e.key === " ") {
+      if (this.disabled || !shouldContinue) return;
+
+      this.active = !this.active;
     }
   };
 
@@ -83,6 +116,7 @@ export class ADWaveSwitchElement extends BaseElement {
           name={this.name}
           form={this.form}
           onclick={this.handleClick}
+          onchange={stopEvent}
           aria-hidden="true"
         />
       </div>

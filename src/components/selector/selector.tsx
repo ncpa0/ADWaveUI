@@ -8,7 +8,12 @@ import {
 } from "jsxte-wc";
 import { BaseElement } from "../../base-elements";
 import { cls } from "../../utils/cls";
+import {
+  CustomKeyboardEvent,
+  CustomMouseEvent,
+} from "../../utils/events";
 import { getUid } from "../../utils/get-uid";
+import { stopEvent } from "../../utils/prevent-default";
 import "./selector.css";
 
 type Ref<T> = { current: T | null };
@@ -41,6 +46,16 @@ const IS_MOBILE =
   /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
     navigator.userAgent,
   );
+
+class SelectorChangeEvent extends CustomEvent<{ value?: string }> {
+  constructor(value?: string) {
+    super("change", {
+      detail: {
+        value,
+      },
+    });
+  }
+}
 
 @CustomElement("adw-selector")
 export class ADWaveSelector extends BaseElement {
@@ -105,19 +120,15 @@ export class ADWaveSelector extends BaseElement {
     );
 
     /**
-     * For mobile devices, when clicking outside of the visible modal,
-     * close it.
+     * When clicking outside of the visible modal, close it.
      */
     this.effect(
       () => {
         if (!IS_MOBILE && this.isOpen) {
           const eventHandler = (event: MouseEvent) => {
-            if (
-              !this.optionsListElem.current?.contains(
-                event.target as Node,
-              )
-            ) {
+            if (!this.contains(event.target as Node)) {
               this.isOpen = false;
+              this.dialogElem.current?.close();
             }
           };
           document.addEventListener("click", eventHandler);
@@ -147,6 +158,31 @@ export class ADWaveSelector extends BaseElement {
       },
       (s) => [s.options],
     );
+
+    // TODO: fix;
+    // this.lifecycle.on(ElementLifecycleEvent.StateDidChange, (c) => {
+    //   if (c.detail.stateName === "currentOption") {
+    //     let newSelected: ADWaveSelectorOption | undefined;
+    //     for (let i = 0; i < this.options.length; i++) {
+    //       const option = this.options[i]!;
+    //       const isSelected = option.isEqualTo(
+    //         c.detail.newValue as any,
+    //       );
+
+    //       if (isSelected) {
+    //         newSelected = option;
+    //       } else {
+    //         if (option.isSelected()) {
+    //           option.setSelected(false);
+    //         }
+    //       }
+    //     }
+
+    //     this.dispatchEvent(
+    //       new SelectorChangeEvent(newSelected?.getValue()),
+    //     );
+    //   }
+    // });
   }
 
   private focusSelf() {
@@ -211,9 +247,9 @@ export class ADWaveSelector extends BaseElement {
     for (let i = 0; i < this.options.length; i++) {
       const option = this.options[i]!;
       const isSelected = option.isEqualTo(optionValue);
-      option.setSelected(isSelected);
 
       if (isSelected) {
+        option.setSelected(true);
         success = true;
       }
     }
@@ -222,27 +258,53 @@ export class ADWaveSelector extends BaseElement {
   }
 
   private handleClick = (e: MouseEvent) => {
-    if (this.disabled) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const shouldContinue = this.dispatchEvent(
+      new CustomMouseEvent(
+        "click",
+        {
+          type: "selector",
+        },
+        e,
+      ),
+    );
+
+    if (!shouldContinue || this.disabled) {
       return;
     }
 
     if (!this.isOpen) {
       this.dialogElem.current?.showModal();
-      this.isOpen = !this.isOpen;
-      e.preventDefault();
-      e.stopPropagation();
+      this.isOpen = true;
+    } else {
+      this.dialogElem.current?.close();
+      this.isOpen = false;
     }
   };
 
   private handleDialogClick = (e: MouseEvent) => {
-    // close the modal if the click is outside the dialog
+    e.preventDefault();
+    e.stopPropagation();
+
     const dialog = this.dialogElem.current;
-    if (this.isOpen && dialog) {
+
+    const shouldContinue = this.dispatchEvent(
+      new CustomMouseEvent(
+        "click",
+        {
+          type: "dialog",
+        },
+        e,
+      ),
+    );
+
+    // close the modal if the click is outside the dialog
+    if (this.isOpen && dialog && shouldContinue) {
       if (!this.optionsListElem.current?.contains(e.target as Node)) {
         dialog.close();
         this.isOpen = false;
-        e.preventDefault();
-        e.stopPropagation();
       }
     }
   };
@@ -254,7 +316,18 @@ export class ADWaveSelector extends BaseElement {
     const btn = e.target as HTMLButtonElement | undefined;
     const { option: optValue } = btn?.dataset ?? {};
 
-    if (optValue == null) {
+    const shouldContinue = this.dispatchEvent(
+      new CustomMouseEvent(
+        "click",
+        {
+          type: "option",
+          option: optValue,
+        },
+        e,
+      ),
+    );
+
+    if (!shouldContinue || this.disabled || optValue == null) {
       return;
     }
 
@@ -272,73 +345,99 @@ export class ADWaveSelector extends BaseElement {
     this.isOpen = false;
   };
 
-  private handleKeyDown = (e: KeyboardEvent) => {
+  private withCustomKeyEvent(
+    ev: KeyboardEvent,
+    cb: () => void,
+    onCancel?: () => void,
+  ) {
+    ev.stopPropagation();
+
+    const shouldContinue = this.dispatchEvent(
+      new CustomKeyboardEvent("keydown", {}, ev),
+    );
+
+    if (shouldContinue) {
+      cb();
+    } else if (onCancel) {
+      onCancel();
+    }
+  }
+
+  private handleKeyDown = (ev: KeyboardEvent) => {
     if (this.disabled) {
       return;
     }
 
-    switch (e.key) {
+    switch (ev.key) {
       case " ":
       case "Enter": {
-        if (!this.isOpen) {
-          this.dialogElem.current?.showModal();
-          this.isOpen = true;
-        } else {
-          const target = e.target as HTMLElement;
-          if ((target as HTMLElement).tagName === "BUTTON") {
-            if (e.key === "Enter") target.click();
+        ev.preventDefault();
+        this.withCustomKeyEvent(ev, () => {
+          if (!this.isOpen) {
+            this.dialogElem.current?.showModal();
+            this.isOpen = true;
           } else {
-            this.dialogElem.current?.close();
-            this.isOpen = false;
+            const target = ev.target as HTMLElement;
+            if ((target as HTMLElement).tagName === "BUTTON") {
+              if (ev.key === "Enter") target.click();
+            } else {
+              this.dialogElem.current?.close();
+              this.isOpen = false;
+            }
           }
-        }
-        e.preventDefault();
-        e.stopPropagation();
+        });
         break;
       }
       case "ArrowUp": {
-        this.focusOption(-1);
-        e.preventDefault();
-        e.stopPropagation();
+        ev.preventDefault();
+        this.withCustomKeyEvent(ev, () => {
+          this.focusOption(-1);
+        });
         break;
       }
       case "ArrowDown": {
-        this.focusOption(+1);
-        e.preventDefault();
-        e.stopPropagation();
+        ev.preventDefault();
+        this.withCustomKeyEvent(ev, () => {
+          this.focusOption(+1);
+        });
         break;
       }
       case "PageUp": {
-        this.focusOption(-10);
-        e.preventDefault();
-        e.stopPropagation();
+        ev.preventDefault();
+        this.withCustomKeyEvent(ev, () => {
+          this.focusOption(-10);
+        });
         break;
       }
       case "PageDown": {
-        this.focusOption(+10);
-        e.preventDefault();
-        e.stopPropagation();
+        ev.preventDefault();
+        this.withCustomKeyEvent(ev, () => {
+          this.focusOption(+10);
+        });
         break;
       }
       case "Home": {
-        this.focusOption(-this.options.length);
-        e.preventDefault();
-        e.stopPropagation();
+        ev.preventDefault();
+        this.withCustomKeyEvent(ev, () => {
+          this.focusOption(-this.options.length);
+        });
         break;
       }
       case "End": {
-        this.focusOption(+this.options.length);
-        e.preventDefault();
-        e.stopPropagation();
+        ev.preventDefault();
+        this.withCustomKeyEvent(ev, () => {
+          this.focusOption(+this.options.length);
+        });
         break;
       }
       case "Escape": {
-        if (this.isOpen) {
-          this.isOpen = false;
-          this.focusSelf();
-          e.preventDefault();
-          e.stopPropagation();
-        }
+        ev.preventDefault();
+        this.withCustomKeyEvent(ev, () => {
+          if (this.isOpen) {
+            this.isOpen = false;
+            this.focusSelf();
+          }
+        });
         break;
       }
     }
@@ -418,6 +517,7 @@ export class ADWaveSelector extends BaseElement {
         form={this.form}
         disabled={this.disabled}
         aria-hidden="true"
+        onchange={stopEvent}
       >
         {this.options.map((option, index) => {
           return (
@@ -471,6 +571,14 @@ export class ADWaveSelector extends BaseElement {
 
 @CustomElement("adw-option")
 export class ADWaveSelectorOption extends WcSlot {
+  get selected() {
+    return this.isSelected();
+  }
+
+  set selected(selected: boolean) {
+    this.setSelected(selected);
+  }
+
   constructor() {
     super();
   }

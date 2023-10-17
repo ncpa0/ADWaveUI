@@ -8,10 +8,17 @@ import {
 import { InputType } from "jsxte/dist/types/jsx/prop-types/input-jsx-props";
 import { BaseElement } from "../../base-elements";
 import { cls } from "../../utils/cls";
+import {
+  CustomKeyboardEvent,
+  CustomMouseEvent,
+} from "../../utils/events";
 import { forceClassName } from "../../utils/force-class-name";
 import { fuzzyCmp } from "../../utils/fuzzy-search";
 import { getUid } from "../../utils/get-uid";
-import { preventDefault } from "../../utils/prevent-default";
+import {
+  preventDefault,
+  stopEvent,
+} from "../../utils/prevent-default";
 import "./input.css";
 
 declare global {
@@ -38,6 +45,16 @@ declare global {
         fuzzy?: boolean;
       };
     }
+  }
+}
+
+class InputChangeEvent extends CustomEvent<{ value?: string }> {
+  constructor(value?: string) {
+    super("change", {
+      detail: {
+        value,
+      },
+    });
   }
 }
 
@@ -99,12 +116,6 @@ export class ADWaveInputElement extends BaseElement {
   constructor() {
     super();
 
-    this.availableOptions = this.getMatchingOptions();
-
-    this.lifecycle.once(ElementLifecycleEvent.WillMount, () => {
-      forceClassName(this, Input.wrapper);
-    });
-
     this.immediateEffect(
       () => {
         this.availableOptions = this.getMatchingOptions();
@@ -127,6 +138,21 @@ export class ADWaveInputElement extends BaseElement {
         }
       },
       (s) => [s.selectedOption],
+    );
+
+    this.lifecycle.once(ElementLifecycleEvent.WillMount, () => {
+      forceClassName(this, Input.wrapper);
+    });
+
+    this.lifecycle.on(
+      ElementLifecycleEvent.AttributeDidChange,
+      (c) => {
+        if (c.detail.attributeName === "value") {
+          this.dispatchEvent(
+            new InputChangeEvent(c.detail.newValue as any),
+          );
+        }
+      },
     );
   }
 
@@ -250,17 +276,30 @@ export class ADWaveInputElement extends BaseElement {
     }
   }
 
-  private handleOptionClick = (ev: Event) => {
+  private handleOptionClick = (ev: MouseEvent) => {
     ev.preventDefault();
+    ev.stopPropagation();
+
     const target = ev.target as HTMLElement;
-    const idx = target.dataset.opt;
-    if (idx) {
-      this.value = this.availableOptions[parseInt(idx!)];
+    const idx = target.dataset.opt
+      ? Number(target.dataset.opt)
+      : undefined;
+    const shouldContinue = this.dispatchEvent(
+      new CustomMouseEvent(
+        "optionclick",
+        {
+          option: idx ? this.availableOptions[idx] : "",
+        },
+        ev,
+      ),
+    );
+    if (idx && shouldContinue) {
+      this.value = this.availableOptions[idx!];
       this.isSuggestionsOpen = false;
     }
   };
 
-  private handleInputChange = (ev: Event) => {
+  private handleInputChange = (ev: InputEvent) => {
     const inputElem = ev.target as HTMLInputElement;
     this.value = inputElem.value;
   };
@@ -276,105 +315,158 @@ export class ADWaveInputElement extends BaseElement {
     );
   }
 
-  private handleKeyPress = (ev: KeyboardEvent) => {
+  private withCustomKeyEvent(
+    ev: KeyboardEvent,
+    cb: () => void,
+    onCancel?: () => void,
+  ) {
+    ev.stopPropagation();
+
+    const shouldContinue = this.dispatchEvent(
+      new CustomKeyboardEvent("keydown", {}, ev),
+    );
+
+    if (shouldContinue) {
+      cb();
+    } else if (onCancel) {
+      onCancel();
+    }
+  }
+
+  private handleKeyDown = (ev: KeyboardEvent) => {
     switch (ev.key) {
       case "ArrowUp":
-        if (this.isSuggestionsOpen) {
-          ev.preventDefault();
-          if (this.suggestionsOrientation == "up") {
-            this.highlightPreviousOption();
-          } else {
-            this.highlightNextOption();
+        ev.preventDefault();
+        this.withCustomKeyEvent(ev, () => {
+          if (this.isSuggestionsOpen) {
+            if (this.suggestionsOrientation == "up") {
+              this.highlightPreviousOption();
+            } else {
+              this.highlightNextOption();
+            }
           }
-        }
+        });
         break;
       case "ArrowDown":
-        if (this.isSuggestionsOpen) {
-          ev.preventDefault();
-          if (this.suggestionsOrientation == "up") {
-            this.highlightNextOption();
-          } else {
-            this.highlightPreviousOption();
+        ev.preventDefault();
+        this.withCustomKeyEvent(ev, () => {
+          if (this.isSuggestionsOpen) {
+            if (this.suggestionsOrientation == "up") {
+              this.highlightNextOption();
+            } else {
+              this.highlightPreviousOption();
+            }
           }
-        }
+        });
         break;
       case "PageUp":
-        if (this.isSuggestionsOpen) {
-          ev.preventDefault();
-          if (this.suggestionsOrientation == "up") {
-            this.highlightPreviousOption(8);
-          } else {
-            this.highlightNextOption(8);
+        ev.preventDefault();
+        this.withCustomKeyEvent(ev, () => {
+          if (this.isSuggestionsOpen) {
+            if (this.suggestionsOrientation == "up") {
+              this.highlightPreviousOption(8);
+            } else {
+              this.highlightNextOption(8);
+            }
           }
-        }
+        });
         break;
       case "PageDown":
-        if (this.isSuggestionsOpen) {
-          ev.preventDefault();
-          if (this.suggestionsOrientation == "up") {
-            this.highlightNextOption(8);
-          } else {
-            this.highlightPreviousOption(8);
+        ev.preventDefault();
+        this.withCustomKeyEvent(ev, () => {
+          if (this.isSuggestionsOpen) {
+            if (this.suggestionsOrientation == "up") {
+              this.highlightNextOption(8);
+            } else {
+              this.highlightPreviousOption(8);
+            }
           }
-        }
+        });
         break;
       case "Home":
-        if (this.isSuggestionsOpen) {
-          ev.preventDefault();
-          if (this.suggestionsOrientation == "up") {
-            this.highlightPreviousOption(
-              this.availableOptions.length - 1,
-            );
-          } else {
-            this.highlightNextOption(
-              this.availableOptions.length - 1,
-            );
+        ev.preventDefault();
+        this.withCustomKeyEvent(ev, () => {
+          if (this.isSuggestionsOpen) {
+            if (this.suggestionsOrientation == "up") {
+              this.highlightPreviousOption(
+                this.availableOptions.length - 1,
+              );
+            } else {
+              this.highlightNextOption(
+                this.availableOptions.length - 1,
+              );
+            }
           }
-        }
+        });
         break;
       case "End":
-        if (this.isSuggestionsOpen) {
-          ev.preventDefault();
-          if (this.suggestionsOrientation == "up") {
-            this.highlightNextOption(
-              this.availableOptions.length - 1,
-            );
-          } else {
-            this.highlightPreviousOption(
-              this.availableOptions.length - 1,
-            );
+        ev.preventDefault();
+        this.withCustomKeyEvent(ev, () => {
+          if (this.isSuggestionsOpen) {
+            if (this.suggestionsOrientation == "up") {
+              this.highlightNextOption(
+                this.availableOptions.length - 1,
+              );
+            } else {
+              this.highlightPreviousOption(
+                this.availableOptions.length - 1,
+              );
+            }
           }
-        }
+        });
         break;
       case "Enter":
-        if (this.isSuggestionsOpen) {
-          ev.preventDefault();
-          const opt = this.availableOptions[this.selectedOption];
-          if (opt) {
-            this.value = opt;
-            this.isSuggestionsOpen = false;
-          }
-        }
+        this.withCustomKeyEvent(
+          ev,
+          () => {
+            if (this.isSuggestionsOpen) {
+              ev.preventDefault();
+              const opt = this.availableOptions[this.selectedOption];
+              if (opt) {
+                this.value = opt;
+                this.isSuggestionsOpen = false;
+              }
+            }
+          },
+          () => {
+            ev.preventDefault();
+          },
+        );
         break;
       case "Backspace":
-        this.isSuggestionsOpen = true;
+        this.withCustomKeyEvent(
+          ev,
+          () => {
+            this.isSuggestionsOpen = true;
+          },
+          () => {
+            ev.preventDefault();
+          },
+        );
         break;
       case "Escape":
-        if (this.isSuggestionsOpen) {
-          ev.preventDefault();
-          this.isSuggestionsOpen = false;
-        }
+        this.withCustomKeyEvent(
+          ev,
+          () => {
+            if (this.isSuggestionsOpen) {
+              this.isSuggestionsOpen = false;
+            }
+          },
+          () => {
+            ev.preventDefault();
+          },
+        );
         break;
     }
   };
 
-  private handleFocus = () => {
+  private handleFocus = (ev: FocusEvent) => {
     if (this.availableOptions.length) {
       this.isSuggestionsOpen = true;
     }
   };
 
-  private handleBlur = () => {
+  private handleBlur = (ev: FocusEvent) => {
     this.isSuggestionsOpen = false;
   };
 
@@ -442,10 +534,12 @@ export class ADWaveInputElement extends BaseElement {
           class={cls({
             [Input.input]: true,
           })}
+          // @ts-expect-error
           oninput={this.handleInputChange}
-          onkeydown={this.handleKeyPress}
+          onkeydown={this.handleKeyDown}
           onfocus={this.handleFocus}
           onblur={this.handleBlur}
+          onchange={stopEvent}
           type={this.type}
           value={this.value}
           disabled={this.disabled}

@@ -6,7 +6,9 @@ import {
 } from "jsxte-wc";
 import { BaseElement } from "../../base-elements";
 import { cls } from "../../utils/cls";
+import { CustomPointerEvent } from "../../utils/events";
 import { changeWithStep, clamp, toPrecision } from "../../utils/math";
+import { stopEvent } from "../../utils/prevent-default";
 import { createRef } from "../../utils/ref";
 import "./slider.css";
 
@@ -36,6 +38,8 @@ const preventDefault = (e: Event) => e.preventDefault();
 class SliderChangeEvent extends CustomEvent<{ value: number }> {
   constructor(value: number) {
     super("change", {
+      bubbles: true,
+      cancelable: true,
       detail: {
         value,
       },
@@ -76,20 +80,52 @@ export class ADWaveSliderElement extends BaseElement {
   constructor() {
     super();
 
-    this.lifecycle.once(ElementLifecycleEvent.DidMount, () => {
-      if (document) {
-        window.addEventListener(
-          "pointerup",
-          this.handlePointerEventUp,
-        );
-        window.addEventListener(
-          "pointermove",
-          this.handlePointerEventMove,
-        );
-      }
+    this.effect(
+      () => {
+        this.moveThumb(this.value);
 
-      this.moveThumb(this.value);
-    });
+        if (document) {
+          window.addEventListener(
+            "pointerup",
+            this.handlePointerEventUp,
+          );
+          window.addEventListener(
+            "pointermove",
+            this.handlePointerEventMove,
+          );
+        }
+
+        return () => {
+          window.removeEventListener(
+            "pointerup",
+            this.handlePointerEventUp,
+          );
+          window.removeEventListener(
+            "pointermove",
+            this.handlePointerEventMove,
+          );
+        };
+      },
+      () => [],
+    );
+
+    this.effect(
+      () => {
+        this.moveThumb(this.value);
+      },
+      (s) => [s.value],
+    );
+
+    this.lifecycle.on(
+      ElementLifecycleEvent.AttributeDidChange,
+      (c) => {
+        if (c.detail.attributeName === "value") {
+          this.dispatchEvent(
+            new SliderChangeEvent(c.detail.newValue as any),
+          );
+        }
+      },
+    );
   }
 
   private setValue(newValue: number) {
@@ -98,8 +134,6 @@ export class ADWaveSliderElement extends BaseElement {
     if (this.value === value) return;
 
     this.value = value;
-    this.moveThumb(value);
-    this.dispatchEvent(new SliderChangeEvent(value));
   }
 
   private moveThumb(value: number) {
@@ -112,7 +146,12 @@ export class ADWaveSliderElement extends BaseElement {
 
   private handlePointerDown = (e: PointerEvent) => {
     e.stopPropagation();
-    if (this.disabled) return;
+
+    const shouldContinue = this.dispatchEvent(
+      new CustomPointerEvent("pointerdown", {}, e),
+    );
+
+    if (!shouldContinue || this.disabled) return;
 
     if (e.pointerType === "mouse" && e.button !== 0) return;
 
@@ -124,8 +163,6 @@ export class ADWaveSliderElement extends BaseElement {
 
   private handlePointerEventUp = (e: PointerEvent) => {
     e.stopPropagation();
-    if (this.disabled) return;
-
     this.isPressed = false;
   };
 
@@ -144,6 +181,7 @@ export class ADWaveSliderElement extends BaseElement {
         ),
         this.step,
       );
+
       this.setValue(tmpValue);
     }
   };
@@ -210,6 +248,7 @@ export class ADWaveSliderElement extends BaseElement {
           max={this.max}
           step={this.step.toString()}
           value={this.value.toString()}
+          onchange={stopEvent}
           aria-hidden="true"
         />
       </div>

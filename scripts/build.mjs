@@ -23,6 +23,7 @@ async function main() {
     bundle: true,
     watch: watch,
     esbuildOptions: {
+      keepNames: true,
       minify: !isDev,
       treeShaking: !isDev,
       sourcemap: isDev ? "inline" : false,
