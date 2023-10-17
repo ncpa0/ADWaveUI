@@ -1,4 +1,4 @@
-import "gtk-css-web/dist/styles.css";
+import "adwavecss/dist/styles.css";
 import "./styles.css";
 
 export * from "./components/input/input";

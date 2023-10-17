@@ -1,4 +1,4 @@
-import { Slider } from "gtk-css-web";
+import { Slider } from "adwavecss";
 import {
   Attribute,
   CustomElement,

@@ -1,4 +1,4 @@
-import { Input, Suggestions } from "gtk-css-web";
+import { Input, Suggestions } from "adwavecss";
 import {
   Attribute,
   CustomElement,
@@ -534,7 +534,6 @@ export class ADWaveInputElement extends BaseElement {
           class={cls({
             [Input.input]: true,
           })}
-          // @ts-expect-error
           oninput={this.handleInputChange}
           onkeydown={this.handleKeyDown}
           onfocus={this.handleFocus}

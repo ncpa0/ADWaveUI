@@ -860,9 +860,9 @@ json-to-ts@^1.7.0:
     pluralize "^3.1.0"
 
 jsxte-wc@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/jsxte-wc/-/jsxte-wc-1.1.1.tgz#bea05b51557696665bc545368e10e1acc3ace304"
-  integrity sha512-l29cdPyFMjIHgad2p2eR0wmYdAB8Z/CkDf4/EcrXAo0PGofKOMkkUZl3aEi2Ic55JjchIhQBjOKvppTuouZIYA==
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/jsxte-wc/-/jsxte-wc-1.1.2.tgz#7c1730832466e2d385ad7b17bb6303b661f8b55b"
+  integrity sha512-g/+hPv+4OIfiqAyccv1ZSeRUbJFQOriZZbMmpn03B+lLG2aUwpV1G8K5EZwf6b7KViQMKUf4fO+RgSVmchbM1A==
 
 jsxte@^3.1.4:
   version "3.1.4"

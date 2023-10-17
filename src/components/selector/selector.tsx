@@ -1,7 +1,8 @@
-import { Selector } from "gtk-css-web";
+import { Selector } from "adwavecss";
 import {
   Attribute,
   CustomElement,
+  ElementLifecycleEvent,
   Slotted,
   State,
   WcSlot,
@@ -141,48 +142,63 @@ export class ADWaveSelector extends BaseElement {
       (s) => [s.isOpen],
     );
 
+    this.effect(
+      () => {
+        const firstSelected = this.options.find((opt) =>
+          opt.isSelected(),
+        );
+
+        if (firstSelected) {
+          this.currentOption = firstSelected.getValue();
+
+          for (let j = 0; j < this.options.length; j++) {
+            const slot = this.options[j]!;
+
+            if (slot !== firstSelected) {
+              slot.setSelected(false);
+            }
+          }
+        }
+      },
+      () => [],
+    );
+
     /**
      * The list of <ADWaveSelectorOption> elements is the source of
      * truth for the selector. Whenever that list changes update the
      * currentOption to the first selected option.
      */
-    this.immediateEffect(
-      () => {
-        const shouldSelectOpt = this.options.find((option) => {
-          return option.isSelected();
-        });
+    this.lifecycle.on(ElementLifecycleEvent.SlotDidChange, (c) => {
+      if (c.detail.slotName === "options") {
+        let hasChanged = false;
+        const changedSlots = c.detail.changes
+          .attributeChanged as ADWaveSelectorOption[];
 
-        if (shouldSelectOpt) {
-          this.currentOption = shouldSelectOpt.getValue();
+        for (let i = 0; i < changedSlots.length; i++) {
+          const slot = changedSlots[i]!;
+          if (slot.isSelected()) {
+            const newValue = slot.getValue();
+            hasChanged = this.currentOption !== newValue;
+            this.currentOption = newValue;
+
+            // unset the `selected` attribute on all other options
+            for (let j = 0; j < this.options.length; j++) {
+              const otherSlot = this.options[j]!;
+              if (otherSlot !== slot) {
+                otherSlot.setSelected(false);
+              }
+            }
+            break;
+          }
         }
-      },
-      (s) => [s.options],
-    );
 
-    // TODO: fix;
-    // this.lifecycle.on(ElementLifecycleEvent.StateDidChange, (c) => {
-    //   if (c.detail.stateName === "currentOption") {
-    //     let newSelected: ADWaveSelectorOption | undefined;
-    //     for (let i = 0; i < this.options.length; i++) {
-    //       const option = this.options[i]!;
-    //       const isSelected = option.isEqualTo(
-    //         c.detail.newValue as any,
-    //       );
-
-    //       if (isSelected) {
-    //         newSelected = option;
-    //       } else {
-    //         if (option.isSelected()) {
-    //           option.setSelected(false);
-    //         }
-    //       }
-    //     }
-
-    //     this.dispatchEvent(
-    //       new SelectorChangeEvent(newSelected?.getValue()),
-    //     );
-    //   }
-    // });
+        if (hasChanged) {
+          this.dispatchEvent(
+            new SelectorChangeEvent(this.currentOption),
+          );
+        }
+      }
+    });
   }
 
   private focusSelf() {
@@ -605,5 +621,21 @@ export class ADWaveSelectorOption extends WcSlot {
 
   isSelected() {
     return this.getAttribute("selected") === "true";
+  }
+
+  protected override shouldEmitAttributeChangeEvent(
+    mutations: MutationRecord[],
+  ): boolean {
+    for (let i = 0; i < mutations.length; i++) {
+      const mutation = mutations[i]!;
+      if (
+        mutation.attributeName === "selected" &&
+        mutation.oldValue !== this.getAttribute("selected")
+      ) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }

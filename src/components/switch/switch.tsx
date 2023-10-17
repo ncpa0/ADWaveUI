@@ -1,4 +1,4 @@
-import { Switch } from "gtk-css-web";
+import { Switch } from "adwavecss";
 import {
   Attribute,
   CustomElement,
