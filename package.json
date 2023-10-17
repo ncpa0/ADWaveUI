@@ -21,6 +21,7 @@
   },
   "packageManager": "yarn@1.22.19",
   "devDependencies": {
+    "@ncpa0cpl/nodepack": "^2.3.0",
     "esbuild": "^0.19.2",
     "git-hook-tasks": "ncpa0cpl/git-hook-tasks",
     "husky": "^8.0.3",
@@ -29,9 +30,8 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "@ncpa0cpl/nodepack": "^2.3.0",
     "adwavecss": "^0.0.1",
-    "jsxte": "^3.1.4",
+    "jsxte": "^3.1.5",
     "jsxte-wc": "^1.1.1"
   }
 }
