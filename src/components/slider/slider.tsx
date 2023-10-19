@@ -5,6 +5,7 @@ import {
   ElementLifecycleEvent,
 } from "jsxte-wc";
 import { BaseElement } from "../../base-elements";
+import "../../index.css";
 import { cls } from "../../utils/cls";
 import { CustomPointerEvent } from "../../utils/events";
 import { changeWithStep, clamp, toPrecision } from "../../utils/math";
@@ -49,29 +50,29 @@ class SliderChangeEvent extends CustomEvent<{ value: number }> {
 
 @CustomElement("adw-slider")
 export class ADWaveSliderElement extends BaseElement {
-  @Attribute({ type: "number" })
+  @Attribute({ type: "number", nullable: false, default: 0 })
   accessor value: number = 0;
 
-  @Attribute({ type: "number" })
+  @Attribute({ type: "number", nullable: false, default: 0 })
   accessor min: number = 0;
 
-  @Attribute({ type: "number" })
+  @Attribute({ type: "number", nullable: false, default: 100 })
   accessor max: number = 100;
 
-  @Attribute({ type: "number" })
+  @Attribute({ type: "number", nullable: false, default: 1 })
   accessor step: number = 1;
 
-  @Attribute({ type: "number" })
+  @Attribute({ type: "number", nullable: false, default: 4 })
   accessor precision: number = 4;
 
-  @Attribute({ type: "boolean" })
+  @Attribute({ type: "boolean", nullable: true })
   accessor disabled: boolean | undefined = undefined;
 
-  @Attribute()
-  accessor name: string | undefined = undefined;
+  @Attribute({ nullable: true })
+  accessor name: string | null = null;
 
-  @Attribute()
-  accessor form: string | undefined = undefined;
+  @Attribute({ nullable: true })
+  accessor form: string | null = null;
 
   private progress = createRef<HTMLDivElement>();
   private thumb = createRef<HTMLDivElement>();
@@ -242,8 +243,8 @@ export class ADWaveSliderElement extends BaseElement {
           type="range"
           class="_adw_hidden"
           disabled={this.disabled}
-          name={this.name}
-          form={this.form}
+          name={this.name ?? undefined}
+          form={this.form ?? undefined}
           min={this.min}
           max={this.max}
           step={this.step.toString()}

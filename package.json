@@ -1,7 +1,30 @@
 {
-  "name": "gtk-web",
+  "name": "adwaveui",
   "version": "1.0.0",
-  "main": "./dist/index.js",
+  "main": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "default": "./dist/esm/index.mjs",
+      "types": "./dist/types/index.d.ts"
+    },
+    "./dist/components/input/input": {
+      "default":"./dist/esm/components/input/input.mjs",
+      "types": "./dist/types/components/input/input.d.ts"
+    },
+    "./dist/components/selector/selector": {
+      "default": "./dist/esm/components/selector/selector.mjs",
+      "types": "./dist/types/components/selector/selector.d.ts"
+    },
+    "./dist/components/slider/slider": {
+      "default": "./dist/esm/components/slider/slider.mjs",
+      "types": "./dist/types/components/slider/slider.d.ts"
+    },
+    "./dist/components/switch/switch": {
+      "default": "./dist/esm/components/switch/switch.mjs",
+      "types": "./dist/types/components/switch/switch.d.ts"
+    }
+  },
   "keywords": [],
   "repository": {
     "type": "git",
@@ -22,6 +45,7 @@
   "packageManager": "yarn@1.22.19",
   "devDependencies": {
     "@ncpa0cpl/nodepack": "^2.3.0",
+    "csso": "^5.0.5",
     "esbuild": "^0.19.2",
     "git-hook-tasks": "ncpa0cpl/git-hook-tasks",
     "husky": "^8.0.3",
@@ -32,6 +56,6 @@
   "dependencies": {
     "adwavecss": "^0.0.1",
     "jsxte": "^3.1.5",
-    "jsxte-wc": "^1.1.2"
+    "jsxte-wc": "^1.1.3"
   }
 }

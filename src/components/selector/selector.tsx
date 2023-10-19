@@ -8,6 +8,7 @@ import {
   WcSlot,
 } from "jsxte-wc";
 import { BaseElement } from "../../base-elements";
+import "../../index.css";
 import { cls } from "../../utils/cls";
 import {
   CustomKeyboardEvent,
@@ -60,19 +61,19 @@ class SelectorChangeEvent extends CustomEvent<{ value?: string }> {
 
 @CustomElement("adw-selector")
 export class ADWaveSelector extends BaseElement {
-  @Attribute()
-  accessor placeholder: string | undefined = undefined;
+  @Attribute({ nullable: true })
+  accessor placeholder: string | null = null;
 
-  @Attribute({ type: "boolean" })
-  accessor disabled: boolean | undefined = undefined;
+  @Attribute({ type: "boolean", nullable: true })
+  accessor disabled: boolean | null = null;
 
-  @Attribute()
-  accessor name: string | undefined = undefined;
+  @Attribute({ nullable: true })
+  accessor name: string | null = null;
 
-  @Attribute()
-  accessor form: string | undefined = undefined;
+  @Attribute({ nullable: true })
+  accessor form: string | null = null;
 
-  @Attribute()
+  @Attribute({ nullable: false, default: "down" })
   accessor orientation: string = "down";
 
   @State()
@@ -529,9 +530,9 @@ export class ADWaveSelector extends BaseElement {
     return (
       <select
         class="_adw_hidden"
-        name={this.name}
-        form={this.form}
-        disabled={this.disabled}
+        name={this.name ?? undefined}
+        form={this.form ?? undefined}
+        disabled={this.disabled ?? undefined}
         aria-hidden="true"
         onchange={stopEvent}
       >

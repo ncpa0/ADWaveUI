@@ -1,10 +1,7 @@
 import { Switch } from "adwavecss";
-import {
-  Attribute,
-  CustomElement,
-  ElementLifecycleEvent,
-} from "jsxte-wc";
+import { Attribute, CustomElement } from "jsxte-wc";
 import { BaseElement } from "../../base-elements";
+import "../../index.css";
 import { cls } from "../../utils/cls";
 import {
   CustomKeyboardEvent,
@@ -25,6 +22,9 @@ declare global {
         disabled?: boolean;
         name?: string;
         form?: string;
+        onChange?: (e: SwitchChangeEvent) => void;
+        onClick?: (e: CustomMouseEvent<{}>) => void;
+        onKeyDown?: (e: CustomKeyboardEvent<{}>) => void;
       };
     }
   }
@@ -40,32 +40,30 @@ class SwitchChangeEvent extends CustomEvent<{ active: boolean }> {
   }
 }
 
+export type { SwitchChangeEvent };
+
 @CustomElement("adw-switch")
 export class ADWaveSwitchElement extends BaseElement {
-  @Attribute({ type: "boolean" })
+  @Attribute({ type: "boolean", nullable: false })
   accessor active: boolean = false;
 
-  @Attribute({ type: "boolean" })
+  @Attribute({ type: "boolean", nullable: false })
   accessor disabled: boolean = false;
 
-  @Attribute()
-  accessor name: string | undefined = undefined;
+  @Attribute({ nullable: true })
+  accessor name: string | null = null;
 
-  @Attribute()
-  accessor form: string | undefined = undefined;
+  @Attribute({ nullable: true })
+  accessor form: string | null = null;
 
   constructor() {
     super();
 
-    this.lifecycle.on(
-      ElementLifecycleEvent.AttributeDidChange,
-      (c) => {
-        if (c.detail.attributeName === "active") {
-          this.dispatchEvent(
-            new SwitchChangeEvent(c.detail.newValue as any),
-          );
-        }
+    this.effect(
+      () => {
+        this.dispatchEvent(new SwitchChangeEvent(this.active));
       },
+      (s) => [s.active],
     );
   }
 
@@ -113,8 +111,8 @@ export class ADWaveSwitchElement extends BaseElement {
           class="_adw_hidden"
           disabled={this.disabled}
           checked={this.active}
-          name={this.name}
-          form={this.form}
+          name={this.name ?? undefined}
+          form={this.form ?? undefined}
           onclick={this.handleClick}
           onchange={stopEvent}
           aria-hidden="true"

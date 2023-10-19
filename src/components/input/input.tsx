@@ -7,6 +7,7 @@ import {
 } from "jsxte-wc";
 import { InputType } from "jsxte/dist/types/jsx/prop-types/input-jsx-props";
 import { BaseElement } from "../../base-elements";
+import "../../index.css";
 import { cls } from "../../utils/cls";
 import {
   CustomKeyboardEvent,
@@ -60,46 +61,46 @@ class InputChangeEvent extends CustomEvent<{ value?: string }> {
 
 @CustomElement("adw-input")
 export class ADWaveInputElement extends BaseElement {
-  @Attribute()
-  accessor value: string | undefined = undefined;
+  @Attribute({ nullable: true })
+  accessor value: string | null = null;
 
-  @Attribute({ type: "boolean" })
-  accessor disabled: boolean | undefined = undefined;
+  @Attribute({ type: "boolean", nullable: false })
+  accessor disabled: boolean = false;
 
-  @Attribute()
-  accessor name: string | undefined = undefined;
+  @Attribute({ nullable: true })
+  accessor name: string | null = null;
 
-  @Attribute()
-  accessor form: string | undefined = undefined;
+  @Attribute({ nullable: true })
+  accessor form: string | null = null;
 
-  @Attribute()
+  @Attribute({ nullable: true, default: "text" })
   accessor type: InputType = "text";
 
-  @Attribute()
-  accessor placeholder: string | undefined = undefined;
+  @Attribute({ nullable: true })
+  accessor placeholder: string | null = null;
 
-  @Attribute({ type: "number" })
-  accessor minLength: number | undefined = undefined;
+  @Attribute({ type: "number", nullable: true })
+  accessor minLength: number | null = null;
 
-  @Attribute({ type: "number" })
-  accessor maxLength: number | undefined = undefined;
+  @Attribute({ type: "number", nullable: true })
+  accessor maxLength: number | null = null;
 
-  @Attribute()
-  accessor errorLabel: string | undefined = undefined;
+  @Attribute({ nullable: true })
+  accessor errorLabel: string | null = null;
 
-  @Attribute()
-  accessor alertLabel: string | undefined = undefined;
+  @Attribute({ nullable: true })
+  accessor alertLabel: string | null = null;
 
-  @Attribute()
-  accessor suggestions: string | undefined = undefined;
+  @Attribute({ nullable: true })
+  accessor suggestions: string | null = null;
 
-  @Attribute({ type: "boolean" })
+  @Attribute({ type: "boolean", nullable: false })
   accessor suggestionsShowAll: boolean = false;
 
-  @Attribute()
+  @Attribute({ nullable: true, default: "down" })
   accessor suggestionsOrientation: string = "down";
 
-  @Attribute({ type: "boolean" })
+  @Attribute({ type: "boolean", nullable: false })
   accessor fuzzy: boolean = false;
 
   @State()
@@ -294,7 +295,7 @@ export class ADWaveInputElement extends BaseElement {
       ),
     );
     if (idx && shouldContinue) {
-      this.value = this.availableOptions[idx!];
+      this.value = this.availableOptions[idx!] ?? null;
       this.isSuggestionsOpen = false;
     }
   };
@@ -540,13 +541,13 @@ export class ADWaveInputElement extends BaseElement {
           onblur={this.handleBlur}
           onchange={stopEvent}
           type={this.type}
-          value={this.value}
+          value={this.value ?? undefined}
           disabled={this.disabled}
-          name={this.name}
-          form={this.form}
-          placeholder={this.placeholder}
-          minlength={this.minLength}
-          maxlength={this.maxLength}
+          name={this.name ?? undefined}
+          form={this.form ?? undefined}
+          placeholder={this.placeholder ?? undefined}
+          minlength={this.minLength ?? undefined}
+          maxlength={this.maxLength ?? undefined}
           aria-placeholder={this.placeholder}
           aria-label={this.placeholder}
           aria-invalid={this.errorLabel != null}

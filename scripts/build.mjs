@@ -1,6 +1,7 @@
 import { build } from "@ncpa0cpl/nodepack";
 import path from "node:path";
 import { fileURLToPath } from "url";
+import { getCssLoaderPlugin } from "./css-loader.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const p = (...fpath) => path.resolve(__dirname, "..", ...fpath);
@@ -20,13 +21,16 @@ async function main() {
     target: "ESNext",
     formats: ["esm"],
     esDecorators: true,
-    bundle: true,
+    bundle: false,
     watch: watch,
+    declarations: true,
+    extMapping: {
+      ".css": ".style.mjs",
+    },
     esbuildOptions: {
       keepNames: true,
-      minify: !isDev,
-      treeShaking: !isDev,
       sourcemap: isDev ? "inline" : false,
+      plugins: [getCssLoaderPlugin()],
     },
   };
 
