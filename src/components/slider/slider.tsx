@@ -1,9 +1,5 @@
 import { Slider } from "adwavecss";
-import {
-  Attribute,
-  CustomElement,
-  ElementLifecycleEvent,
-} from "jsxte-wc";
+import { Attribute, CustomElement } from "jsxte-wc";
 import { BaseElement } from "../../base-elements";
 import "../../index.css";
 import { cls } from "../../utils/cls";
@@ -83,8 +79,6 @@ export class ADWaveSliderElement extends BaseElement {
 
     this.effect(
       () => {
-        this.moveThumb(this.value);
-
         if (document) {
           window.addEventListener(
             "pointerup",
@@ -117,15 +111,12 @@ export class ADWaveSliderElement extends BaseElement {
       (s) => [s.value],
     );
 
-    this.lifecycle.on(
-      ElementLifecycleEvent.AttributeDidChange,
-      (c) => {
-        if (c.detail.attributeName === "value") {
-          this.dispatchEvent(
-            new SliderChangeEvent(c.detail.newValue as any),
-          );
-        }
+    this.effect(
+      ({ isFirstMount }) => {
+        if (isFirstMount) return;
+        this.dispatchEvent(new SliderChangeEvent(this.value));
       },
+      (s) => [s.value],
     );
   }
 

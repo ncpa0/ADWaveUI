@@ -61,8 +61,8 @@ class InputChangeEvent extends CustomEvent<{ value?: string }> {
 
 @CustomElement("adw-input")
 export class ADWaveInputElement extends BaseElement {
-  @Attribute({ nullable: true })
-  accessor value: string | null = null;
+  @Attribute({ nullable: false })
+  accessor value: string = "";
 
   @Attribute({ type: "boolean", nullable: false })
   accessor disabled: boolean = false;
@@ -127,7 +127,9 @@ export class ADWaveInputElement extends BaseElement {
 
     this.immediateEffect(
       () => {
-        this.selectedOption = 0;
+        if (this.isSuggestionsOpen) {
+          this.selectedOption = 0;
+        }
       },
       (s) => [s.isSuggestionsOpen],
     );
@@ -141,20 +143,17 @@ export class ADWaveInputElement extends BaseElement {
       (s) => [s.selectedOption],
     );
 
+    this.effect(
+      ({ isFirstMount }) => {
+        if (isFirstMount) return;
+        this.dispatchEvent(new InputChangeEvent(this.value));
+      },
+      (s) => [s.value],
+    );
+
     this.lifecycle.once(ElementLifecycleEvent.WillMount, () => {
       forceClassName(this, Input.wrapper);
     });
-
-    this.lifecycle.on(
-      ElementLifecycleEvent.AttributeDidChange,
-      (c) => {
-        if (c.detail.attributeName === "value") {
-          this.dispatchEvent(
-            new InputChangeEvent(c.detail.newValue as any),
-          );
-        }
-      },
-    );
   }
 
   /**
@@ -295,7 +294,7 @@ export class ADWaveInputElement extends BaseElement {
       ),
     );
     if (idx && shouldContinue) {
-      this.value = this.availableOptions[idx!] ?? null;
+      this.value = this.availableOptions[idx] ?? "";
       this.isSuggestionsOpen = false;
     }
   };

@@ -60,7 +60,8 @@ export class ADWaveSwitchElement extends BaseElement {
     super();
 
     this.effect(
-      () => {
+      ({ isFirstMount }) => {
+        if (isFirstMount) return;
         this.dispatchEvent(new SwitchChangeEvent(this.active));
       },
       (s) => [s.active],

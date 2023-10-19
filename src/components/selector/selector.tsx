@@ -92,52 +92,45 @@ export class ADWaveSelector extends BaseElement {
   constructor() {
     super();
 
-    /**
-     * When opening the selector, scroll into view to the first
-     * option.
-     */
     this.effect(
       () => {
-        if (!this.isOpen) {
-          return;
-        }
-
-        const optionsList = this.optionsListElem.current;
-        if (optionsList) {
-          const reverse = this.orientation === "up";
-          if (reverse) {
-            optionsList.scrollTo({
-              top: optionsList.scrollHeight,
-              behavior: "instant",
-            });
-          } else {
-            optionsList.scrollTo({
-              top: 0,
-              behavior: "instant",
-            });
-          }
-        }
-      },
-      (s) => [s.isOpen],
-    );
-
-    /**
-     * When clicking outside of the visible modal, close it.
-     */
-    this.effect(
-      () => {
-        if (!IS_MOBILE && this.isOpen) {
-          const eventHandler = (event: MouseEvent) => {
-            if (!this.contains(event.target as Node)) {
-              this.isOpen = false;
-              this.dialogElem.current?.close();
+        if (this.isOpen) {
+          /**
+           * When opening the selector, scroll into view to the first
+           * option.
+           */
+          const optionsList = this.optionsListElem.current;
+          if (optionsList) {
+            const reverse = this.orientation === "up";
+            if (reverse) {
+              optionsList.scrollTo({
+                top: optionsList.scrollHeight,
+                behavior: "instant",
+              });
+            } else {
+              optionsList.scrollTo({
+                top: 0,
+                behavior: "instant",
+              });
             }
-          };
-          document.addEventListener("click", eventHandler);
+          }
 
-          return () => {
-            document.removeEventListener("click", eventHandler);
-          };
+          /**
+           * When clicking outside of the visible modal, close it.
+           */
+          if (!IS_MOBILE) {
+            const eventHandler = (event: MouseEvent) => {
+              if (!this.contains(event.target as Node)) {
+                this.isOpen = false;
+                this.dialogElem.current?.close();
+              }
+            };
+            document.addEventListener("click", eventHandler);
+
+            return () => {
+              document.removeEventListener("click", eventHandler);
+            };
+          }
         }
       },
       (s) => [s.isOpen],
