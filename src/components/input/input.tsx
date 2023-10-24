@@ -44,6 +44,16 @@ declare global {
         suggestionsshowall?: boolean;
         suggestionsorientation?: string;
         fuzzy?: boolean;
+        onChange?: (e: InputChangeEvent) => void;
+        onchange?: string;
+        onKeyDown?: (e: CustomKeyboardEvent<{}>) => void;
+        onkeydown?: string;
+        onInput?: (e: InputEvent) => void;
+        oninput?: string;
+        onBlur?: (e: FocusEvent) => void;
+        onblur?: string;
+        onFocus?: (e: FocusEvent) => void;
+        onfocus?: string;
       };
     }
   }
@@ -113,6 +123,8 @@ export class ADWaveInputElement extends BaseElement {
   accessor isSuggestionsOpen = false;
 
   private uid = getUid();
+  private isInFocus = false;
+  private hasChanged = false;
 
   constructor() {
     super();
@@ -146,7 +158,11 @@ export class ADWaveInputElement extends BaseElement {
     this.effect(
       ({ isFirstMount }) => {
         if (isFirstMount) return;
-        this.dispatchEvent(new InputChangeEvent(this.value));
+        if (this.isInFocus) {
+          this.hasChanged = true;
+        } else {
+          this.dispatchEvent(new InputChangeEvent(this.value));
+        }
       },
       (s) => [s.value],
     );
@@ -426,6 +442,9 @@ export class ADWaveInputElement extends BaseElement {
                 this.value = opt;
                 this.isSuggestionsOpen = false;
               }
+            } else if (this.hasChanged) {
+              this.hasChanged = false;
+              this.dispatchEvent(new InputChangeEvent(this.value));
             }
           },
           () => {
@@ -461,13 +480,19 @@ export class ADWaveInputElement extends BaseElement {
   };
 
   private handleFocus = (ev: FocusEvent) => {
+    this.isInFocus = true;
     if (this.availableOptions.length) {
       this.isSuggestionsOpen = true;
     }
   };
 
   private handleBlur = (ev: FocusEvent) => {
+    this.isInFocus = false;
     this.isSuggestionsOpen = false;
+    if (this.hasChanged) {
+      this.hasChanged = false;
+      this.dispatchEvent(new InputChangeEvent(this.value));
+    }
   };
 
   private Suggestions = () => {
@@ -533,6 +558,7 @@ export class ADWaveInputElement extends BaseElement {
         <input
           class={cls({
             [Input.input]: true,
+            [Input.disabled]: this.disabled,
           })}
           oninput={this.handleInputChange}
           onkeydown={this.handleKeyDown}

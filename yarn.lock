@@ -200,10 +200,10 @@
   resolved "https://registry.npmjs.org/@types/unist/-/unist-2.0.7.tgz"
   integrity sha512-cputDpIbFgLUaGQn6Vqg3/YsJwxUwHLO13v3i5ouxT4lat0khip9AEWxtERujXV9wxIB1EyF97BSJFt6vpdI8g==
 
-adwavecss@^0.0.1:
-  version "0.0.1"
-  resolved "https://registry.npmjs.org/adwavecss/-/adwavecss-0.0.1.tgz"
-  integrity sha512-bc2+VsJXgU8j0bOWBlCk6HFtBthwB2mTUm9yqjywqgJrXx+Y75Je3YeVo4fKAUz3Z1AG2OeCuroKPXhqBpljyg==
+adwavecss@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/adwavecss/-/adwavecss-0.0.2.tgz#1ddbd487b6be4ae5240e3108fcdc163c677384b9"
+  integrity sha512-aNB1y2aAfOYeYmnSwgR+gH+2lMrN85ilUAMHtQ4xCad3aj5GSWFvgJMoDIlh7F8TEgZUyNXGHmPHGnNTA1jFfw==
 
 ansi-regex@^5.0.1:
   version "5.0.1"

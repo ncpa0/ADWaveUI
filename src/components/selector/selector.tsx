@@ -39,6 +39,9 @@ declare global {
         name?: string;
         form?: string;
         orientation?: string;
+        children?: any;
+        onChange?: (e: CustomEvent<{ value?: string }>) => void;
+        onClick?: (e: CustomMouseEvent<{}>) => void;
       };
     }
   }
@@ -64,8 +67,8 @@ export class ADWaveSelector extends BaseElement {
   @Attribute({ nullable: true })
   accessor placeholder: string | null = null;
 
-  @Attribute({ type: "boolean", nullable: true })
-  accessor disabled: boolean | null = null;
+  @Attribute({ type: "boolean", nullable: false, default: false })
+  accessor disabled: boolean = false;
 
   @Attribute({ nullable: true })
   accessor name: string | null = null;
@@ -549,6 +552,7 @@ export class ADWaveSelector extends BaseElement {
           [Selector.selector]: true,
           [Selector.opened]: this.isOpen,
           [Selector.noPosition]: IS_MOBILE,
+          [Selector.disabled]: this.disabled,
         })}
         onclick={this.handleClick}
         onkeydown={this.handleKeyDown}

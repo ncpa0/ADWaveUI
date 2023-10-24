@@ -47,7 +47,7 @@ export class ADWaveSwitchElement extends BaseElement {
   @Attribute({ type: "boolean", nullable: false })
   accessor active: boolean = false;
 
-  @Attribute({ type: "boolean", nullable: false })
+  @Attribute({ type: "boolean", nullable: false, default: false })
   accessor disabled: boolean = false;
 
   @Attribute({ nullable: true })
@@ -96,8 +96,8 @@ export class ADWaveSwitchElement extends BaseElement {
       <div
         class={cls({
           [Switch.switch]: true,
-          disabled: this.disabled,
-          active: this.active,
+          [Switch.disabled]: this.disabled,
+          [Switch.active]: this.active,
         })}
         onclick={this.handleClick}
         onkeydown={this.handleKeyDown}

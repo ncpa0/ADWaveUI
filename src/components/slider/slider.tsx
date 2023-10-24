@@ -25,6 +25,8 @@ declare global {
         disabled?: boolean;
         name?: string;
         form?: string;
+        onChange?: (e: SliderChangeEvent) => void;
+        onPointerDown?: (e: CustomPointerEvent<{}>) => void;
       };
     }
   }
@@ -61,8 +63,8 @@ export class ADWaveSliderElement extends BaseElement {
   @Attribute({ type: "number", nullable: false, default: 4 })
   accessor precision: number = 4;
 
-  @Attribute({ type: "boolean", nullable: true })
-  accessor disabled: boolean | undefined = undefined;
+  @Attribute({ type: "boolean", nullable: false, default: false })
+  accessor disabled: boolean = false;
 
   @Attribute({ nullable: true })
   accessor name: string | null = null;
@@ -197,7 +199,7 @@ export class ADWaveSliderElement extends BaseElement {
         draggable="false"
         class={cls({
           [Slider.slider]: true,
-          disabled: this.disabled,
+          [Slider.disabled]: this.disabled,
         })}
         onpointerdown={this.handlePointerDown}
         onpointermove={preventDefault}
