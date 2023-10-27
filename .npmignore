@@ -6,6 +6,7 @@
 /coverage
 /scripts
 /src
+/.yarn
 /.editorconfig
 /.eslintignore
 /.eslintrc.json
@@ -17,4 +18,6 @@
 /git-hook-tasks.config.json
 /jest.config.js
 /tsconfig.json
+/yarn-error.log
+/index.html
 /yarn-error.log

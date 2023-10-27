@@ -1,6 +1,6 @@
 {
   "name": "adwaveui",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "main": "./dist/esm/index.js",
   "types": "./dist/types/index.d.ts",
   "exports": {
@@ -54,7 +54,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "adwavecss": "^0.0.2",
+    "adwavecss": "^0.0.3",
     "jsxte": "^3.1.5",
     "jsxte-wc": "^1.1.4"
   }
