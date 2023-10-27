@@ -12,20 +12,25 @@ import "./switch.css";
 
 declare global {
   namespace JSX {
+    interface AdwSwitchProps {
+      class?: string;
+      id?: string;
+      slot?: string;
+      style?: string;
+      active?: boolean;
+      disabled?: boolean;
+      name?: string;
+      form?: string;
+      onChange?: (e: SwitchChangeEvent) => void;
+      onchange?: string;
+      onClick?: (e: CustomMouseEvent<{}>) => void;
+      onclick?: string;
+      onKeyDown?: (e: CustomKeyboardEvent<{}>) => void;
+      onkeydown?: string;
+    }
+
     interface IntrinsicElements {
-      "adw-switch": {
-        class?: string;
-        id?: string;
-        slot?: string;
-        style?: string;
-        active?: boolean;
-        disabled?: boolean;
-        name?: string;
-        form?: string;
-        onChange?: (e: SwitchChangeEvent) => void;
-        onClick?: (e: CustomMouseEvent<{}>) => void;
-        onKeyDown?: (e: CustomKeyboardEvent<{}>) => void;
-      };
+      "adw-switch": AdwSwitchProps;
     }
   }
 }

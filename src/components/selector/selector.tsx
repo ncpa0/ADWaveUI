@@ -28,21 +28,25 @@ declare global {
   }
 
   namespace JSX {
+    interface AdwSelectorProps {
+      class?: string;
+      id?: string;
+      slot?: string;
+      style?: string;
+      placeholder?: string;
+      disabled?: boolean;
+      name?: string;
+      form?: string;
+      orientation?: string;
+      children?: any;
+      onChange?: (e: CustomEvent<{ value?: string }>) => void;
+      onchange?: string;
+      onClick?: (e: CustomMouseEvent<{}>) => void;
+      onclick?: string;
+    }
+
     interface IntrinsicElements {
-      "adw-selector": {
-        class?: string;
-        id?: string;
-        slot?: string;
-        style?: string;
-        placeholder?: string;
-        disabled?: boolean;
-        name?: string;
-        form?: string;
-        orientation?: string;
-        children?: any;
-        onChange?: (e: CustomEvent<{ value?: string }>) => void;
-        onClick?: (e: CustomMouseEvent<{}>) => void;
-      };
+      "adw-selector": AdwSelectorProps;
     }
   }
 }

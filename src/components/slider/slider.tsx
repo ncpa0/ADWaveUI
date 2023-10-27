@@ -11,23 +11,27 @@ import "./slider.css";
 
 declare global {
   namespace JSX {
+    interface AdwSliderProps {
+      class?: string;
+      id?: string;
+      slot?: string;
+      style?: string;
+      value?: number;
+      min?: number;
+      max?: number;
+      step?: number;
+      precision?: number;
+      disabled?: boolean;
+      name?: string;
+      form?: string;
+      onChange?: (e: SliderChangeEvent) => void;
+      onchange?: string;
+      onPointerDown?: (e: CustomPointerEvent<{}>) => void;
+      onpointerdown?: string;
+    }
+
     interface IntrinsicElements {
-      "adw-slider": {
-        class?: string;
-        id?: string;
-        slot?: string;
-        style?: string;
-        value?: number;
-        min?: number;
-        max?: number;
-        step?: number;
-        precision?: number;
-        disabled?: boolean;
-        name?: string;
-        form?: string;
-        onChange?: (e: SliderChangeEvent) => void;
-        onPointerDown?: (e: CustomPointerEvent<{}>) => void;
-      };
+      "adw-slider": AdwSliderProps;
     }
   }
 }

@@ -24,37 +24,40 @@ import "./input.css";
 
 declare global {
   namespace JSX {
+
+    interface AdwInputProps {
+      class?: string;
+      id?: string;
+      slot?: string;
+      style?: string;
+      value?: string;
+      disabled?: boolean;
+      name?: string;
+      form?: string;
+      type?: InputType;
+      placeholder?: string;
+      minlength?: number;
+      maxlength?: number;
+      errorlabel?: string;
+      alertlabel?: string;
+      suggestions?: string;
+      suggestionsshowall?: boolean;
+      suggestionsorientation?: string;
+      fuzzy?: boolean;
+      onChange?: (e: InputChangeEvent) => void;
+      onchange?: string;
+      onKeyDown?: (e: CustomKeyboardEvent<{}>) => void;
+      onkeydown?: string;
+      onInput?: (e: InputEvent) => void;
+      oninput?: string;
+      onBlur?: (e: FocusEvent) => void;
+      onblur?: string;
+      onFocus?: (e: FocusEvent) => void;
+      onfocus?: string;
+    }
+
     interface IntrinsicElements {
-      "adw-input": {
-        class?: string;
-        id?: string;
-        slot?: string;
-        style?: string;
-        value?: string;
-        disabled?: boolean;
-        name?: string;
-        form?: string;
-        type?: InputType;
-        placeholder?: string;
-        minlength?: number;
-        maxlength?: number;
-        errorlabel?: string;
-        alertlabel?: string;
-        suggestions?: string;
-        suggestionsshowall?: boolean;
-        suggestionsorientation?: string;
-        fuzzy?: boolean;
-        onChange?: (e: InputChangeEvent) => void;
-        onchange?: string;
-        onKeyDown?: (e: CustomKeyboardEvent<{}>) => void;
-        onkeydown?: string;
-        onInput?: (e: InputEvent) => void;
-        oninput?: string;
-        onBlur?: (e: FocusEvent) => void;
-        onblur?: string;
-        onFocus?: (e: FocusEvent) => void;
-        onfocus?: string;
-      };
+      "adw-input": AdwInputProps;
     }
   }
 }
