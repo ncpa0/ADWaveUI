@@ -1,4 +1,5 @@
 import { Input, Suggestions } from "adwavecss";
+import { AttributeBool } from "jsxte";
 import {
   Attribute,
   CustomElement,
@@ -24,14 +25,13 @@ import "./input.css";
 
 declare global {
   namespace JSX {
-
     interface AdwInputProps {
       class?: string;
       id?: string;
       slot?: string;
       style?: string;
       value?: string;
-      disabled?: boolean;
+      disabled?: AttributeBool;
       name?: string;
       form?: string;
       type?: InputType;
@@ -41,9 +41,9 @@ declare global {
       errorlabel?: string;
       alertlabel?: string;
       suggestions?: string;
-      suggestionsshowall?: boolean;
+      suggestionsshowall?: AttributeBool;
       suggestionsorientation?: string;
-      fuzzy?: boolean;
+      fuzzy?: AttributeBool;
       onChange?: (e: InputChangeEvent) => void;
       onchange?: string;
       onKeyDown?: (e: CustomKeyboardEvent<{}>) => void;
@@ -159,6 +159,15 @@ export class ADWaveInputElement extends BaseElement {
     );
 
     this.effect(
+      () => {
+        if (this.isSuggestionsOpen) {
+          this.scrollActiveToView(true);
+        }
+      },
+      (s) => [s.isSuggestionsOpen],
+    );
+
+    this.effect(
       ({ isFirstMount }) => {
         if (isFirstMount) return;
         if (this.isInFocus) {
@@ -185,7 +194,7 @@ export class ADWaveInputElement extends BaseElement {
 
     for (let i = 0; i < options.length; i++) {
       const option = options[i]!;
-      if (option.startsWith(query)) {
+      if (option.toLowerCase().startsWith(query)) {
         results.push(option);
       }
     }
@@ -203,7 +212,7 @@ export class ADWaveInputElement extends BaseElement {
 
     for (let i = 0; i < options.length; i++) {
       const option = options[i]!;
-      if (fuzzyCmp(query, option)) {
+      if (fuzzyCmp(query, option.toLowerCase())) {
         results.push(option);
       }
     }
@@ -217,10 +226,6 @@ export class ADWaveInputElement extends BaseElement {
     }
 
     let options = this.suggestions.split(";");
-
-    for (let i = 0; i < options.length; i++) {
-      options[i] = options[i]!.toLowerCase();
-    }
 
     if (this.suggestionsShowAll) {
       return options;
@@ -244,7 +249,7 @@ export class ADWaveInputElement extends BaseElement {
   /**
    * Scrolls into view the currently highlighted suggestion.
    */
-  private scrollActiveToView() {
+  private scrollActiveToView(forceInstant = false) {
     const suggestions = this.querySelector(
       `.${Suggestions.suggestions}`,
     );
@@ -261,38 +266,30 @@ export class ADWaveInputElement extends BaseElement {
       return;
     }
 
-    const autocompleteRect = suggestions.getBoundingClientRect();
-    const activeOptionRect = activeOption.getBoundingClientRect();
+    const now = Date.now();
 
-    if (
-      activeOptionRect.top < autocompleteRect.top ||
-      activeOptionRect.bottom > autocompleteRect.bottom
-    ) {
-      const now = Date.now();
-
-      /**
-       * If the behavior is smooth and the arrow key is being held
-       * down, the scrolling won't happen until the key is released.
-       *
-       * In order to have smooth scrolling when the key is tapped, but
-       * also have instant scrolling when the key is held down, we
-       * check the time difference between the last scroll and the
-       * current scroll, and chose an appropriate behavior.
-       */
-      if (now - this.lastScrollIntoView > 100) {
-        activeOption.scrollIntoView({
-          behavior: "smooth",
-          block: "nearest",
-        });
-      } else {
-        activeOption.scrollIntoView({
-          behavior: "instant",
-          block: "nearest",
-        });
-      }
-
-      this.lastScrollIntoView = now;
+    /**
+     * If the behavior is smooth and the arrow key is being held down,
+     * the scrolling won't happen until the key is released.
+     *
+     * In order to have smooth scrolling when the key is tapped, but
+     * also have instant scrolling when the key is held down, we check
+     * the time difference between the last scroll and the current
+     * scroll, and chose an appropriate behavior.
+     */
+    if (forceInstant || now - this.lastScrollIntoView <= 100) {
+      activeOption.scrollIntoView({
+        behavior: "instant",
+        block: "nearest",
+      });
+    } else {
+      activeOption.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
     }
+
+    this.lastScrollIntoView = now;
   }
 
   private handleOptionClick = (ev: MouseEvent) => {
@@ -499,13 +496,10 @@ export class ADWaveInputElement extends BaseElement {
   };
 
   private Suggestions = () => {
-    if (
+    const isHidden =
       this.suggestions == null ||
       this.availableOptions.length === 0 ||
-      this.isSuggestionsOpen === false
-    ) {
-      return <></>;
-    }
+      this.isSuggestionsOpen === false;
 
     const reversed = this.suggestionsOrientation == "up";
 
@@ -543,6 +537,7 @@ export class ADWaveInputElement extends BaseElement {
           {
             [Suggestions.suggestions]: true,
             "suggestions-options": true,
+            _adw_hidden: isHidden,
           },
           this.suggestionsOrientation === "up"
             ? ["orientation-up", "top"]

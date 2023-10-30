@@ -1,4 +1,5 @@
 import { Selector } from "adwavecss";
+import { AttributeBool } from "jsxte";
 import {
   Attribute,
   CustomElement,
@@ -34,10 +35,10 @@ declare global {
       slot?: string;
       style?: string;
       placeholder?: string;
-      disabled?: boolean;
+      disabled?: AttributeBool;
       name?: string;
       form?: string;
-      orientation?: string;
+      orientation?: "up" | "down";
       children?: any;
       onChange?: (e: CustomEvent<{ value?: string }>) => void;
       onchange?: string;
@@ -45,8 +46,14 @@ declare global {
       onclick?: string;
     }
 
+    interface AdwOptionProps {
+      value: string;
+      selected?: AttributeBool;
+    }
+
     interface IntrinsicElements {
       "adw-selector": AdwSelectorProps;
+      "adw-option": AdwOptionProps;
     }
   }
 }
@@ -81,7 +88,7 @@ export class ADWaveSelector extends BaseElement {
   accessor form: string | null = null;
 
   @Attribute({ nullable: false, default: "down" })
-  accessor orientation: string = "down";
+  accessor orientation: "up" | "down" = "down";
 
   @State()
   accessor isOpen: boolean = false;

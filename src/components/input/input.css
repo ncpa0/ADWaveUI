@@ -26,11 +26,11 @@ adw-input .suggestions-options {
 }
 
 adw-input .suggestions-options.orientation-down {
-  top: calc(100% - 0.6em);
+  top: calc(100% + 0.2em);
 }
 
 adw-input .suggestions-options.orientation-up {
-  bottom: calc(100% - 0.45em);
+  bottom: calc(100% + 0.2em);
 }
 
 adw-input .suggestions-options * {

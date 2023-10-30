@@ -1,4 +1,5 @@
 import { Switch } from "adwavecss";
+import { AttributeBool } from "jsxte";
 import { Attribute, CustomElement } from "jsxte-wc";
 import { BaseElement } from "../../base-elements";
 import "../../index.css";
@@ -17,8 +18,8 @@ declare global {
       id?: string;
       slot?: string;
       style?: string;
-      active?: boolean;
-      disabled?: boolean;
+      active?: AttributeBool;
+      disabled?: AttributeBool;
       name?: string;
       form?: string;
       onChange?: (e: SwitchChangeEvent) => void;

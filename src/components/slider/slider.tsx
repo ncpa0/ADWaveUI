@@ -1,4 +1,5 @@
 import { Slider } from "adwavecss";
+import { AttributeBool } from "jsxte";
 import { Attribute, CustomElement } from "jsxte-wc";
 import { BaseElement } from "../../base-elements";
 import "../../index.css";
@@ -21,7 +22,7 @@ declare global {
       max?: number;
       step?: number;
       precision?: number;
-      disabled?: boolean;
+      disabled?: AttributeBool;
       name?: string;
       form?: string;
       onChange?: (e: SliderChangeEvent) => void;
@@ -36,7 +37,10 @@ declare global {
   }
 }
 
-const preventDefault = (e: Event) => e.preventDefault();
+const preventDefault = (e: Event) => {
+  e.preventDefault();
+  return false;
+};
 
 class SliderChangeEvent extends CustomEvent<{ value: number }> {
   constructor(value: number) {

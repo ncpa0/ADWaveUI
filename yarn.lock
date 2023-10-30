@@ -200,10 +200,10 @@
   resolved "https://registry.npmjs.org/@types/unist/-/unist-2.0.7.tgz"
   integrity sha512-cputDpIbFgLUaGQn6Vqg3/YsJwxUwHLO13v3i5ouxT4lat0khip9AEWxtERujXV9wxIB1EyF97BSJFt6vpdI8g==
 
-adwavecss@^0.0.2:
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/adwavecss/-/adwavecss-0.0.2.tgz#1ddbd487b6be4ae5240e3108fcdc163c677384b9"
-  integrity sha512-aNB1y2aAfOYeYmnSwgR+gH+2lMrN85ilUAMHtQ4xCad3aj5GSWFvgJMoDIlh7F8TEgZUyNXGHmPHGnNTA1jFfw==
+adwavecss@^0.0.4:
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/adwavecss/-/adwavecss-0.0.4.tgz#92b8449c02f4e11a8fff2db02a99dbaa889b4f9e"
+  integrity sha512-6IAQhJSAvK3NN6GlIufACf7d7FRcip2TP49to/6jbH6BoNHEdhIUPHv8ZDXOnJf5vVxdeoGq09L7E5iMKuUsxQ==
 
 ansi-regex@^5.0.1:
   version "5.0.1"
@@ -874,15 +874,15 @@ json-to-ts@^1.7.0:
     hash.js "^1.0.3"
     pluralize "^3.1.0"
 
-jsxte-wc@^1.1.4:
-  version "1.1.4"
-  resolved "https://registry.yarnpkg.com/jsxte-wc/-/jsxte-wc-1.1.4.tgz#4032d4c1116d703677226d7cedb4818a18b8e198"
-  integrity sha512-XdZlIh3cwJi02+JTTsjNHBpc40sZ6K6u2rJScEpnHhZhosDkm5aTUpSuUnWHg+ltT4rdH+mTDnoKbN0y0GlrDw==
+jsxte-wc@^1.1.5:
+  version "1.1.5"
+  resolved "https://registry.yarnpkg.com/jsxte-wc/-/jsxte-wc-1.1.5.tgz#799b71a6297d31d92c90dbad826fd5bdfebfc6ff"
+  integrity sha512-YawsSCI2zvGQJH5zaoVo9F9zeAEug+7yabVJBkKvAA+ngvTvdLUm/Bgg7oPbz9ZIY1jqjGTn6+kL7igzHXdlaQ==
 
-jsxte@^3.1.5:
-  version "3.1.5"
-  resolved "https://registry.npmjs.org/jsxte/-/jsxte-3.1.5.tgz"
-  integrity sha512-oBZTMBzbOTnS8uEDCIHB2t2W0lN9kLGI4x6DGjNFXZ/Cq7DMVLgncrq3lq9aqcKzBf7ZwskwvNs2jW8UhIehNg==
+jsxte@^3.1.6:
+  version "3.1.6"
+  resolved "https://registry.yarnpkg.com/jsxte/-/jsxte-3.1.6.tgz#1f7a74af1345e12e044519a1f916b1ba7071cd1a"
+  integrity sha512-9Kx5nrwBriZZ2Wu5WQA4Lxtap/gklOdvGMDaoSQZ28bU7I4FrnTBVevxklPX9TrDTKgUB0Nn+F1z7pkptcRidQ==
 
 kleur@^4.0.3:
   version "4.1.5"
