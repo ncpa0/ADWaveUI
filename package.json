@@ -52,7 +52,8 @@
     "fix:format": "prettier -w ./src/**/*.ts",
     "test:format": "prettier -c ./src/**/*.ts",
     "test:tsc": "tsc --noEmit",
-    "build": "node ./scripts/build.mjs"
+    "build": "node ./scripts/build.mjs",
+    "prepare": "husky install"
   },
   "packageManager": "yarn@1.22.19",
   "devDependencies": {
