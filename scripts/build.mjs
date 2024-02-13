@@ -58,7 +58,15 @@ async function main() {
     },
   };
 
-  await build(bldOptions);
+  /** @type {import("@ncpa0cpl/nodepack").BuildConfig} */
+  const bundleOptions = {
+    ...bldOptions,
+    entrypoint: p("src/index.ts"),
+    bundle: true,
+    outDir: p("dist/bundle"),
+  };
+
+  await Promise.all([build(bldOptions), build(bundleOptions)]);
   await removeJsxteTypeImports();
 }
 

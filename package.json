@@ -23,6 +23,14 @@
     "./dist/components/switch/switch": {
       "default": "./dist/esm/components/switch/switch.mjs",
       "types": "./dist/types/components/switch/switch.d.ts"
+    },
+    "./bundle": {
+      "default": "./dist/bundle/esm/index.mjs",
+      "types": "./dist/types/index.d.ts"
+    },
+    "./dist/bundle/esm/index": {
+      "default": "./dist/bundle/esm/index.mjs",
+      "types": "./dist/types/index.d.ts"
     }
   },
   "keywords": [
