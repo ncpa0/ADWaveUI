@@ -1,5 +1,4 @@
 import { Switch } from "adwavecss";
-import { AttributeBool } from "jsxte";
 import { Attribute, CustomElement } from "jsxte-wc";
 import { BaseElement } from "../../base-elements";
 import "../../index.css";
@@ -9,6 +8,7 @@ import {
   CustomMouseEvent,
 } from "../../utils/events";
 import { stopEvent } from "../../utils/prevent-default";
+import { AttributeBool } from "../../utils/types";
 import "./switch.css";
 
 declare global {

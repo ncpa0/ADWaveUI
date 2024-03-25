@@ -1,5 +1,4 @@
 import { Selector } from "adwavecss";
-import { AttributeBool } from "jsxte";
 import {
   Attribute,
   CustomElement,
@@ -17,6 +16,7 @@ import {
 } from "../../utils/events";
 import { getUid } from "../../utils/get-uid";
 import { stopEvent } from "../../utils/prevent-default";
+import { AttributeBool } from "../../utils/types";
 import "./selector.css";
 
 type Ref<T> = { current: T | null };

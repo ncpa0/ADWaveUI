@@ -1,5 +1,4 @@
 import { Slider } from "adwavecss";
-import { AttributeBool } from "jsxte";
 import { Attribute, CustomElement } from "jsxte-wc";
 import { BaseElement } from "../../base-elements";
 import "../../index.css";
@@ -8,6 +7,7 @@ import { CustomPointerEvent } from "../../utils/events";
 import { changeWithStep, clamp, toPrecision } from "../../utils/math";
 import { stopEvent } from "../../utils/prevent-default";
 import { createRef } from "../../utils/ref";
+import { AttributeBool } from "../../utils/types";
 import "./slider.css";
 
 declare global {

@@ -1,12 +1,10 @@
 import { Input, Suggestions } from "adwavecss";
-import { AttributeBool } from "jsxte";
 import {
   Attribute,
   CustomElement,
   ElementLifecycleEvent,
   State,
 } from "jsxte-wc";
-import { InputType } from "jsxte/dist/types/jsx/prop-types/input-jsx-props";
 import { BaseElement } from "../../base-elements";
 import "../../index.css";
 import { cls } from "../../utils/cls";
@@ -21,6 +19,7 @@ import {
   preventDefault,
   stopEvent,
 } from "../../utils/prevent-default";
+import { AttributeBool, InputType } from "../../utils/types";
 import "./input.css";
 
 declare global {
@@ -246,9 +245,7 @@ export class ADWaveInputElement extends BaseElement {
 
   private lastScrollIntoView = 0;
 
-  /**
-   * Scrolls into view the currently highlighted suggestion.
-   */
+  /** Scrolls into view the currently highlighted suggestion. */
   private scrollActiveToView(forceInstant = false) {
     const suggestions = this.querySelector(
       `.${Suggestions.suggestions}`,

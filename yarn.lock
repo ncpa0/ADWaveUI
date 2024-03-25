@@ -206,7 +206,7 @@
   resolved "https://registry.yarnpkg.com/@types/unist/-/unist-3.0.2.tgz#6dd61e43ef60b34086287f83683a5c1b2dc53d20"
   integrity sha512-dqId9J8K/vGi5Zr7oo212BGii5m3q5Hxlkwy3WpYuKPklmBEvsbMYYyLxAQpSffdLl/gdW0XUpKWFvYmyoWCoQ==
 
-adwavecss@>0.0.12:
+adwavecss@>=0.0.12:
   version "0.0.12"
   resolved "https://registry.yarnpkg.com/adwavecss/-/adwavecss-0.0.12.tgz#6c5c76b8c37ae5f8bb7c97095eed2d2935a52d3c"
   integrity sha512-cEQiFyCKoBvrVU6HuglyR8eXsxrnF60P9bMMh7nh8VWHIy7zgieTcVLXKhyaLD0+z8KcKFC/kV+shX5ogzQoWw==
@@ -1202,7 +1202,7 @@ ms@2.1.2:
   resolved "https://registry.npmjs.org/ms/-/ms-2.1.2.tgz"
   integrity sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==
 
-node-os-walk@>=1.0.2, node-os-walk@^1.0.0:
+node-os-walk@>=1.0.2, node-os-walk@^1.0.0, node-os-walk@^1.0.2:
   version "1.0.2"
   resolved "https://registry.npmjs.org/node-os-walk/-/node-os-walk-1.0.2.tgz"
   integrity sha512-aJOH1sKNP2vdYZwLyaSqPouM5Bg5YnNd0t/8cdLz2mjxDGxZyqFpa7vTsbhfjUdJM3ZBwiLPwu84kl2tET8T+Q==

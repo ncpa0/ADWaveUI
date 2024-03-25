@@ -62,13 +62,14 @@
     "esbuild": "^0.20.0",
     "git-hook-tasks": "git+https://github.com/ncpa0cpl/git-hook-tasks#0.0.1",
     "husky": "^8.0.3",
+    "node-os-walk": "^1.0.2",
     "prettier": "^3.2.5",
     "prettier-plugin-jsdoc": "^1.3.0",
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "adwavecss": ">=0.0.12",
     "jsxte": "^3.3.1",
-    "jsxte-wc": "^1.1.5",
-    "adwavecss": ">0.0.12"
+    "jsxte-wc": "^1.1.5"
   }
 }
