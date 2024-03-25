@@ -75,6 +75,8 @@ class SelectorChangeEvent extends CustomEvent<{
   }
 }
 
+export type { SelectorChangeEvent };
+
 @CustomElement("adw-selector")
 export class ADWaveSelector extends BaseElement {
   @Attribute({ nullable: true })

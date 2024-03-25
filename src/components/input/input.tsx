@@ -71,6 +71,8 @@ class InputChangeEvent extends CustomEvent<{ value?: string }> {
   }
 }
 
+export type { InputChangeEvent };
+
 @CustomElement("adw-input")
 export class ADWaveInputElement extends BaseElement {
   @Attribute({ nullable: false })

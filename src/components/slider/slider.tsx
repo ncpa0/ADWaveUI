@@ -54,6 +54,8 @@ class SliderChangeEvent extends CustomEvent<{ value: number }> {
   }
 }
 
+export type { SliderChangeEvent };
+
 @CustomElement("adw-slider")
 export class ADWaveSliderElement extends BaseElement {
   @Attribute({ type: "number", nullable: false, default: 0 })
