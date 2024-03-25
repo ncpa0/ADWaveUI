@@ -41,7 +41,7 @@ declare global {
       alertlabel?: string;
       suggestions?: string;
       suggestionsshowall?: AttributeBool;
-      suggestionsorientation?: string;
+      suggestionsorientation?: "up" | "down";
       fuzzy?: AttributeBool;
       onChange?: (e: InputChangeEvent) => void;
       onchange?: string;
@@ -61,11 +61,15 @@ declare global {
   }
 }
 
-class InputChangeEvent extends CustomEvent<{ value?: string }> {
-  constructor(value?: string) {
+class InputChangeEvent extends CustomEvent<{
+  value: string;
+  type: "select" | "submit";
+}> {
+  constructor(type: "select" | "submit", value: string) {
     super("change", {
       detail: {
         value,
+        type,
       },
     });
   }
@@ -112,7 +116,7 @@ export class ADWaveInputElement extends BaseElement {
   accessor suggestionsShowAll: boolean = false;
 
   @Attribute({ nullable: true, default: "down" })
-  accessor suggestionsOrientation: string = "down";
+  accessor suggestionsOrientation: "up" | "down" = "down";
 
   @Attribute({ type: "boolean", nullable: false })
   accessor fuzzy: boolean = false;
@@ -121,7 +125,7 @@ export class ADWaveInputElement extends BaseElement {
   accessor availableOptions: string[] = [];
 
   @State()
-  accessor selectedOption: number = 0;
+  accessor selectedOption: number = -1;
 
   @State()
   accessor isSuggestionsOpen = false;
@@ -136,7 +140,7 @@ export class ADWaveInputElement extends BaseElement {
     this.immediateEffect(
       () => {
         this.availableOptions = this.getMatchingOptions();
-        this.selectedOption = 0;
+        this.selectedOption = -1;
       },
       (s) => [s.value, s.suggestions, s.suggestionsShowAll],
     );
@@ -144,7 +148,7 @@ export class ADWaveInputElement extends BaseElement {
     this.immediateEffect(
       () => {
         if (this.isSuggestionsOpen) {
-          this.selectedOption = 0;
+          this.selectedOption = -1;
         }
       },
       (s) => [s.isSuggestionsOpen],
@@ -174,7 +178,9 @@ export class ADWaveInputElement extends BaseElement {
         if (this.isInFocus) {
           this.hasChanged = true;
         } else {
-          this.dispatchEvent(new InputChangeEvent(this.value));
+          this.dispatchEvent(
+            new InputChangeEvent("submit", this.value),
+          );
         }
       },
       (s) => [s.value],
@@ -320,7 +326,7 @@ export class ADWaveInputElement extends BaseElement {
   };
 
   private highlightNextOption(offset = 1) {
-    this.selectedOption = Math.max(0, this.selectedOption! - offset);
+    this.selectedOption = Math.max(-1, this.selectedOption! - offset);
   }
 
   private highlightPreviousOption(offset = 1) {
@@ -434,16 +440,21 @@ export class ADWaveInputElement extends BaseElement {
         this.withCustomKeyEvent(
           ev,
           () => {
-            if (this.isSuggestionsOpen) {
+            if (this.isSuggestionsOpen && this.selectedOption >= 0) {
               ev.preventDefault();
               const opt = this.availableOptions[this.selectedOption];
               if (opt) {
                 this.value = opt;
                 this.isSuggestionsOpen = false;
+                this.dispatchEvent(
+                  new InputChangeEvent("select", this.value),
+                );
               }
             } else if (this.hasChanged) {
               this.hasChanged = false;
-              this.dispatchEvent(new InputChangeEvent(this.value));
+              this.dispatchEvent(
+                new InputChangeEvent("submit", this.value),
+              );
             }
           },
           () => {
@@ -490,7 +501,7 @@ export class ADWaveInputElement extends BaseElement {
     this.isSuggestionsOpen = false;
     if (this.hasChanged) {
       this.hasChanged = false;
-      this.dispatchEvent(new InputChangeEvent(this.value));
+      this.dispatchEvent(new InputChangeEvent("submit", this.value));
     }
   };
 
