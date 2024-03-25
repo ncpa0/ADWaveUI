@@ -39,6 +39,7 @@ declare global {
       name?: string;
       form?: string;
       orientation?: "up" | "down";
+      value?: string;
       children?: any;
       onChange?: (e: CustomEvent<{ value?: string }>) => void;
       onchange?: string;
@@ -49,6 +50,7 @@ declare global {
     interface AdwOptionProps {
       value: string;
       selected?: AttributeBool;
+      children?: string;
     }
 
     interface IntrinsicElements {

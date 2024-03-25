@@ -7,3 +7,4 @@ export type {
   CustomMouseEvent,
   CustomPointerEvent,
 } from "./utils/events";
+export type { AttributeBool, InputType } from "./utils/types";
