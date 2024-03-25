@@ -67,8 +67,8 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "jsxte": "^3.3.0",
+    "jsxte": "^3.3.1",
     "jsxte-wc": "^1.1.5",
-    "adwavecss": ">0.0.4"
+    "adwavecss": ">0.0.12"
   }
 }

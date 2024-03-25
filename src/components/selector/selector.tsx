@@ -63,8 +63,10 @@ const IS_MOBILE =
     navigator.userAgent,
   );
 
-class SelectorChangeEvent extends CustomEvent<{ value?: string }> {
-  constructor(value?: string) {
+class SelectorChangeEvent extends CustomEvent<{
+  value: string | null;
+}> {
+  constructor(value: string | null) {
     super("change", {
       detail: {
         value,
@@ -90,11 +92,11 @@ export class ADWaveSelector extends BaseElement {
   @Attribute({ nullable: false, default: "down" })
   accessor orientation: "up" | "down" = "down";
 
-  @State()
-  accessor isOpen: boolean = false;
+  @Attribute({ nullable: true })
+  accessor value: string | null = null;
 
   @State()
-  accessor currentOption: string | undefined = undefined;
+  accessor isOpen: boolean = false;
 
   @Slotted({ filter: "adw-option" })
   accessor options: ADWaveSelectorOption[] = [];
@@ -129,9 +131,7 @@ export class ADWaveSelector extends BaseElement {
             }
           }
 
-          /**
-           * When clicking outside of the visible modal, close it.
-           */
+          /** When clicking outside of the visible modal, close it. */
           if (!IS_MOBILE) {
             const eventHandler = (event: MouseEvent) => {
               if (!this.contains(event.target as Node)) {
@@ -157,7 +157,7 @@ export class ADWaveSelector extends BaseElement {
         );
 
         if (firstSelected) {
-          this.currentOption = firstSelected.getValue();
+          this.value = firstSelected.getValue();
 
           for (let j = 0; j < this.options.length; j++) {
             const slot = this.options[j]!;
@@ -186,8 +186,8 @@ export class ADWaveSelector extends BaseElement {
           const slot = changedSlots[i]!;
           if (slot.isSelected()) {
             const newValue = slot.getValue();
-            hasChanged = this.currentOption !== newValue;
-            this.currentOption = newValue;
+            hasChanged = this.value !== newValue;
+            this.value = newValue;
 
             // unset the `selected` attribute on all other options
             for (let j = 0; j < this.options.length; j++) {
@@ -201,9 +201,7 @@ export class ADWaveSelector extends BaseElement {
         }
 
         if (hasChanged) {
-          this.dispatchEvent(
-            new SelectorChangeEvent(this.currentOption),
-          );
+          this.dispatchEvent(new SelectorChangeEvent(this.value));
         }
       }
     });
@@ -469,7 +467,7 @@ export class ADWaveSelector extends BaseElement {
 
   private getSelectedOption() {
     return this.options.find((option) =>
-      option.isEqualTo(this.currentOption),
+      option.isEqualTo(this.value),
     );
   }
 
@@ -480,7 +478,7 @@ export class ADWaveSelector extends BaseElement {
         onclick={this.handleOptionClick}
         data-option={props.option.getValue()}
         role="option"
-        aria-selected={props.option.isEqualTo(this.currentOption)}
+        aria-selected={props.option.isEqualTo(this.value)}
       >
         {props.option.getLabel()}
       </button>
@@ -547,7 +545,7 @@ export class ADWaveSelector extends BaseElement {
           return (
             <option
               value={option.getValue()}
-              selected={option.isEqualTo(this.currentOption)}
+              selected={option.isEqualTo(this.value)}
             />
           );
         })}
@@ -608,7 +606,7 @@ export class ADWaveSelectorOption extends WcSlot {
     super();
   }
 
-  isEqualTo(value?: string) {
+  isEqualTo(value?: string | null) {
     return this.hasValue() && this.getValue() === value;
   }
 
