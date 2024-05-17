@@ -35,6 +35,19 @@ async function removeJsxteTypeImports() {
   return Promise.all(ops);
 }
 
+async function onBundleBuildComplete() {
+  await fs.rename(
+    p("dist/bundle/esm/index.mjs"),
+    p("dist/bundle/index.js"),
+  );
+  await fs.rm(p("dist/bundle/esm"), {
+    recursive: true,
+  });
+  await fs.rm(p("dist/bundle/types"), {
+    recursive: true,
+  });
+}
+
 async function main() {
   /** @type {import("@ncpa0cpl/nodepack").BuildConfig} */
   const bldOptions = {
@@ -64,9 +77,14 @@ async function main() {
     entrypoint: p("src/index.ts"),
     bundle: true,
     outDir: p("dist/bundle"),
+    onBuildComplete: onBundleBuildComplete,
   };
 
-  await Promise.all([build(bldOptions), build(bundleOptions)]);
+  const buildBase = () => build(bldOptions);
+  const buildBundle = () =>
+    build(bundleOptions).then(() => onBundleBuildComplete());
+
+  await Promise.all([buildBase(), buildBundle()]);
   await removeJsxteTypeImports();
 }
 
