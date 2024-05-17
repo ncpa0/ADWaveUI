@@ -577,8 +577,7 @@ export class ADWaveInputElement extends BaseElement {
           aria-haspopup="listbox"
           aria-expanded={this.isSuggestionsOpen}
           aria-controls={this.uid}
-        >
-        </input>
+        />
         <this.Suggestions />
       </>
     );

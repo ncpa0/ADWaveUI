@@ -58,7 +58,9 @@
   },
   "scripts": {
     "fix:fmt": "dprint fmt './src/**/*'",
+    "fix:lint": "oxlint --fix",
     "test:fmt": "dprint check './src/**/*'",
+    "test:lint": "oxlint",
     "test:tsc": "tsc --noEmit",
     "build": "node ./scripts/build.mjs",
     "prepare": "husky install"
@@ -74,6 +76,7 @@
     "git-hook-tasks": "git+https://github.com/ncpa0cpl/git-hook-tasks#0.0.1",
     "husky": "^8.0.3",
     "node-os-walk": "^1.0.2",
+    "oxlint": "^0.3.5",
     "prettier": "^3.2.5",
     "prettier-plugin-jsdoc": "^1.3.0",
     "typescript": "^5.4.5"
