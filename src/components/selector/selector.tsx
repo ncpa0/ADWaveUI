@@ -122,14 +122,26 @@ export class ADWaveSelector extends BaseElement {
           const optionsList = this.optionsListElem.current;
           if (optionsList) {
             const reverse = this.orientation === "up";
-            if (reverse) {
-              optionsList.scrollTo({
-                top: optionsList.scrollHeight,
-                behavior: "instant",
-              });
+
+            if (this.value != null) {
+              const allOptElems = Array.from(
+                optionsList.querySelectorAll("button.option"),
+              ) as HTMLButtonElement[];
+
+              const activeOptionElem = allOptElems.find(
+                (btn) => btn.dataset.option === this.value,
+              );
+
+              if (activeOptionElem) {
+                activeOptionElem.focus();
+                activeOptionElem.scrollIntoView({
+                  behavior: "instant",
+                  block: "center",
+                });
+              }
             } else {
               optionsList.scrollTo({
-                top: 0,
+                top: reverse ? optionsList.scrollHeight : 0,
                 behavior: "instant",
               });
             }
@@ -476,13 +488,18 @@ export class ADWaveSelector extends BaseElement {
   }
 
   private Option = (props: { option: ADWaveSelectorOption }) => {
+    const isSelected = props.option.isEqualTo(this.value);
+
     return (
       <button
-        class={Selector.option}
+        class={cls({
+          [Selector.option]: true,
+          selected: isSelected,
+        })}
         onclick={this.handleOptionClick}
         data-option={props.option.getValue()}
         role="option"
-        aria-selected={props.option.isEqualTo(this.value)}
+        aria-selected={isSelected}
       >
         {props.option.getLabel()}
       </button>
