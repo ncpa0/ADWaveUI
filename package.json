@@ -1,7 +1,7 @@
 {
   "name": "adwaveui",
   "version": "0.0.5",
-  "main": "./dist/esm/index.js",
+  "main": "./dist/esm/index.mjs",
   "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
@@ -25,11 +25,11 @@
       "types": "./dist/types/components/switch/switch.d.ts"
     },
     "./bundle": {
-      "default": "./dist/bundle/esm/index.mjs",
+      "default": "./dist/bundle/index.js",
       "types": "./dist/types/index.d.ts"
     },
-    "./dist/bundle/esm/index": {
-      "default": "./dist/bundle/esm/index.mjs",
+    "./dist/bundle/index": {
+      "default": "./dist/bundle/index.js",
       "types": "./dist/types/index.d.ts"
     }
   },
@@ -67,6 +67,7 @@
   "devDependencies": {
     "@ncpa0cpl/goserve": "^1.0.2",
     "@ncpa0cpl/nodepack": "^2.3.3",
+    "@types/node": "^20.12.12",
     "csso": "^5.0.5",
     "esbuild": "^0.21.3",
     "git-hook-tasks": "git+https://github.com/ncpa0cpl/git-hook-tasks#0.0.1",
