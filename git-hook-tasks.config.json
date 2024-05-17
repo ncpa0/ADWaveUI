@@ -9,7 +9,7 @@
       },
       {
         "name": "Formatting",
-        "script": "test:format"
+        "script": "test:fmt"
       }
     ],
     "pre-commit": [],

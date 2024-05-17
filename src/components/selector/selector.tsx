@@ -1,19 +1,9 @@
 import { Selector } from "adwavecss";
-import {
-  Attribute,
-  CustomElement,
-  ElementLifecycleEvent,
-  Slotted,
-  State,
-  WcSlot,
-} from "jsxte-wc";
+import { Attribute, CustomElement, ElementLifecycleEvent, Slotted, State, WcSlot } from "jsxte-wc";
 import { BaseElement } from "../../base-elements";
 import "../../index.css";
 import { cls } from "../../utils/cls";
-import {
-  CustomKeyboardEvent,
-  CustomMouseEvent,
-} from "../../utils/events";
+import { CustomKeyboardEvent, CustomMouseEvent } from "../../utils/events";
 import { getUid } from "../../utils/get-uid";
 import { stopEvent } from "../../utils/prevent-default";
 import { AttributeBool } from "../../utils/types";
@@ -60,10 +50,9 @@ declare global {
   }
 }
 
-const IS_MOBILE =
-  /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-    navigator.userAgent,
-  );
+const IS_MOBILE = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+  navigator.userAgent,
+);
 
 class SelectorChangeEvent extends CustomEvent<{
   value: string | null;
@@ -168,9 +157,7 @@ export class ADWaveSelector extends BaseElement {
 
     this.effect(
       () => {
-        const firstSelected = this.options.find((opt) =>
-          opt.isSelected(),
-        );
+        const firstSelected = this.options.find((opt) => opt.isSelected());
 
         if (firstSelected) {
           this.value = firstSelected.getValue();
@@ -260,8 +247,7 @@ export class ADWaveSelector extends BaseElement {
 
     let target = currentOption;
 
-    const direction =
-      offset > 0 ? "nextElementSibling" : "previousElementSibling";
+    const direction = offset > 0 ? "nextElementSibling" : "previousElementSibling";
     for (let i = 0; i < Math.abs(offset); i++) {
       const next = target[direction] as HTMLButtonElement | undefined;
       if (!next) {
@@ -482,9 +468,7 @@ export class ADWaveSelector extends BaseElement {
   };
 
   private getSelectedOption() {
-    return this.options.find((option) =>
-      option.isEqualTo(this.value),
-    );
+    return this.options.find((option) => option.isEqualTo(this.value));
   }
 
   private Option = (props: { option: ADWaveSelectorOption }) => {
@@ -519,9 +503,7 @@ export class ADWaveSelector extends BaseElement {
           ref={this.optionsListElem}
           role="listbox"
         >
-          {this.options.map((option) => (
-            <this.Option option={option} />
-          ))}
+          {this.options.map((option) => <this.Option option={option} />)}
         </div>
       </dialog>
     );
@@ -545,9 +527,7 @@ export class ADWaveSelector extends BaseElement {
         })}
         ref={this.optionsListElem}
       >
-        {options.map((option) => (
-          <this.Option option={option} />
-        ))}
+        {options.map((option) => <this.Option option={option} />)}
       </div>
     );
   };
@@ -602,11 +582,7 @@ export class ADWaveSelector extends BaseElement {
           {label ? label : this.placeholder}
         </span>
         <span class={Selector.downButton}></span>
-        {IS_MOBILE ? (
-          <this.OptionsListMobile />
-        ) : (
-          <this.OptionsListDesktop />
-        )}
+        {IS_MOBILE ? <this.OptionsListMobile /> : <this.OptionsListDesktop />}
         <this.HiddenSelect />
       </div>
     );
@@ -657,8 +633,8 @@ export class ADWaveSelectorOption extends WcSlot {
     for (let i = 0; i < mutations.length; i++) {
       const mutation = mutations[i]!;
       if (
-        mutation.attributeName === "selected" &&
-        mutation.oldValue !== this.getAttribute("selected")
+        mutation.attributeName === "selected"
+        && mutation.oldValue !== this.getAttribute("selected")
       ) {
         return true;
       }

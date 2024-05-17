@@ -141,8 +141,7 @@ export class ADWaveSliderElement extends BaseElement {
   }
 
   private moveThumb(value: number) {
-    const percent =
-      ((value - this.min) / (this.max - this.min)) * 100;
+    const percent = ((value - this.min) / (this.max - this.min)) * 100;
 
     this.progress.current!.style.right = `${100 - percent}%`;
     this.thumb.current!.style.left = `calc(${percent}% - 0.3em)`;
@@ -227,21 +226,24 @@ export class ADWaveSliderElement extends BaseElement {
           class={Slider.track}
           onpointermove={preventDefault}
           ondrag={preventDefault}
-        ></div>
+        >
+        </div>
         <div
           ref={this.progress}
           draggable="false"
           class={Slider.progress}
           onpointermove={preventDefault}
           ondrag={preventDefault}
-        ></div>
+        >
+        </div>
         <div
           ref={this.thumb}
           draggable="false"
           class={Slider.thumb}
           onpointermove={preventDefault}
           ondrag={preventDefault}
-        ></div>
+        >
+        </div>
         <input
           type="range"
           class="_adw_hidden"
