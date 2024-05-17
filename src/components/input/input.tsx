@@ -305,6 +305,7 @@ export class ADWaveInputElement extends BaseElement {
     const idx = target.dataset.opt
       ? Number(target.dataset.opt)
       : undefined;
+
     const shouldContinue = this.dispatchEvent(
       new CustomMouseEvent(
         "optionclick",
@@ -314,7 +315,8 @@ export class ADWaveInputElement extends BaseElement {
         ev,
       ),
     );
-    if (idx && shouldContinue) {
+
+    if (idx != null && shouldContinue) {
       this.value = this.availableOptions[idx] ?? "";
       this.isSuggestionsOpen = false;
     }
