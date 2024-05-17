@@ -1,24 +1,13 @@
 import { Input, Suggestions } from "adwavecss";
-import {
-  Attribute,
-  CustomElement,
-  ElementLifecycleEvent,
-  State,
-} from "jsxte-wc";
+import { Attribute, CustomElement, ElementLifecycleEvent, State } from "jsxte-wc";
 import { BaseElement } from "../../base-elements";
 import "../../index.css";
 import { cls } from "../../utils/cls";
-import {
-  CustomKeyboardEvent,
-  CustomMouseEvent,
-} from "../../utils/events";
+import { CustomKeyboardEvent, CustomMouseEvent } from "../../utils/events";
 import { forceClassName } from "../../utils/force-class-name";
 import { fuzzyCmp } from "../../utils/fuzzy-search";
 import { getUid } from "../../utils/get-uid";
-import {
-  preventDefault,
-  stopEvent,
-} from "../../utils/prevent-default";
+import { preventDefault, stopEvent } from "../../utils/prevent-default";
 import { AttributeBool, InputType } from "../../utils/types";
 import "./input.css";
 
@@ -508,10 +497,9 @@ export class ADWaveInputElement extends BaseElement {
   };
 
   private Suggestions = () => {
-    const isHidden =
-      this.suggestions == null ||
-      this.availableOptions.length === 0 ||
-      this.isSuggestionsOpen === false;
+    const isHidden = this.suggestions == null
+      || this.availableOptions.length === 0
+      || this.isSuggestionsOpen === false;
 
     const reversed = this.suggestionsOrientation == "up";
 
@@ -589,7 +577,8 @@ export class ADWaveInputElement extends BaseElement {
           aria-haspopup="listbox"
           aria-expanded={this.isSuggestionsOpen}
           aria-controls={this.uid}
-        ></input>
+        >
+        </input>
         <this.Suggestions />
       </>
     );

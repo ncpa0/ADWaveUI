@@ -57,8 +57,8 @@
     "email": "szymonb21@gmail.com"
   },
   "scripts": {
-    "fix:format": "prettier -w ./src/**/*.ts",
-    "test:format": "prettier -c ./src/**/*.ts",
+    "fix:fmt": "dprint fmt './src/**/*'",
+    "test:fmt": "dprint check './src/**/*'",
     "test:tsc": "tsc --noEmit",
     "build": "node ./scripts/build.mjs",
     "prepare": "husky install"
@@ -69,6 +69,7 @@
     "@ncpa0cpl/nodepack": "^2.3.3",
     "@types/node": "^20.12.12",
     "csso": "^5.0.5",
+    "dprint": "^0.45.1",
     "esbuild": "^0.21.3",
     "git-hook-tasks": "git+https://github.com/ncpa0cpl/git-hook-tasks#0.0.1",
     "husky": "^8.0.3",
