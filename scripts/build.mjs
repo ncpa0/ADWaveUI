@@ -13,8 +13,7 @@ const watch = process.argv.includes("--watch");
 
 async function removeJsxteTypeImports() {
   const ops = [];
-  const regx =
-    /import\s+\{[^}]+\}\s+from\s+['"]jsxte(-wc){0,1}['"];/g;
+  const regx = /import\s+\{[^}]+\}\s+from\s+['"]jsxte(-wc){0,1}['"];/g;
 
   for await (const [root, _, files] of walk(p("dist/types"))) {
     for (const f of files) {
@@ -35,17 +34,14 @@ async function removeJsxteTypeImports() {
   return Promise.all(ops);
 }
 
-async function onBundleBuildComplete() {
-  await fs.rename(
+function onBundleBuildComplete() {
+  fs.rename(
     p("dist/bundle/esm/index.mjs"),
     p("dist/bundle/index.js"),
   );
-  await fs.rm(p("dist/bundle/esm"), {
+  fs.rm(p("dist/bundle/esm"), {
     recursive: true,
-  });
-  await fs.rm(p("dist/bundle/types"), {
-    recursive: true,
-  });
+  }).catch(() => {});
 }
 
 async function main() {
@@ -74,6 +70,7 @@ async function main() {
   /** @type {import("@ncpa0cpl/nodepack").BuildConfig} */
   const bundleOptions = {
     ...bldOptions,
+    declarations: false,
     entrypoint: p("src/index.ts"),
     bundle: true,
     outDir: p("dist/bundle"),

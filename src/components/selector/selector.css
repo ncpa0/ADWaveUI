@@ -6,8 +6,12 @@ adw-selector .selector {
   flex: 1;
 }
 
+adw-selector .selector .option:focus {
+  background-color: rgb(255 255 255 / 15%) !important;
+}
+
 adw-selector .selector .option.selected {
-  background-color: rgb(255 255 255 / 20%);
+  background-color: rgb(255 255 255 / 20%) !important;
 }
 
 adw-selector .selected-option.with-placeholder {
