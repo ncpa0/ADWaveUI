@@ -1,5 +1,12 @@
 import { Selector } from "adwavecss";
-import { Attribute, CustomElement, ElementLifecycleEvent, Slotted, State, WcSlot } from "jsxte-wc";
+import {
+  Attribute,
+  CustomElement,
+  ElementLifecycleEvent,
+  Slotted,
+  State,
+  WcSlot,
+} from "jsxte-wc";
 import { BaseElement } from "../../base-elements";
 import "../../index.css";
 import { cls } from "../../utils/cls";
@@ -50,9 +57,14 @@ declare global {
   }
 }
 
-const IS_MOBILE = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-  navigator.userAgent,
-);
+const IS_MOBILE =
+  /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent,
+  );
+
+const SEARCHABLE_CHARS =
+  "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+=-[]\\{}|;':\",./<>?"
+    .split("");
 
 class SelectorChangeEvent extends CustomEvent<{
   value: string | null;
@@ -97,6 +109,8 @@ export class ADWaveSelector extends BaseElement {
   private uid = getUid();
   private dialogElem: Ref<HTMLDialogElement> = { current: null };
   private optionsListElem: Ref<HTMLDivElement> = { current: null };
+  private searchInputMemory: string = "";
+  private clearSearchInputMemoryTimeout?: number;
 
   constructor() {
     super();
@@ -113,21 +127,7 @@ export class ADWaveSelector extends BaseElement {
             const reverse = this.orientation === "up";
 
             if (this.value != null) {
-              const allOptElems = Array.from(
-                optionsList.querySelectorAll("button.option"),
-              ) as HTMLButtonElement[];
-
-              const activeOptionElem = allOptElems.find(
-                (btn) => btn.dataset.option === this.value,
-              );
-
-              if (activeOptionElem) {
-                activeOptionElem.focus();
-                activeOptionElem.scrollIntoView({
-                  behavior: "instant",
-                  block: "center",
-                });
-              }
+              this.scrollToOption(this.value);
             } else {
               optionsList.scrollTo({
                 top: reverse ? optionsList.scrollHeight : 0,
@@ -210,6 +210,52 @@ export class ADWaveSelector extends BaseElement {
     });
   }
 
+  private tryInputSearch() {
+    if (this.searchInputMemory.length === 0) return;
+    const searchTerm = this.searchInputMemory.toLowerCase();
+
+    let foundOpt = this.options.find(opt => {
+      const label = opt.getLabel().toLowerCase();
+      return label.startsWith(searchTerm);
+    });
+
+    if (!foundOpt) {
+      this.options.find(opt =>{
+        const label = opt.getLabel().toLowerCase();
+        return label.includes(searchTerm);
+      }
+      );
+    }
+
+    if (foundOpt) {
+      this.scrollToOption(foundOpt?.getValue(), "smooth");
+    }
+  }
+
+  private scrollToOption(value: string, behavior: ScrollBehavior = "instant") {
+    const optionsList = this.optionsListElem.current;
+
+    if (!optionsList) {
+      return;
+    }
+
+    const allOptElems = Array.from(
+      optionsList.querySelectorAll("button.option"),
+    ) as HTMLButtonElement[];
+
+    const activeOptionElem = allOptElems.find(
+      (btn) => btn.dataset.option === value,
+    );
+
+    if (activeOptionElem) {
+      activeOptionElem.focus();
+      activeOptionElem.scrollIntoView({
+        behavior,
+        block: "center",
+      });
+    }
+  }
+
   private focusSelf() {
     // @ts-expect-error
     this.querySelector(`.${Selector.selector}`)?.focus();
@@ -247,7 +293,9 @@ export class ADWaveSelector extends BaseElement {
 
     let target = currentOption;
 
-    const direction = offset > 0 ? "nextElementSibling" : "previousElementSibling";
+    const direction = offset > 0
+      ? "nextElementSibling"
+      : "previousElementSibling";
     for (let i = 0; i < Math.abs(offset); i++) {
       const next = target[direction] as HTMLButtonElement | undefined;
       if (!next) {
@@ -464,6 +512,16 @@ export class ADWaveSelector extends BaseElement {
         });
         break;
       }
+      default:
+        if (SEARCHABLE_CHARS.includes(ev.key)) {
+          this.searchInputMemory += ev.key;
+          window.clearTimeout(this.clearSearchInputMemoryTimeout);
+          this.clearSearchInputMemoryTimeout = window.setTimeout(() => {
+            this.searchInputMemory = "";
+          }, 1000);
+          this.tryInputSearch();
+        }
+        break;
     }
   };
 
