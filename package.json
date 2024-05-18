@@ -1,6 +1,6 @@
 {
   "name": "adwaveui",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "main": "./dist/esm/index.mjs",
   "types": "./dist/types/index.d.ts",
   "exports": {
@@ -56,6 +56,12 @@
     "name": "Szymon Bretner",
     "email": "szymonb21@gmail.com"
   },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md",
+    "package.json"
+  ],
   "scripts": {
     "fix:fmt": "dprint fmt './src/**/*'",
     "fix:lint": "oxlint --fix",
