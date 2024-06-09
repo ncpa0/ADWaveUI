@@ -10,6 +10,10 @@
       {
         "name": "Formatting",
         "script": "test:fmt"
+      },
+      {
+        "name": "Linting",
+        "script": "test:lint"
       }
     ],
     "pre-commit": [],
