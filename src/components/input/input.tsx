@@ -1,5 +1,10 @@
 import { Input, Suggestions } from "adwavecss";
-import { Attribute, CustomElement, ElementLifecycleEvent, State } from "jsxte-wc";
+import {
+  Attribute,
+  CustomElement,
+  ElementLifecycleEvent,
+  State,
+} from "jsxte-wc";
 import { BaseElement } from "../../base-elements";
 import "../../index.css";
 import { cls } from "../../utils/cls";

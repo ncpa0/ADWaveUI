@@ -220,11 +220,10 @@ export class ADWaveSelector extends BaseElement {
     });
 
     if (!foundOpt) {
-      this.options.find(opt =>{
+      this.options.find(opt => {
         const label = opt.getLabel().toLowerCase();
         return label.includes(searchTerm);
-      }
-      );
+      });
     }
 
     if (foundOpt) {
@@ -248,11 +247,12 @@ export class ADWaveSelector extends BaseElement {
     );
 
     if (activeOptionElem) {
-      activeOptionElem.focus();
-      activeOptionElem.scrollIntoView({
+      const optionsList = this.optionsListElem.current;
+      optionsList?.scrollTo({
+        top: activeOptionElem.offsetTop - (optionsList.clientHeight / 2),
         behavior,
-        block: "center",
       });
+      activeOptionElem.focus();
     }
   }
 
