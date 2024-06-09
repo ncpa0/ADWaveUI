@@ -182,11 +182,39 @@ export class ADWaveSelector extends BaseElement {
     this.lifecycle.on(ElementLifecycleEvent.SlotDidChange, (c) => {
       if (c.detail.slotName === "options") {
         let hasChanged = false;
+        const addedSlots = c.detail.changes.added as ADWaveSelectorOption[];
+        const removedSlots = c.detail.changes.removed as ADWaveSelectorOption[];
         const changedSlots = c.detail.changes
           .attributeChanged as ADWaveSelectorOption[];
 
+        for (let i = 0; i < removedSlots.length; i++) {
+          const slot = removedSlots[i]!;
+          if (slot.isSelected()) {
+            hasChanged = true;
+            this.value = null;
+          }
+        }
+
         for (let i = 0; i < changedSlots.length; i++) {
           const slot = changedSlots[i]!;
+          if (slot.isSelected()) {
+            const newValue = slot.getValue();
+            hasChanged = this.value !== newValue;
+            this.value = newValue;
+
+            // unset the `selected` attribute on all other options
+            for (let j = 0; j < this.options.length; j++) {
+              const otherSlot = this.options[j]!;
+              if (otherSlot !== slot) {
+                otherSlot.setSelected(false);
+              }
+            }
+            break;
+          }
+        }
+
+        for (let i = 0; i < addedSlots.length; i++) {
+          const slot = addedSlots[i]!;
           if (slot.isSelected()) {
             const newValue = slot.getValue();
             hasChanged = this.value !== newValue;

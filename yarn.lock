@@ -152,10 +152,10 @@
   resolved "https://registry.yarnpkg.com/@esbuild/win32-x64/-/win32-x64-0.21.3.tgz#899c03576c4c28c83228f0e64dfa10edae99c9a2"
   integrity sha512-xRxC0jaJWDLYvcUvjQmHCJSfMrgmUuvsoXgDeU/wTorQ1ngDdUBuFtgY3W1Pc5sprGAvZBtWdJX7RPg/iZZUqA==
 
-"@ncpa0cpl/goserve@^1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@ncpa0cpl/goserve/-/goserve-1.0.2.tgz#cf421831ed87186d039179b6d68d22e4f33b4862"
-  integrity sha512-xgzQByV8NjcU/Q0HdU9eazOsnnXCCojRQW2IfxacKbd6kd3s1l2vD3JwRBZL8399Gf7XO1VpxZLlxYq9f5D/Lw==
+"@ncpa0cpl/goserve@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@ncpa0cpl/goserve/-/goserve-1.0.3.tgz#35142e857d2529f85ea80b6cb891d10c1bd8b711"
+  integrity sha512-5UU6m1bWemoXKF+3rcnatBMnXQ91v98RS5VlGgQRlOCzis/AaSngy0PlX/g1fwYjqUBQloW5JBwP2oCTPBWRjA==
 
 "@ncpa0cpl/node-worker-bridge@^0.0.3":
   version "0.0.3"

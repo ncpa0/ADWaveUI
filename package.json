@@ -73,7 +73,7 @@
   },
   "packageManager": "yarn@1.22.19",
   "devDependencies": {
-    "@ncpa0cpl/goserve": "^1.0.2",
+    "@ncpa0cpl/goserve": "^1.0.3",
     "@ncpa0cpl/nodepack": "^2.3.3",
     "@types/node": "^20.12.12",
     "csso": "^5.0.5",
