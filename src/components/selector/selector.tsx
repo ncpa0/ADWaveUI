@@ -36,6 +36,7 @@ declare global {
       name?: string;
       form?: string;
       orientation?: "up" | "down";
+      reverseorder?: AttributeBool;
       value?: string;
       children?: any;
       onChange?: (e: CustomEvent<{ value?: string }>) => void;
@@ -103,6 +104,9 @@ export class ADWaveSelector extends BaseElement {
 
   @Attribute({ nullable: false, default: "down" })
   accessor orientation: "up" | "down" = "down";
+
+  @Attribute({ type: "boolean", nullable: false, default: false })
+  accessor reverseorder: boolean = false;
 
   @Attribute({ nullable: true })
   accessor value: string | null = null;
@@ -667,6 +671,12 @@ export class ADWaveSelector extends BaseElement {
   };
 
   private OptionsListMobile = () => {
+    let options = this.options;
+
+    if (this.reverseorder) {
+      options = options.slice().reverse();
+    }
+
     return (
       <dialog
         ref={this.dialogElem}
@@ -679,19 +689,17 @@ export class ADWaveSelector extends BaseElement {
           ref={this.optionsListElem}
           role="listbox"
         >
-          {this.options.map((option) => <this.Option option={option} />)}
+          {options.map((option) => <this.Option option={option} />)}
         </div>
       </dialog>
     );
   };
 
   private OptionsListDesktop = () => {
-    const reverse = this.orientation === "up";
-
     let options = this.options;
 
-    if (reverse) {
-      options = options.toReversed();
+    if (this.reverseorder) {
+      options = options.slice().reverse();
     }
 
     return (
@@ -699,7 +707,7 @@ export class ADWaveSelector extends BaseElement {
         id={this.uid}
         class={cls({
           [Selector.optionsList]: true,
-          [Selector.top]: reverse,
+          [Selector.top]: this.orientation === "up",
         })}
         ref={this.optionsListElem}
       >
