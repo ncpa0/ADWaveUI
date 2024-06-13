@@ -27,20 +27,20 @@
 
 ### Properties
 
-| Property                | Description                                                                 | Default |
-|-------------------------|-----------------------------------------------------------------------------|---------|
-| `disabled`              | If the input is disabled or not.                                            | "false" |
-| `form`                  | The form the input belongs to.                                              |         |
-| `maxlength`             | The maximum length of the input.                                            |         |
-| `minlength`             | The minimum length of the input.                                            |         |
-| `name`                  | The name of the input, used when submitting a form.                         |         |
-| `placeholder`           | Text displayed when the input is empty.                                     |         |
-| `suggestions`           | List of suggested strings to display when the input is focused.             |         |
-| `suggestionsorientation`| Determines whether the list of suggestions appears above or below the input field. `up` or `down`. | "down"  |
-| `suggestionsshowall`    | Set to "true" to always display all the suggestions.                        | "false" |
-| `fuzzy`                 | When set to "true" the suggestions will be filtered using a fuzzy search algorithm as the user types. By default filtering is done using a simple string match. |         |
-| `type`                  | The type of the input. (text, password, email, etc.)                        | "text"  |
-| `value`                 | The current value of the input.                                             |         |
+| Property                 | Description                                                                                                                                                     | Default |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| `disabled`               | If the input is disabled or not.                                                                                                                                | "false" |
+| `form`                   | The form the input belongs to.                                                                                                                                  |         |
+| `maxlength`              | The maximum length of the input.                                                                                                                                |         |
+| `minlength`              | The minimum length of the input.                                                                                                                                |         |
+| `name`                   | The name of the input, used when submitting a form.                                                                                                             |         |
+| `placeholder`            | Text displayed when the input is empty.                                                                                                                         |         |
+| `suggestions`            | List of suggested strings to display when the input is focused.                                                                                                 |         |
+| `suggestionsorientation` | Determines whether the list of suggestions appears above or below the input field. `up` or `down`.                                                              | "down"  |
+| `suggestionsshowall`     | Set to "true" to always display all the suggestions.                                                                                                            | "false" |
+| `fuzzy`                  | When set to "true" the suggestions will be filtered using a fuzzy search algorithm as the user types. By default filtering is done using a simple string match. |         |
+| `type`                   | The type of the input. (text, password, email, etc.)                                                                                                            | "text"  |
+| `value`                  | The current value of the input.                                                                                                                                 |         |
 
 ## Selector
 
@@ -60,20 +60,21 @@
 
 ### Properties
 
-| Property                | Description                                                                 | Default |
-|-------------------------|-----------------------------------------------------------------------------|---------|
-| `disabled`              | If the selector is disabled or not.                                         | "false" |
-| `form`                  | The form the selector belongs to.                                           |         |
-| `name`                  | The name of the selector, used when submitting a form.                      |         |
-| `orientation`           | Determines whether the list of options appears above or below the selector. `up` or `down`. | "down"  |
-| `placeholder`           | Text displayed when no option is selected.                                  |         |
+| Property      | Description                                                                                                                                      | Default |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------- |
+| `disabled`    | If the selector is disabled or not.                                                                                                              | "false" |
+| `form`        | The form the selector belongs to.                                                                                                                |         |
+| `name`        | The name of the selector, used when submitting a form.                                                                                           |         |
+| `orientation` | Determines whether the list of options appears above or below the selector. `up` or `down`.                                                      | "down"  |
+| `placeholder` | Text displayed when no option is selected.                                                                                                       |         |
+| `inert`       | When set to true, this option will appear as non-selectable, this can be used to create separators or headers above or in between other options. | "false" |
 
 ### adw-option properties
 
-| Property                | Description                                                                 | Default |
-|-------------------------|-----------------------------------------------------------------------------|---------|
-| `selected`              | If the option is selected or not.                                           | "false" |
-| `value`                 | The value of the option.                                                    |         |
+| Property   | Description                       | Default |
+| ---------- | --------------------------------- | ------- |
+| `selected` | If the option is selected or not. | "false" |
+| `value`    | The value of the option.          |         |
 
 ## Slider
 
@@ -87,16 +88,16 @@
 
 ### Properties
 
-| Property                | Description                                                                 | Default |
-|-------------------------|-----------------------------------------------------------------------------|---------|
-| `disabled`              | If the slider is disabled or not.                                           | "false" |
-| `form`                  | The form the slider belongs to.                                             |         |
-| `max`                   | The maximum value on the slider.                                            | 100     |
-| `min`                   | The minimum value on the slider.                                            | 0       |
-| `name`                  | The name of the slider, used when submitting a form.                        |         |
-| `precision`             | The number of decimal places to round the value to.                         | 4       |
-| `step`                  | The amount to increment or decrement the value by when moving the slider.   | 1       |
-| `value`                 | The current value of the slider.                                            |         |
+| Property    | Description                                                               | Default |
+| ----------- | ------------------------------------------------------------------------- | ------- |
+| `disabled`  | If the slider is disabled or not.                                         | "false" |
+| `form`      | The form the slider belongs to.                                           |         |
+| `max`       | The maximum value on the slider.                                          | 100     |
+| `min`       | The minimum value on the slider.                                          | 0       |
+| `name`      | The name of the slider, used when submitting a form.                      |         |
+| `precision` | The number of decimal places to round the value to.                       | 4       |
+| `step`      | The amount to increment or decrement the value by when moving the slider. | 1       |
+| `value`     | The current value of the slider.                                          |         |
 
 ## Switch
 
@@ -108,9 +109,9 @@
 
 ### Properties
 
-| Property                | Description                                                                 | Default |
-|-------------------------|-----------------------------------------------------------------------------|---------|
-| `disabled`              | If the switch is disabled or not.                                           |         |
-| `form`                  | The form the switch belongs to.                                             |         |
-| `name`                  | The name of the switch, used when submitting a form.                        |         |
-| `active`                | If the switch is active or not.                                             | "false" |
+| Property   | Description                                          | Default |
+| ---------- | ---------------------------------------------------- | ------- |
+| `disabled` | If the switch is disabled or not.                    |         |
+| `form`     | The form the switch belongs to.                      |         |
+| `name`     | The name of the switch, used when submitting a form. |         |
+| `active`   | If the switch is active or not.                      | "false" |
