@@ -71,6 +71,8 @@ const SEARCHABLE_CHARS =
   "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+=-[]\\{}|;':\",./<>?"
     .split("");
 
+const FOCUS_CHANGE_EVENT_THROTTLE = 60;
+
 class SelectorChangeEvent extends CustomEvent<{
   value: string | null;
 }> {
@@ -343,20 +345,24 @@ export class ADWaveSelector extends BaseElement {
       return;
     }
 
-    const currentOption = options.querySelector(
+    let currentOption = options.querySelector(
       `.${Selector.option}:focus`,
     ) as HTMLButtonElement | undefined;
 
     if (!currentOption) {
-      if (this.isOpen) {
-        const reverse = this.orientation === "up";
-        const firstOption = options.querySelector(
-          reverse
-            ? `.${Selector.option}:last-child`
-            : `.${Selector.option}:first-child`,
-        ) as HTMLButtonElement | undefined;
-        firstOption?.focus();
-      }
+      currentOption = options.querySelector(`.${Selector.option}.selected`) as
+        | HTMLButtonElement
+        | undefined;
+    }
+
+    if (!currentOption) {
+      const reverse = this.orientation === "up";
+      const firstOption = options.querySelector(
+        reverse
+          ? `.${Selector.option}:nth-last-child(1 of :not(.inert))`
+          : `.${Selector.option}:nth-child(1 of :not(.inert))`,
+      ) as HTMLButtonElement | undefined;
+      firstOption?.focus();
       return;
     }
 
@@ -365,12 +371,18 @@ export class ADWaveSelector extends BaseElement {
     const direction = offset > 0
       ? "nextElementSibling"
       : "previousElementSibling";
-    for (let i = 0; i < Math.abs(offset); i++) {
-      const next = target[direction] as HTMLButtonElement | undefined;
+    mainloop: for (let i = 0; i < Math.abs(offset); i++) {
+      let next = target[direction] as HTMLButtonElement | undefined;
       if (!next) {
         break;
       }
-      target = next;
+      while (next.classList.contains("inert")) {
+        next = next[direction] as HTMLButtonElement | undefined;
+        if (!next) {
+          break mainloop;
+        }
+      }
+      target = next!;
     }
 
     if (target) {
@@ -498,6 +510,15 @@ export class ADWaveSelector extends BaseElement {
     }
   }
 
+  private _lastFocusChange = 0;
+  private withFocusChangeEvent(handler: () => void) {
+    const now = Date.now();
+    if (now - this._lastFocusChange > FOCUS_CHANGE_EVENT_THROTTLE) {
+      this._lastFocusChange = now;
+      handler();
+    }
+  }
+
   private handleKeyDown = (ev: KeyboardEvent) => {
     if (this.disabled) {
       return;
@@ -525,43 +546,55 @@ export class ADWaveSelector extends BaseElement {
       }
       case "ArrowUp": {
         ev.preventDefault();
-        this.withCustomKeyEvent(ev, () => {
-          this.focusOption(-1);
+        this.withFocusChangeEvent(() => {
+          this.withCustomKeyEvent(ev, () => {
+            this.focusOption(-1);
+          });
         });
         break;
       }
       case "ArrowDown": {
         ev.preventDefault();
-        this.withCustomKeyEvent(ev, () => {
-          this.focusOption(+1);
+        this.withFocusChangeEvent(() => {
+          this.withCustomKeyEvent(ev, () => {
+            this.focusOption(+1);
+          });
         });
         break;
       }
       case "PageUp": {
         ev.preventDefault();
-        this.withCustomKeyEvent(ev, () => {
-          this.focusOption(-10);
+        this.withFocusChangeEvent(() => {
+          this.withCustomKeyEvent(ev, () => {
+            this.focusOption(-10);
+          });
         });
         break;
       }
       case "PageDown": {
         ev.preventDefault();
-        this.withCustomKeyEvent(ev, () => {
-          this.focusOption(+10);
+        this.withFocusChangeEvent(() => {
+          this.withCustomKeyEvent(ev, () => {
+            this.focusOption(+10);
+          });
         });
         break;
       }
       case "Home": {
         ev.preventDefault();
-        this.withCustomKeyEvent(ev, () => {
-          this.focusOption(-this.selectableOptions.length);
+        this.withFocusChangeEvent(() => {
+          this.withCustomKeyEvent(ev, () => {
+            this.focusOption(-this.selectableOptions.length);
+          });
         });
         break;
       }
       case "End": {
         ev.preventDefault();
-        this.withCustomKeyEvent(ev, () => {
-          this.focusOption(+this.selectableOptions.length);
+        this.withFocusChangeEvent(() => {
+          this.withCustomKeyEvent(ev, () => {
+            this.focusOption(+this.selectableOptions.length);
+          });
         });
         break;
       }
