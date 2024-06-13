@@ -1,65 +1,90 @@
+/* margin-inline: 0.5em; */
 adw-selector {
-  display: flex;
+    display: flex;
 }
 
 adw-selector .selector {
-  flex: 1;
+    flex: 1;
 }
 
-adw-selector .selector .option:focus {
-  background-color: rgb(255 255 255 / 15%) !important;
+adw-selector .selector .option:not(.inert):focus {
+    background-color: rgb(255 255 255 / 15%) !important;
 }
 
 adw-selector .selector .option.selected {
-  background-color: rgb(255 255 255 / 20%) !important;
+    background-color: rgb(255 255 255 / 20%) !important;
 }
 
 adw-selector .selected-option {
-  text-wrap: nowrap;
+    text-wrap: nowrap;
 }
 
 adw-selector .selected-option.with-placeholder {
-  opacity: 0.4;
+    opacity: 0.4;
 }
 
 adw-selector .selector .options-list {
-  display: none;
-  z-index: 10;
-  max-height: min(20em, 80vh);
-  overflow-y: scroll;
+    display: none;
+    z-index: 10;
+    max-height: min(20em, 80vh);
+    overflow-y: scroll;
+}
+
+adw-selector .selector .options-list .option.inert {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+adw-selector .selector .options-list .option.inert span {
+    color: var(--clr-text-secondary);
+}
+
+adw-selector .selector .options-list .option.inert span.opt-label {
+    margin-inline: 0.5em;
+}
+
+adw-selector .selector .options-list .option.inert span:is(:first-child, :last-child) {
+    flex: 1;
+    height: 1px;
+    background-color: var(--clr-text-secondary);
+}
+
+adw-selector .selector .options-list .option.inert:hover {
+    background-color: initial;
 }
 
 adw-selector .selector.opened .options-list {
-  display: flex;
+    display: flex;
 }
 
 adw-selector dialog {
-  border: unset;
-  margin: unset;
-  background: transparent;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
+    border: unset;
+    margin: unset;
+    background: transparent;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
 }
 
 adw-selector dialog::backdrop {
-  background-color: rgb(35 35 35 / 50%);
+    background-color: rgb(35 35 35 / 50%);
 }
 
 adw-selector dialog[open] {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 adw-selector .selector dialog .options-list {
-  margin: unset;
-  padding: 0.4em;
-  width: calc(95% - 0.8em);
-  max-height: calc(85% - 0.8em);
-  font-size: 1.25em;
+    margin: unset;
+    padding: 0.4em;
+    width: calc(95% - 0.8em);
+    max-height: calc(85% - 0.8em);
+    font-size: 1.25em;
 }
 
 adw-selector .selector dialog .options-list .option {
-  padding: 0.5em;
+    padding: 0.5em;
 }

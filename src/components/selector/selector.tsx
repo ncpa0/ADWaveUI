@@ -45,9 +45,14 @@ declare global {
     }
 
     interface AdwOptionProps {
-      value: string;
+      value?: string;
       selected?: AttributeBool;
       children?: string;
+      /**
+       * When set to true, this option will appear as non-selectable,
+       * this can be used to create separators or headers above or in between other options.
+       */
+      inert?: AttributeBool;
     }
 
     interface IntrinsicElements {
@@ -105,6 +110,7 @@ export class ADWaveSelector extends BaseElement {
 
   @Slotted({ filter: "adw-option" })
   accessor options: ADWaveSelectorOption[] = [];
+  private selectableOptions: ADWaveSelectorOption[] = [];
 
   private uid = getUid();
   private dialogElem: Ref<HTMLDialogElement> = { current: null };
@@ -114,6 +120,10 @@ export class ADWaveSelector extends BaseElement {
 
   constructor() {
     super();
+
+    this.immediateEffect(() => {
+      this.updateSelectableOptions();
+    }, s => [s.options]);
 
     this.effect(
       () => {
@@ -157,13 +167,15 @@ export class ADWaveSelector extends BaseElement {
 
     this.effect(
       () => {
-        const firstSelected = this.options.find((opt) => opt.isSelected());
+        const firstSelected = this.selectableOptions.find((opt) =>
+          opt.isSelected()
+        );
 
         if (firstSelected) {
           this.value = firstSelected.getValue();
 
-          for (let j = 0; j < this.options.length; j++) {
-            const slot = this.options[j]!;
+          for (let j = 0; j < this.selectableOptions.length; j++) {
+            const slot = this.selectableOptions[j]!;
 
             if (slot !== firstSelected) {
               slot.setSelected(false);
@@ -203,8 +215,8 @@ export class ADWaveSelector extends BaseElement {
             this.value = newValue;
 
             // unset the `selected` attribute on all other options
-            for (let j = 0; j < this.options.length; j++) {
-              const otherSlot = this.options[j]!;
+            for (let j = 0; j < this.selectableOptions.length; j++) {
+              const otherSlot = this.selectableOptions[j]!;
               if (otherSlot !== slot) {
                 otherSlot.setSelected(false);
               }
@@ -231,6 +243,8 @@ export class ADWaveSelector extends BaseElement {
           }
         }
 
+        this.updateSelectableOptions();
+
         if (hasChanged) {
           this.dispatchEvent(new SelectorChangeEvent(this.value));
         }
@@ -238,17 +252,44 @@ export class ADWaveSelector extends BaseElement {
     });
   }
 
+  public toggleOpen() {
+    if (!this.isOpen) {
+      this.dialogElem.current?.showModal();
+      this.isOpen = true;
+    } else {
+      this.dialogElem.current?.close();
+      this.isOpen = false;
+    }
+  }
+
+  private updateSelectableOptions() {
+    this.selectableOptions = [];
+
+    for (let i = 0; i < this.options.length; i++) {
+      const option = this.options[i]!;
+      if (!option.inert) {
+        this.selectableOptions.push(option);
+      }
+    }
+
+    if (this.value != null) {
+      if (this.getSelectedOption() === undefined) {
+        this.value = null;
+      }
+    }
+  }
+
   private tryInputSearch() {
     if (this.searchInputMemory.length === 0) return;
     const searchTerm = this.searchInputMemory.toLowerCase();
 
-    let foundOpt = this.options.find(opt => {
+    let foundOpt = this.selectableOptions.find(opt => {
       const label = opt.getLabel().toLowerCase();
       return label.startsWith(searchTerm);
     });
 
     if (!foundOpt) {
-      this.options.find(opt => {
+      this.selectableOptions.find(opt => {
         const label = opt.getLabel().toLowerCase();
         return label.includes(searchTerm);
       });
@@ -344,8 +385,8 @@ export class ADWaveSelector extends BaseElement {
 
     let success = false;
 
-    for (let i = 0; i < this.options.length; i++) {
-      const option = this.options[i]!;
+    for (let i = 0; i < this.selectableOptions.length; i++) {
+      const option = this.selectableOptions[i]!;
       const isSelected = option.isEqualTo(optionValue);
 
       if (isSelected) {
@@ -375,13 +416,7 @@ export class ADWaveSelector extends BaseElement {
       return;
     }
 
-    if (!this.isOpen) {
-      this.dialogElem.current?.showModal();
-      this.isOpen = true;
-    } else {
-      this.dialogElem.current?.close();
-      this.isOpen = false;
-    }
+    this.toggleOpen();
   };
 
   private handleDialogClick = (e: MouseEvent) => {
@@ -519,14 +554,14 @@ export class ADWaveSelector extends BaseElement {
       case "Home": {
         ev.preventDefault();
         this.withCustomKeyEvent(ev, () => {
-          this.focusOption(-this.options.length);
+          this.focusOption(-this.selectableOptions.length);
         });
         break;
       }
       case "End": {
         ev.preventDefault();
         this.withCustomKeyEvent(ev, () => {
-          this.focusOption(+this.options.length);
+          this.focusOption(+this.selectableOptions.length);
         });
         break;
       }
@@ -554,18 +589,40 @@ export class ADWaveSelector extends BaseElement {
   };
 
   private getSelectedOption() {
-    return this.options.find((option) => option.isEqualTo(this.value));
+    return this.selectableOptions.find((option) =>
+      option.isEqualTo(this.value)
+    );
   }
 
   private Option = (props: { option: ADWaveSelectorOption }) => {
     const isSelected = props.option.isEqualTo(this.value);
+    const isInert = props.option.inert;
+
+    if (isInert) {
+      return (
+        <button
+          class={cls([{
+            [Selector.option]: true,
+            inert: true,
+          }, props.option.className])}
+          role="presentation"
+          onclick={stopEvent}
+        >
+          <span />
+          <span class="opt-label">
+            {props.option.getLabel()}
+          </span>
+          <span />
+        </button>
+      );
+    }
 
     return (
       <button
-        class={cls({
+        class={cls([{
           [Selector.option]: true,
           selected: isSelected,
-        })}
+        }, props.option.className])}
         onclick={this.handleOptionClick}
         data-option={props.option.getValue()}
         role="option"
@@ -628,7 +685,7 @@ export class ADWaveSelector extends BaseElement {
         aria-hidden="true"
         onchange={stopEvent}
       >
-        {this.options.map((option, index) => {
+        {this.selectableOptions.map((option, index) => {
           return (
             <option
               value={option.getValue()}
@@ -685,6 +742,22 @@ export class ADWaveSelectorOption extends WcSlot {
     this.setSelected(selected);
   }
 
+  get value() {
+    return this.getValue();
+  }
+
+  set value(value: string) {
+    this.setAttribute("value", value);
+  }
+
+  get inert() {
+    return this.hasAttribute("inert");
+  }
+
+  set inert(inert: boolean) {
+    this.toggleAttribute("inert", inert);
+  }
+
   constructor() {
     super();
   }
@@ -718,11 +791,16 @@ export class ADWaveSelectorOption extends WcSlot {
   ): boolean {
     for (let i = 0; i < mutations.length; i++) {
       const mutation = mutations[i]!;
-      if (
-        mutation.attributeName === "selected"
-        && mutation.oldValue !== this.getAttribute("selected")
-      ) {
-        return true;
+      switch (mutation.attributeName) {
+        case "inert":
+        case "value":
+        case "class":
+          return true;
+        case "selected":
+          if (mutation.oldValue !== this.getAttribute("selected")) {
+            return true;
+          }
+          break;
       }
     }
 
