@@ -66,6 +66,7 @@
 | `form`        | The form the selector belongs to.                                                                                                                |         |
 | `name`        | The name of the selector, used when submitting a form.                                                                                           |         |
 | `orientation` | Determines whether the list of options appears above or below the selector. `up` or `down`.                                                      | "down"  |
+| `reverseorder`| When set to true, the options will be displayed in reverse order.                                                                                | "false" |
 | `placeholder` | Text displayed when no option is selected.                                                                                                       |         |
 | `inert`       | When set to true, this option will appear as non-selectable, this can be used to create separators or headers above or in between other options. | "false" |
 
