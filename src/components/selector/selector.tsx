@@ -269,6 +269,8 @@ export class ADWaveSelector extends BaseElement {
   }
 
   private updateSelectableOptions() {
+    const selectedBefore = this.selectableOptions.find(o => o.isSelected());
+
     this.selectableOptions = [];
 
     for (let i = 0; i < this.options.length; i++) {
@@ -278,8 +280,14 @@ export class ADWaveSelector extends BaseElement {
       }
     }
 
-    if (this.value != null) {
-      if (this.getSelectedOption() === undefined) {
+    if (selectedBefore) {
+      const selectedAfter = this.selectableOptions.find(o =>
+        o.isEqualTo(selectedBefore.getValue())
+      );
+
+      if (selectedAfter) {
+        selectedBefore.setSelected(true);
+      } else {
         this.value = null;
       }
     }
