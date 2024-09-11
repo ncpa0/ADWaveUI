@@ -1,590 +1,581 @@
+import "../../base-elements";
+import { sig } from "@ncpa0cpl/vanilla-jsx/signals";
 import { Input, Suggestions } from "adwavecss";
-import {
-  Attribute,
-  CustomElement,
-  ElementLifecycleEvent,
-  State,
-} from "jsxte-wc";
-import { BaseElement } from "../../base-elements";
-import "../../index.css";
-import { cls } from "../../utils/cls";
+import { AttributesOf, customElement, EventNamesOf } from "wc_toolkit";
+import { Enum } from "../../utils/enum-attribute";
 import { CustomKeyboardEvent, CustomMouseEvent } from "../../utils/events";
-import { forceClassName } from "../../utils/force-class-name";
 import { fuzzyCmp } from "../../utils/fuzzy-search";
 import { getUid } from "../../utils/get-uid";
 import { preventDefault, stopEvent } from "../../utils/prevent-default";
-import { AttributeBool, InputType } from "../../utils/types";
+import "../../index.css";
 import "./input.css";
 
-declare global {
-  namespace JSX {
-    interface AdwInputProps {
-      class?: string;
-      id?: string;
-      slot?: string;
-      style?: string;
-      value?: string;
-      disabled?: AttributeBool;
-      name?: string;
-      form?: string;
-      type?: InputType;
-      placeholder?: string;
-      minlength?: number;
-      maxlength?: number;
-      errorlabel?: string;
-      alertlabel?: string;
-      suggestions?: string;
-      suggestionsshowall?: AttributeBool;
-      suggestionsorientation?: "up" | "down";
-      fuzzy?: AttributeBool;
-      onChange?: (e: InputChangeEvent) => void;
-      onchange?: string;
-      onKeyDown?: (e: CustomKeyboardEvent<{}>) => void;
-      onkeydown?: string;
-      onInput?: (e: InputEvent) => void;
-      oninput?: string;
-      onBlur?: (e: FocusEvent) => void;
-      onblur?: string;
-      onFocus?: (e: FocusEvent) => void;
-      onfocus?: string;
-    }
-
-    interface IntrinsicElements {
-      "adw-input": AdwInputProps;
-    }
-  }
-}
-
-class InputChangeEvent extends CustomEvent<{
+class AdwInputChangeEvent extends Event {
+  declare readonly type: "change";
   value: string;
-  type: "select" | "submit";
-}> {
+  t: "select" | "submit";
+
   constructor(type: "select" | "submit", value: string) {
     super("change", {
-      detail: {
-        value,
-        type,
-      },
+      bubbles: true,
     });
+    this.value = value;
+    this.t = type;
   }
 }
 
-export type { InputChangeEvent };
+/**
+ * Performs a simple search through options with the provided query,
+ * if the option starts with the exact same string as the query, it
+ * is considered a match.
+ */
+function search(options: string[], query: string): string[] {
+  const results: string[] = [];
 
-@CustomElement("adw-input")
-export class ADWaveInputElement extends BaseElement {
-  @Attribute({ nullable: false })
-  accessor value: string = "";
+  for (let i = 0; i < options.length; i++) {
+    const option = options[i]!;
+    if (option.toLowerCase().startsWith(query)) {
+      results.push(option);
+    }
+  }
 
-  @Attribute({ type: "boolean", nullable: false })
-  accessor disabled: boolean = false;
+  return results;
+}
 
-  @Attribute({ nullable: true })
-  accessor name: string | null = null;
+/**
+ * Performs a fuzzy search through options with the provided query,
+ * if the option is similar enough to the query, it is considered a
+ * match.
+ */
+function fuzzySearch(options: string[], query: string): string[] {
+  const results: string[] = [];
 
-  @Attribute({ nullable: true })
-  accessor form: string | null = null;
+  for (let i = 0; i < options.length; i++) {
+    const option = options[i]!;
+    if (fuzzyCmp(query, option.toLowerCase())) {
+      results.push(option);
+    }
+  }
 
-  @Attribute({ nullable: true, default: "text" })
-  accessor type: InputType = "text";
+  return results;
+}
 
-  @Attribute({ nullable: true })
-  accessor placeholder: string | null = null;
+const { CustomElement } = customElement("adw-input")
+  .attributes({
+    value: "string",
+    disabled: "boolean",
+    name: "string",
+    form: "string",
+    type: "string",
+    placeholder: "string",
+    minLength: "number",
+    maxLength: "number",
+    errorLabel: "string",
+    alertLabel: "string",
+    /**
+     * List of suggestions to show below the input field. Only "matching"
+     * suggestions are shown, if any, unless `suggestionsShowAll` is
+     * set to `true`.
+     */
+    suggestions: "string[]",
+    /**
+     * When enabled, always show all suggestions, regardless of the input value.
+     */
+    suggestionsShowAll: "boolean",
+    /**
+     * In which direction the suggestion box should open.
+     * - `up` - The box will open above the input.
+     * - `down` - The box will open below the input.
+     * - `detect` - The box will try to detect if it has
+     *   enough space to open `down`, if not it will open `up`.
+     *
+     * Default: `down`
+     */
+    suggestionsOrientation: Enum(["up", "down", "detect"]),
+    /**
+     * When enabled, perform a fuzzy search on the suggestions to determine which
+     * ones to show. By default only a exact substring match is considered as "matching".
+     */
+    fuzzy: "boolean",
+  })
+  .events([
+    "change",
+    "optionclick",
+    "keydown",
+    "input",
+    "cut",
+    "copy",
+    "paste",
+    "focus",
+    "blur",
+  ])
+  .context(
+    (
+      { suggestions, suggestionsShowAll, suggestionsOrientation, value, fuzzy },
+    ) => {
+      const options = sig.derive(
+        suggestions.signal,
+        suggestionsShowAll.signal,
+        suggestionsOrientation.signal,
+        fuzzy.signal,
+        value.signal,
+        (suggestions, showAll, orientation, fuzzy, value = "") => {
+          if (!suggestions || suggestions.length === 0) return [];
 
-  @Attribute({ type: "number", nullable: true })
-  accessor minLength: number | null = null;
+          let result: string[];
+          if (showAll) {
+            result = suggestions.slice();
+          } else {
+            if (fuzzy) {
+              result = fuzzySearch(suggestions, value);
+            } else {
+              result = search(suggestions, value);
+            }
+          }
 
-  @Attribute({ type: "number", nullable: true })
-  accessor maxLength: number | null = null;
+          if (orientation === "up") {
+            return result.reverse();
+          } else {
+            return result;
+          }
+        },
+      );
 
-  @Attribute({ nullable: true })
-  accessor errorLabel: string | null = null;
+      return {
+        /** Whether suggestions combo box is opened */
+        open: sig(false),
+        selectedOption: sig(-1),
+        options,
+        uid: getUid(),
+        isInFocus: false,
+        hasChanged: false,
+        lastScrollIntoView: 0,
+      };
+    },
+  )
+  .methods((wc) => {
+    const { attribute, context } = wc;
 
-  @Attribute({ nullable: true })
-  accessor alertLabel: string | null = null;
-
-  @Attribute({ nullable: true })
-  accessor suggestions: string | null = null;
-
-  @Attribute({ type: "boolean", nullable: false })
-  accessor suggestionsShowAll: boolean = false;
-
-  @Attribute({ nullable: true, default: "down" })
-  accessor suggestionsOrientation: "up" | "down" = "down";
-
-  @Attribute({ type: "boolean", nullable: false })
-  accessor fuzzy: boolean = false;
-
-  @State()
-  accessor availableOptions: string[] = [];
-
-  @State()
-  accessor selectedOption: number = -1;
-
-  @State()
-  accessor isSuggestionsOpen = false;
-
-  private uid = getUid();
-  private isInFocus = false;
-  private hasChanged = false;
-
-  constructor() {
-    super();
-
-    this.immediateEffect(
-      () => {
-        this.availableOptions = this.getMatchingOptions();
-        this.selectedOption = -1;
+    return {
+      focus() {
+        wc.thisElement.querySelector("input")?.focus();
       },
-      (s) => [s.value, s.suggestions, s.suggestionsShowAll],
-    );
 
-    this.immediateEffect(
-      () => {
-        if (this.isSuggestionsOpen) {
-          this.selectedOption = -1;
+      showSuggestions() {
+        context.open.dispatch(true);
+        context.selectedOption.dispatch(
+          attribute.suggestionsOrientation.get() === "up"
+            ? context.options.get().length - 1
+            : 0,
+        );
+        this.scrollActiveToView(true);
+      },
+
+      hideSuggestions() {
+        context.selectedOption.dispatch(-1);
+        context.open.dispatch(false);
+      },
+
+      scrollActiveToView(forceInstant = false) {
+        setTimeout(() => {
+          const suggestionElem = wc.thisElement.querySelector(
+            `.${Suggestions.suggestions}`,
+          );
+
+          if (suggestionElem == null) {
+            return;
+          }
+
+          const activeOption = suggestionElem?.querySelector(
+            `.${Suggestions.active}`,
+          ) as HTMLElement;
+
+          if (activeOption == null) {
+            return;
+          }
+
+          const now = Date.now();
+
+          /**
+           * If the behavior is smooth and the arrow key is being held down,
+           * the scrolling won't happen until the key is released.
+           *
+           * In order to have smooth scrolling when the key is tapped, but
+           * also have instant scrolling when the key is held down, we check
+           * the time difference between the last scroll and the current
+           * scroll, and chose an appropriate behavior.
+           */
+          if (forceInstant || now - context.lastScrollIntoView <= 100) {
+            activeOption.scrollIntoView({
+              behavior: "instant",
+              block: "nearest",
+            });
+          } else {
+            activeOption.scrollIntoView({
+              behavior: "smooth",
+              block: "nearest",
+            });
+          }
+
+          context.lastScrollIntoView = now;
+        });
+      },
+
+      _highlightNextOption(offset = 1) {
+        context.selectedOption.dispatch(current =>
+          Math.max(0, current - offset)
+        );
+      },
+
+      _highlightPreviousOption(offset = 1) {
+        context.selectedOption.dispatch(current =>
+          Math.min(
+            context.options.get().length - 1,
+            current! + offset,
+          )
+        );
+      },
+
+      _handleOptionClick(event: MouseEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const target = event.currentTarget as HTMLElement;
+        const idx = target.dataset.opt
+          ? Number(target.dataset.opt)
+          : undefined;
+
+        const option = idx && context.options.get()[idx] || "";
+
+        wc.emitEvent(
+          new CustomMouseEvent("optionclick", { option }, event),
+        ).onCommit(() => {
+          if (idx != null) {
+            attribute.value.set(option);
+            this.hideSuggestions();
+          }
+        });
+      },
+
+      _handleInputChange(event: Event) {
+        const inputElem = event.target as HTMLInputElement;
+        attribute.value.set(inputElem.value);
+      },
+
+      _handleKeyDown(event: KeyboardEvent) {
+        switch (event.key) {
+          case "ArrowUp":
+            event.stopPropagation();
+            event.preventDefault();
+
+            wc.emitEvent(new CustomKeyboardEvent("keydown", {}, event))
+              .onCommit(() => {
+                if (context.open.get()) {
+                  this._highlightNextOption();
+                }
+              });
+
+            break;
+          case "ArrowDown":
+            event.stopPropagation();
+            event.preventDefault();
+
+            wc.emitEvent(new CustomKeyboardEvent("keydown", {}, event))
+              .onCommit(() => {
+                if (context.open.get()) {
+                  this._highlightPreviousOption();
+                }
+              });
+
+            break;
+          case "PageUp":
+            event.stopPropagation();
+            event.preventDefault();
+
+            wc.emitEvent(new CustomKeyboardEvent("keydown", {}, event))
+              .onCommit(() => {
+                if (context.open.get()) {
+                  this._highlightNextOption(8);
+                }
+              });
+            break;
+          case "PageDown":
+            event.stopPropagation();
+            event.preventDefault();
+
+            wc.emitEvent(new CustomKeyboardEvent("keydown", {}, event))
+              .onCommit(() => {
+                if (context.open.get()) {
+                  this._highlightPreviousOption(8);
+                }
+              });
+            break;
+          case "Home":
+            event.stopPropagation();
+            event.preventDefault();
+
+            wc.emitEvent(new CustomKeyboardEvent("keydown", {}, event))
+              .onCommit(() => {
+                if (context.open.get()) {
+                  this._highlightNextOption(
+                    context.options.get().length - 1,
+                  );
+                }
+              });
+            break;
+          case "End":
+            event.stopPropagation();
+            event.preventDefault();
+
+            wc.emitEvent(new CustomKeyboardEvent("keydown", {}, event))
+              .onCommit(() => {
+                if (context.open.get()) {
+                  this._highlightPreviousOption(
+                    context.options.get().length - 1,
+                  );
+                }
+              });
+            break;
+          case "Enter":
+            event.stopPropagation();
+            wc.emitEvent(new CustomKeyboardEvent("keydown", {}, event))
+              .onCommit(() => {
+                if (context.open.get() && context.selectedOption.get() >= 0) {
+                  event.preventDefault();
+                  const opt =
+                    context.options.get()[context.selectedOption.get()];
+                  if (opt) {
+                    attribute.value.set(opt);
+                    this.hideSuggestions();
+                    context.hasChanged = false;
+                    wc.emitEvent(
+                      new AdwInputChangeEvent(
+                        "select",
+                        attribute.value.get() ?? "",
+                      ),
+                    );
+                  }
+                } else if (context.hasChanged) {
+                  context.hasChanged = false;
+                  wc.emitEvent(
+                    new AdwInputChangeEvent(
+                      "submit",
+                      attribute.value.get() ?? "",
+                    ),
+                  );
+                }
+              })
+              .onCancel(() => {
+                event.preventDefault();
+              });
+            break;
+          case "Backspace":
+            event.stopPropagation();
+            wc.emitEvent(new CustomKeyboardEvent("keydown", {}, event))
+              .onCommit(() => {
+                this.showSuggestions();
+              })
+              .onCancel(() => {
+                event.preventDefault();
+              });
+            break;
+          case "Escape":
+            event.stopPropagation();
+            wc.emitEvent(new CustomKeyboardEvent("keydown", {}, event))
+              .onCommit(() => {
+                this.hideSuggestions();
+              })
+              .onCancel(() => {
+                event.preventDefault();
+              });
+            break;
         }
       },
-      (s) => [s.isSuggestionsOpen],
-    );
 
-    this.effect(
-      () => {
-        if (this.isSuggestionsOpen) {
-          this.scrollActiveToView();
+      _handleFocus(ev: FocusEvent) {
+        context.isInFocus = true;
+        if (context.options.get().length) {
+          this.showSuggestions();
         }
       },
-      (s) => [s.selectedOption],
-    );
 
-    this.effect(
-      () => {
-        if (this.isSuggestionsOpen) {
-          this.scrollActiveToView(true);
-        }
-      },
-      (s) => [s.isSuggestionsOpen],
-    );
-
-    this.effect(
-      ({ isFirstMount }) => {
-        if (isFirstMount) return;
-        if (this.isInFocus) {
-          this.hasChanged = true;
-        } else {
-          this.dispatchEvent(
-            new InputChangeEvent("submit", this.value),
+      _handleBlur(ev: FocusEvent) {
+        context.isInFocus = false;
+        this.hideSuggestions();
+        if (context.hasChanged) {
+          context.hasChanged = false;
+          wc.emitEvent(
+            new AdwInputChangeEvent("submit", attribute.value.get() ?? ""),
           );
         }
       },
-      (s) => [s.value],
+    };
+  })
+  .connected((wc) => {
+    const {
+      context,
+      method,
+      attribute: {
+        disabled,
+        errorLabel,
+        form,
+        maxLength,
+        minLength,
+        name,
+        placeholder,
+        suggestions,
+        suggestionsOrientation,
+        type,
+        value,
+      },
+    } = wc;
+
+    const forcedPosition = sig<"up" | "down">();
+
+    wc.thisElement.classList.add(Input.wrapper);
+
+    const isHidden = sig.derive(
+      suggestions.signal,
+      context.options,
+      context.open,
+      (allSuggestions, options, open) => {
+        return !open || options.length === 0 || !allSuggestions
+          || allSuggestions.length === 0;
+      },
     );
 
-    this.lifecycle.once(ElementLifecycleEvent.WillMount, () => {
-      forceClassName(this, Input.wrapper);
+    const isUp = sig.derive(
+      suggestionsOrientation.signal,
+      forcedPosition,
+      (o, fo) => {
+        if (o === "detect") {
+          o = fo;
+        }
+        return o === "up";
+      },
+    );
+
+    wc.onChange([value], () => {
+      if (context.isInFocus) {
+        context.hasChanged = true;
+      }
     });
-  }
 
-  /**
-   * Performs a simple search through options with the provided query,
-   * if the option starts with the exact same string as the query, it
-   * is considered a match.
-   */
-  private search(options: string[], query: string): string[] {
-    const results: string[] = [];
-
-    for (let i = 0; i < options.length; i++) {
-      const option = options[i]!;
-      if (option.toLowerCase().startsWith(query)) {
-        results.push(option);
-      }
-    }
-
-    return results;
-  }
-
-  /**
-   * Performs a fuzzy search through options with the provided query,
-   * if the option is similar enough to the query, it is considered a
-   * match.
-   */
-  private fuzzySearch(options: string[], query: string): string[] {
-    const results: string[] = [];
-
-    for (let i = 0; i < options.length; i++) {
-      const option = options[i]!;
-      if (fuzzyCmp(query, option.toLowerCase())) {
-        results.push(option);
-      }
-    }
-
-    return results;
-  }
-
-  private getMatchingOptions(): string[] {
-    if (this.suggestions == null) {
-      return [];
-    }
-
-    let options = this.suggestions.split(";");
-
-    if (this.suggestionsShowAll) {
-      return options;
-    }
-
-    const value = this.value?.toLowerCase();
-
-    if (value == null) {
-      return options;
-    }
-
-    if (this.fuzzy) {
-      return this.fuzzySearch(options, value);
-    } else {
-      return this.search(options, value);
-    }
-  }
-
-  private lastScrollIntoView = 0;
-
-  /** Scrolls into view the currently highlighted suggestion. */
-  private scrollActiveToView(forceInstant = false) {
-    const suggestions = this.querySelector(
-      `.${Suggestions.suggestions}`,
-    );
-
-    if (suggestions == null) {
-      return;
-    }
-
-    const activeOption = suggestions?.querySelector(
-      `.${Suggestions.active}`,
-    ) as HTMLElement;
-
-    if (activeOption == null) {
-      return;
-    }
-
-    const now = Date.now();
-
-    /**
-     * If the behavior is smooth and the arrow key is being held down,
-     * the scrolling won't happen until the key is released.
-     *
-     * In order to have smooth scrolling when the key is tapped, but
-     * also have instant scrolling when the key is held down, we check
-     * the time difference between the last scroll and the current
-     * scroll, and chose an appropriate behavior.
-     */
-    if (forceInstant || now - this.lastScrollIntoView <= 100) {
-      activeOption.scrollIntoView({
-        behavior: "instant",
-        block: "nearest",
-      });
-    } else {
-      activeOption.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-      });
-    }
-
-    this.lastScrollIntoView = now;
-  }
-
-  private handleOptionClick = (ev: MouseEvent) => {
-    ev.preventDefault();
-    ev.stopPropagation();
-
-    const target = ev.target as HTMLElement;
-    const idx = target.dataset.opt
-      ? Number(target.dataset.opt)
-      : undefined;
-
-    const shouldContinue = this.dispatchEvent(
-      new CustomMouseEvent(
-        "optionclick",
-        {
-          option: idx ? this.availableOptions[idx] : "",
-        },
-        ev,
-      ),
-    );
-
-    if (idx != null && shouldContinue) {
-      this.value = this.availableOptions[idx] ?? "";
-      this.isSuggestionsOpen = false;
-    }
-  };
-
-  private handleInputChange = (ev: InputEvent) => {
-    const inputElem = ev.target as HTMLInputElement;
-    this.value = inputElem.value;
-  };
-
-  private highlightNextOption(offset = 1) {
-    this.selectedOption = Math.max(-1, this.selectedOption! - offset);
-  }
-
-  private highlightPreviousOption(offset = 1) {
-    this.selectedOption = Math.min(
-      this.availableOptions.length - 1,
-      this.selectedOption! + offset,
-    );
-  }
-
-  private withCustomKeyEvent(
-    ev: KeyboardEvent,
-    cb: () => void,
-    onCancel?: () => void,
-  ) {
-    ev.stopPropagation();
-
-    const shouldContinue = this.dispatchEvent(
-      new CustomKeyboardEvent("keydown", {}, ev),
-    );
-
-    if (shouldContinue) {
-      cb();
-    } else if (onCancel) {
-      onCancel();
-    }
-  }
-
-  private handleKeyDown = (ev: KeyboardEvent) => {
-    switch (ev.key) {
-      case "ArrowUp":
-        ev.preventDefault();
-        this.withCustomKeyEvent(ev, () => {
-          if (this.isSuggestionsOpen) {
-            if (this.suggestionsOrientation == "up") {
-              this.highlightPreviousOption();
-            } else {
-              this.highlightNextOption();
-            }
-          }
-        });
-        break;
-      case "ArrowDown":
-        ev.preventDefault();
-        this.withCustomKeyEvent(ev, () => {
-          if (this.isSuggestionsOpen) {
-            if (this.suggestionsOrientation == "up") {
-              this.highlightNextOption();
-            } else {
-              this.highlightPreviousOption();
-            }
-          }
-        });
-        break;
-      case "PageUp":
-        ev.preventDefault();
-        this.withCustomKeyEvent(ev, () => {
-          if (this.isSuggestionsOpen) {
-            if (this.suggestionsOrientation == "up") {
-              this.highlightPreviousOption(8);
-            } else {
-              this.highlightNextOption(8);
-            }
-          }
-        });
-        break;
-      case "PageDown":
-        ev.preventDefault();
-        this.withCustomKeyEvent(ev, () => {
-          if (this.isSuggestionsOpen) {
-            if (this.suggestionsOrientation == "up") {
-              this.highlightNextOption(8);
-            } else {
-              this.highlightPreviousOption(8);
-            }
-          }
-        });
-        break;
-      case "Home":
-        ev.preventDefault();
-        this.withCustomKeyEvent(ev, () => {
-          if (this.isSuggestionsOpen) {
-            if (this.suggestionsOrientation == "up") {
-              this.highlightPreviousOption(
-                this.availableOptions.length - 1,
-              );
-            } else {
-              this.highlightNextOption(
-                this.availableOptions.length - 1,
-              );
-            }
-          }
-        });
-        break;
-      case "End":
-        ev.preventDefault();
-        this.withCustomKeyEvent(ev, () => {
-          if (this.isSuggestionsOpen) {
-            if (this.suggestionsOrientation == "up") {
-              this.highlightNextOption(
-                this.availableOptions.length - 1,
-              );
-            } else {
-              this.highlightPreviousOption(
-                this.availableOptions.length - 1,
-              );
-            }
-          }
-        });
-        break;
-      case "Enter":
-        this.withCustomKeyEvent(
-          ev,
-          () => {
-            if (this.isSuggestionsOpen && this.selectedOption >= 0) {
-              ev.preventDefault();
-              const opt = this.availableOptions[this.selectedOption];
-              if (opt) {
-                this.value = opt;
-                this.isSuggestionsOpen = false;
-                this.dispatchEvent(
-                  new InputChangeEvent("select", this.value),
-                );
-              }
-            } else if (this.hasChanged) {
-              this.hasChanged = false;
-              this.dispatchEvent(
-                new InputChangeEvent("submit", this.value),
-              );
-            }
-          },
-          () => {
-            ev.preventDefault();
-          },
-        );
-        break;
-      case "Backspace":
-        this.withCustomKeyEvent(
-          ev,
-          () => {
-            this.isSuggestionsOpen = true;
-          },
-          () => {
-            ev.preventDefault();
-          },
-        );
-        break;
-      case "Escape":
-        this.withCustomKeyEvent(
-          ev,
-          () => {
-            if (this.isSuggestionsOpen) {
-              this.isSuggestionsOpen = false;
-            }
-          },
-          () => {
-            ev.preventDefault();
-          },
-        );
-        break;
-    }
-  };
-
-  private handleFocus = (ev: FocusEvent) => {
-    this.isInFocus = true;
-    if (this.availableOptions.length) {
-      this.isSuggestionsOpen = true;
-    }
-  };
-
-  private handleBlur = (ev: FocusEvent) => {
-    this.isInFocus = false;
-    this.isSuggestionsOpen = false;
-    if (this.hasChanged) {
-      this.hasChanged = false;
-      this.dispatchEvent(new InputChangeEvent("submit", this.value));
-    }
-  };
-
-  private Suggestions = () => {
-    const isHidden = this.suggestions == null
-      || this.availableOptions.length === 0
-      || this.isSuggestionsOpen === false;
-
-    const reversed = this.suggestionsOrientation == "up";
-
-    const options = this.availableOptions.map((option, idx) => {
-      const isActive = idx === this.selectedOption;
-      return (
-        <div
-          data-opt={idx}
-          class={cls({
-            [Suggestions.option]: true,
-            [Suggestions.active]: isActive,
-          })}
-          onclick={this.handleOptionClick}
-          onmousedown={preventDefault}
-          role="option"
-        >
-          <span
-            data-opt={idx}
-            class="text"
-          >
-            {option}
-          </span>
-        </div>
+    wc.onChange([value, suggestions], () => {
+      context.selectedOption.dispatch(
+        suggestionsOrientation.get() === "up"
+          ? context.options.get().length - 1
+          : 0,
       );
     });
 
-    if (reversed) {
-      options.reverse();
-    }
+    wc.onChange([context.open], () => {
+      if (context.open.get() && suggestionsOrientation.get() === "detect") {
+        const rect = inputElem.getBoundingClientRect();
+        const distanceToBottom = window.innerHeight - rect.bottom;
+        const fontSize = getComputedStyle(suggestionBox).fontSize;
+        const emSize = Number(fontSize.replace("px", ""));
 
-    return (
+        const maxTargetHeight = Math.min(
+          // 16em
+          16 * emSize,
+          // 80vh
+          0.8 * window.innerHeight,
+        );
+        const targetHeight = Math.min(
+          maxTargetHeight,
+          context.options.get().length * (1.75 * emSize),
+        );
+
+        if (distanceToBottom < targetHeight) {
+          forcedPosition.dispatch("up");
+        } else {
+          forcedPosition.dispatch("down");
+        }
+      }
+    });
+
+    wc.cleanup(
+      context.selectedOption.observe(() => {
+        method.scrollActiveToView();
+      }).detach,
+    );
+
+    const inputElem = (
+      <input
+        class={{
+          [Input.input]: true,
+          [Input.disabled]: disabled.signal,
+        }}
+        oninput={method._handleInputChange}
+        onkeydown={method._handleKeyDown}
+        onfocus={method._handleFocus}
+        onblur={method._handleBlur}
+        onchange={stopEvent}
+        type={type.signal}
+        value={value.signal}
+        disabled={disabled.signal}
+        name={name.signal}
+        attribute:form={form.signal}
+        placeholder={placeholder.signal}
+        attribute:minlength={minLength.signal}
+        attribute:maxlength={maxLength.signal}
+        aria-placeholder={placeholder.signal}
+        aria-label={placeholder.signal}
+        aria-invalid={errorLabel.signal.derive(err => !!err)}
+        aria-haspopup="listbox"
+        aria-expanded={context.open}
+        aria-controls={context.uid}
+      />
+    );
+
+    const suggestionBox = (
       <div
-        id={this.uid}
-        class={cls([
-          {
-            [Suggestions.suggestions]: true,
-            "suggestions-options": true,
-            _adw_hidden: isHidden,
-          },
-          this.suggestionsOrientation === "up"
-            ? ["orientation-up", "top"]
-            : "orientation-down",
-        ])}
+        id={context.uid}
+        class={{
+          [Suggestions.suggestions]: true,
+          "suggestions-options": true,
+          "_adw_hidden": isHidden,
+          "orientation-down": sig.not(isUp),
+          "orientation-up": isUp,
+          "top": isUp,
+        }}
         role="listbox"
       >
-        {options}
+        {context.options.derive((options) => {
+          return options.map((optLabel, idx) => {
+            const isActive = sig.eq(context.selectedOption, idx);
+            return (
+              <div
+                data-opt={idx}
+                class={{
+                  [Suggestions.option]: true,
+                  [Suggestions.active]: isActive,
+                }}
+                onclick={method._handleOptionClick}
+                onmousedown={preventDefault}
+                role="option"
+              >
+                <span class="text">
+                  {optLabel}
+                </span>
+              </div>
+            );
+          });
+        })}
       </div>
     );
-  };
 
-  render() {
-    return (
-      <>
-        <input
-          class={cls({
-            [Input.input]: true,
-            [Input.disabled]: this.disabled,
-          })}
-          oninput={this.handleInputChange}
-          onkeydown={this.handleKeyDown}
-          onfocus={this.handleFocus}
-          onblur={this.handleBlur}
-          onchange={stopEvent}
-          type={this.type}
-          value={this.value ?? undefined}
-          disabled={this.disabled}
-          name={this.name ?? undefined}
-          form={this.form ?? undefined}
-          placeholder={this.placeholder ?? undefined}
-          minlength={this.minLength ?? undefined}
-          maxlength={this.maxLength ?? undefined}
-          aria-placeholder={this.placeholder}
-          aria-label={this.placeholder}
-          aria-invalid={this.errorLabel != null}
-          aria-haspopup="listbox"
-          aria-expanded={this.isSuggestionsOpen}
-          aria-controls={this.uid}
-        />
-        <this.Suggestions />
-      </>
-    );
-  }
-}
+    wc.attach(inputElem);
+    wc.attach(suggestionBox);
+  })
+  .register();
+
+const AdwInput = CustomElement;
+type AdwInput = InstanceType<typeof CustomElement>;
+
+type AdwInputAttributes = AttributesOf<typeof AdwInput>;
+type AdwInputEvents = EventNamesOf<typeof AdwInput>;
+
+export { AdwInput };
+export type { AdwInputAttributes, AdwInputChangeEvent, AdwInputEvents };

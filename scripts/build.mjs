@@ -35,10 +35,7 @@ async function removeJsxteTypeImports() {
 }
 
 function onBundleBuildComplete() {
-  fs.rename(
-    p("dist/bundle/esm/index.mjs"),
-    p("dist/bundle/index.js"),
-  );
+  fs.rename(p("dist/bundle/esm/index.mjs"), p("dist/bundle/index.js"));
   fs.rm(p("dist/bundle/esm"), {
     recursive: true,
   }).catch(() => {});
@@ -64,6 +61,7 @@ async function main() {
       keepNames: true,
       sourcemap: isDev ? "inline" : false,
       plugins: [getCssLoaderPlugin()],
+      jsxImportSource: "@ncpa0cpl/vanilla-jsx",
     },
   };
 
@@ -75,6 +73,11 @@ async function main() {
     bundle: true,
     outDir: p("dist/bundle"),
     onBuildComplete: onBundleBuildComplete,
+    // external: [
+    //   "@ncpa0cpl/vanilla-jsx",
+    //   "@ncpa0cpl/vanilla-jsx/signals",
+    //   "@ncpa0cpl/vanilla-jsx/jsx-runtime",
+    // ],
   };
 
   const buildBase = () => build(bldOptions);

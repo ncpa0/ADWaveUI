@@ -1,127 +1,119 @@
+import "../../base-elements";
 import { Switch } from "adwavecss";
-import { Attribute, CustomElement } from "jsxte-wc";
-import { BaseElement } from "../../base-elements";
 import "../../index.css";
-import { cls } from "../../utils/cls";
+import { AttributesOf, customElement, EventNamesOf } from "wc_toolkit";
 import { CustomKeyboardEvent, CustomMouseEvent } from "../../utils/events";
 import { stopEvent } from "../../utils/prevent-default";
-import { AttributeBool } from "../../utils/types";
 import "./switch.css";
 
-declare global {
-  namespace JSX {
-    interface AdwSwitchProps {
-      class?: string;
-      id?: string;
-      slot?: string;
-      style?: string;
-      active?: AttributeBool;
-      disabled?: AttributeBool;
-      name?: string;
-      form?: string;
-      onChange?: (e: SwitchChangeEvent) => void;
-      onchange?: string;
-      onClick?: (e: CustomMouseEvent<{}>) => void;
-      onclick?: string;
-      onKeyDown?: (e: CustomKeyboardEvent<{}>) => void;
-      onkeydown?: string;
-    }
+class AdwSwitchChangeEvent extends Event {
+  declare readonly type: "change";
+  public readonly active: boolean;
 
-    interface IntrinsicElements {
-      "adw-switch": AdwSwitchProps;
-    }
-  }
-}
-
-class SwitchChangeEvent extends CustomEvent<{ active: boolean }> {
   constructor(active: boolean) {
     super("change", {
-      detail: {
-        active,
-      },
+      bubbles: true,
     });
+    this.active = active;
   }
 }
 
-export type { SwitchChangeEvent };
+const { CustomElement } = customElement("adw-switch")
+  .attributes({
+    active: "boolean",
+    disabled: "boolean",
+    name: "string",
+    form: "string",
+  })
+  .events(["change", "click", "keydown"])
+  .context()
+  .methods(wc => {
+    const { attribute: { active, disabled } } = wc;
 
-@CustomElement("adw-switch")
-export class ADWaveSwitchElement extends BaseElement {
-  @Attribute({ type: "boolean", nullable: false })
-  accessor active: boolean = false;
+    const setActiveValue = (v: boolean | undefined | null) => {
+      v = !!v;
+      active.set(v);
+      wc.emitEvent(new AdwSwitchChangeEvent(v));
+    };
 
-  @Attribute({ type: "boolean", nullable: false, default: false })
-  accessor disabled: boolean = false;
-
-  @Attribute({ nullable: true })
-  accessor name: string | null = null;
-
-  @Attribute({ nullable: true })
-  accessor form: string | null = null;
-
-  constructor() {
-    super();
-
-    this.effect(
-      ({ isFirstMount }) => {
-        if (isFirstMount) return;
-        this.dispatchEvent(new SwitchChangeEvent(this.active));
+    return {
+      toggle() {
+        setActiveValue(!active.get());
       },
-      (s) => [s.active],
-    );
-  }
 
-  private handleClick = (e: MouseEvent) => {
-    e.stopPropagation();
-    const shouldContinue = this.dispatchEvent(
-      new CustomMouseEvent("click", {}, e),
-    );
+      focus() {
+        // @ts-expect-error
+        wc.thisElement.querySelector(`.${Switch.switch}`)?.focus();
+      },
 
-    if (this.disabled || !shouldContinue) return;
+      _handleClick(e: MouseEvent) {
+        e.stopPropagation();
+        const nextValue = !active.get();
 
-    this.active = !this.active;
-  };
+        wc
+          .emitEvent(new CustomMouseEvent("click", { nextValue }, e))
+          .onCommit(() => {
+            if (disabled.get()) return;
+            setActiveValue(nextValue);
+          });
+      },
 
-  private handleKeyDown = (e: KeyboardEvent) => {
-    e.stopPropagation();
-    const shouldContinue = this.dispatchEvent(
-      new CustomKeyboardEvent("keydown", {}, e),
-    );
-    if (shouldContinue && e.key === " ") {
-      if (this.disabled || !shouldContinue) return;
+      _handleKeyDown(e: KeyboardEvent) {
+        e.stopPropagation();
 
-      this.active = !this.active;
-    }
-  };
+        wc
+          .emitEvent(new CustomKeyboardEvent("keydown", {}, e))
+          .onCommit(() => {
+            if (disabled.get()) return;
 
-  render() {
-    return (
+            if (e.key === " " || e.key === "Enter") {
+              const nextValue = !active.get();
+              setActiveValue(nextValue);
+            }
+          });
+      },
+    };
+  })
+  .connected((wc) => {
+    const { attribute, method } = wc;
+    const { active, disabled, form, name } = attribute;
+
+    wc.attach(
       <div
-        class={cls({
+        class={{
           [Switch.switch]: true,
-          [Switch.disabled]: this.disabled,
-          [Switch.active]: this.active,
-        })}
-        onclick={this.handleClick}
-        onkeydown={this.handleKeyDown}
-        tabindex="0"
+          [Switch.disabled]: disabled.signal,
+          [Switch.active]: active.signal,
+        }}
+        onclick={method._handleClick}
+        onkeydown={method._handleKeyDown}
+        tabIndex={0}
         role="switch"
-        aria-checked={this.active}
-        aria-disabled={this.disabled ? "true" : "false"}
+        aria-checked={active.signal}
+        aria-disabled={disabled.signal}
       >
         <div class={Switch.knob}></div>
         <input
           type="checkbox"
           class="_adw_hidden"
-          disabled={this.disabled}
-          checked={this.active}
-          name={this.name ?? undefined}
-          form={this.form ?? undefined}
-          onclick={this.handleClick}
+          disabled={disabled.signal}
+          checked={active.signal}
+          name={name.signal}
+          attribute:form={form.signal}
+          onclick={method._handleClick}
           onchange={stopEvent}
           aria-hidden="true"
         />
-      </div>
+      </div>,
     );
-  }
-}
+  })
+  .register();
+
+const AdwSwitch = CustomElement;
+type AdwSwitch = InstanceType<typeof CustomElement>;
+
+type AdwSwitchAttributes = AttributesOf<typeof AdwSwitch>;
+type AdwSwitchEvents = EventNamesOf<typeof AdwSwitch>;
+
+export { AdwSwitch };
+export type { AdwSwitchAttributes, AdwSwitchChangeEvent, AdwSwitchEvents };

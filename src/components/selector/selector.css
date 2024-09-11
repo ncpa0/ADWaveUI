@@ -24,10 +24,22 @@ adw-selector .selected-option.with-placeholder {
 }
 
 adw-selector .selector .options-list {
-    display: none;
+    display: flex;
     z-index: 10;
     max-height: min(20em, 80vh);
     overflow-y: scroll;
+    interpolate-size: allow-keywords;
+    transition: height 0.2s, margin 0.2s, padding 0.2s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    adw-selector .selector .options-list {
+        transition: none;
+    }
+
+    adw-selector .selector.closed .options-list {
+        animation: none;
+    }
 }
 
 adw-selector .selector .options-list .option.inert {
@@ -54,8 +66,23 @@ adw-selector .selector .options-list .option.inert:hover {
     background-color: initial;
 }
 
+@keyframes hide-selector-options {
+    100% {
+        visibility: collapse;
+    }
+}
+
+adw-selector .selector.closed .options-list {
+    height: 0;
+    margin: unset;
+    padding: 0 .4em;
+    animation: hide-selector-options 0.4s forwards;
+}
+
 adw-selector .selector.opened .options-list {
-    display: flex;
+    height: auto;
+    margin-top: .3em;
+    padding: .4em;
 }
 
 adw-selector dialog {
