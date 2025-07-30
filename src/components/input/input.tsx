@@ -7,8 +7,7 @@ import { CustomKeyboardEvent, CustomMouseEvent } from "../../utils/events";
 import { fuzzyCmp } from "../../utils/fuzzy-search";
 import { getUid } from "../../utils/get-uid";
 import { preventDefault, stopEvent } from "../../utils/prevent-default";
-import "../../index.css";
-import "./input.css";
+import "./styles.css";
 
 class AdwInputChangeEvent extends Event {
   declare readonly type: "change";

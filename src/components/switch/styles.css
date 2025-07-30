@@ -1,3 +1,11 @@
+._adw_hidden {
+    display: none;
+}
+
+._adw_col {
+    flex-direction: column;
+}
+
 adw-switch {
     display: flex;
 }
