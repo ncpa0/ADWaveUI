@@ -1,10 +1,9 @@
 import "../../base-elements";
 import { Switch } from "adwavecss";
-import "../../index.css";
 import { AttributesOf, customElement, EventNamesOf } from "wc_toolkit";
 import { CustomKeyboardEvent, CustomMouseEvent } from "../../utils/events";
 import { stopEvent } from "../../utils/prevent-default";
-import "./switch.css";
+import "./styles.css";
 
 class AdwSwitchChangeEvent extends Event {
   declare readonly type: "change";

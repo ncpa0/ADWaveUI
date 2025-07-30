@@ -1,22 +1,21 @@
 import "../../base-elements";
-import { Selector } from "adwavecss";
-import "../../index.css";
-import { CustomKeyboardEvent, CustomMouseEvent } from "../../utils/events";
-import { getUid } from "../../utils/get-uid";
-import { stopEvent } from "../../utils/prevent-default";
-import "./selector.css";
 import { sig, SignalListenerReference } from "@ncpa0cpl/vanilla-jsx/signals";
+import { Selector } from "adwavecss";
 import { customElement, EventNamesOf } from "wc_toolkit";
 import { AttributesOf } from "wc_toolkit";
 import { arrEq } from "../../utils/cmp-arrray";
 import { debounced } from "../../utils/debounced";
 import { Enum } from "../../utils/enum-attribute";
+import { CustomKeyboardEvent, CustomMouseEvent } from "../../utils/events";
+import { getUid } from "../../utils/get-uid";
+import { stopEvent } from "../../utils/prevent-default";
 import {
   AdwSelectorChangeEvent,
   OptionAttributeChangeEvent,
   OptionContentChangeEvent,
 } from "./events";
 import { AdwSelectorOption } from "./option";
+import "./styles.css";
 
 type InnerDialgoElement = HTMLDialogElement & {
   _openEffect?: SignalListenerReference<boolean>;

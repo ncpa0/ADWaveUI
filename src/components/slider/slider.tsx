@@ -1,13 +1,12 @@
 import "../../base-elements";
+import { sig } from "@ncpa0cpl/vanilla-jsx/signals";
 import { Slider } from "adwavecss";
-import "../../index.css";
+import { AttributesOf, customElement, EventNamesOf } from "wc_toolkit";
 import { CustomKeyboardEvent, CustomPointerEvent } from "../../utils/events";
+import { isLmb } from "../../utils/is-lmb";
 import { changeWithStep, clamp, toPrecision } from "../../utils/math";
 import { stopEvent } from "../../utils/prevent-default";
-import "./slider.css";
-import { sig } from "@ncpa0cpl/vanilla-jsx/signals";
-import { AttributesOf, customElement, EventNamesOf } from "wc_toolkit";
-import { isLmb } from "../../utils/is-lmb";
+import "./styles.css";
 
 const preventDefault = (e: Event) => {
   e.preventDefault();
