@@ -1,5 +1,5 @@
 import { minify } from "csso";
-import fs from "fs/promises";
+import fs from "fs";
 import path from "path";
 
 /**
@@ -13,47 +13,38 @@ const minifyCss = (stylesheet, filename) => {
 };
 
 /**
- * @param {string} stylesheet
- */
-const injectorSnippet = (stylesheet) => {
-  return /* js */ `
-const stylesheet = ${stylesheet};
-const exports = {
-    css: stylesheet,
-    element: null,
-};
-(function () {
-    if(typeof window !== "undefined") {
-        const head = document.head;
-        const style = document.createElement("style");
-        style.appendChild(document.createTextNode(stylesheet));
-        head.appendChild(style);
-        exports.element = style;
-    }
-})();
-
-export {
-  exports as default,
-}
-`.trim();
-};
-
-/**
+ * @param {string} inDir
+ * @param {string} outDir
+ * @param {(file: string, stylesheet: string) => void} onStyle
  * @returns {import("esbuild").Plugin}
  */
-export const getCssLoaderPlugin = () => {
+export const getCssLoaderPlugin = (srcRoot, outRoot, onStyle) => {
+  const styleSheets = {};
+
   return {
     name: "css-autoloader",
     setup(build) {
-      build.onLoad({ filter: /\.css$/ }, async (args) => {
-        const contents = await fs.readFile(args.path, "utf8");
-        const stringified = JSON.stringify(
-          minifyCss(contents, path.basename(args.path)),
-        );
-        return {
-          contents: injectorSnippet(stringified),
-          loader: "js",
-        };
+      build.onLoad({ filter: /\.css$/ }, (args) => {
+        const contents = fs.readFileSync(args.path, "utf8");
+        const stringified = minifyCss(contents, path.basename(args.path));
+        const relPath = path.relative(srcRoot, args.path);
+        onStyle(relPath, stringified);
+        styleSheets[relPath] = stringified;
+
+        return { loader: "empty", contents: "" };
+      });
+
+      build.onEnd(() => {
+        try {
+          for (const [relPath, styles] of Object.entries(styleSheets)) {
+            const outPath = path.join(outRoot, relPath);
+            if (fs.existsSync(path.dirname(outPath))) {
+              fs.writeFileSync(outPath, styles);
+            }
+          }
+        } catch (err) {
+          console.error(err);
+        }
       });
     },
   };

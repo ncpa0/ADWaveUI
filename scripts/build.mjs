@@ -34,6 +34,15 @@ async function removeJsxteTypeImports() {
   return Promise.all(ops);
 }
 
+async function onBuildComplete(outDir, allStyles) {
+  let stylesheet = "";
+  for (const [srcPath, styles] of Object.entries(allStyles)) {
+    stylesheet += `/* ${srcPath} */\n` + styles + "\n";
+  }
+
+  await fs.writeFile(path.join(outDir, "styles.css"), stylesheet);
+}
+
 function onBundleBuildComplete() {
   fs.rename(p("dist/bundle/esm/index.mjs"), p("dist/bundle/index.js"));
   fs.rm(p("dist/bundle/esm"), {
@@ -42,6 +51,18 @@ function onBundleBuildComplete() {
 }
 
 async function main() {
+  const allStyles = {};
+  const onStyle = (fpath, style) => {
+    allStyles[fpath] = style;
+  };
+
+  const esbuildOptions = {
+    keepNames: true,
+    sourcemap: isDev ? "inline" : false,
+    plugins: [getCssLoaderPlugin(p("src"), p("dist/esm"), onStyle)],
+    jsxImportSource: "@ncpa0cpl/vanilla-jsx",
+  };
+
   /** @type {import("@ncpa0cpl/nodepack").BuildConfig} */
   const bldOptions = {
     tsConfig: p("tsconfig.json"),
@@ -54,15 +75,9 @@ async function main() {
     bundle: false,
     watch: watch,
     declarations: true,
-    extMapping: {
-      ".css": ".style.mjs",
-    },
-    esbuildOptions: {
-      keepNames: true,
-      sourcemap: isDev ? "inline" : false,
-      plugins: [getCssLoaderPlugin()],
-      jsxImportSource: "@ncpa0cpl/vanilla-jsx",
-    },
+    esbuildOptions,
+    onBuildComplete,
+    exclude: /.+\.css/,
   };
 
   /** @type {import("@ncpa0cpl/nodepack").BuildConfig} */
@@ -72,19 +87,28 @@ async function main() {
     entrypoint: p("src/index.ts"),
     bundle: true,
     outDir: p("dist/bundle"),
-    onBuildComplete: onBundleBuildComplete,
-    // external: [
-    //   "@ncpa0cpl/vanilla-jsx",
-    //   "@ncpa0cpl/vanilla-jsx/signals",
-    //   "@ncpa0cpl/vanilla-jsx/jsx-runtime",
-    // ],
+    onBuildComplete: () => onBundleBuildComplete(),
+    esbuildOptions: {
+      ...esbuildOptions,
+      plugins: [getCssLoaderPlugin(p("src"), p("dist/bundle"), () => {})],
+    },
+    external: [
+      "@ncpa0cpl/vanilla-jsx",
+      "@ncpa0cpl/vanilla-jsx/signals",
+      "@ncpa0cpl/vanilla-jsx/jsx-runtime",
+    ],
   };
 
-  const buildBase = () => build(bldOptions);
+  const buildBase = () =>
+    build(bldOptions).then(() => onBuildComplete(p("dist"), allStyles));
   const buildBundle = () =>
     build(bundleOptions).then(() => onBundleBuildComplete());
 
-  await Promise.all([buildBase(), buildBundle()]);
+  await Promise.all([
+    buildBase(),
+    buildBundle(),
+  ]);
+
   await removeJsxteTypeImports();
 }
 
