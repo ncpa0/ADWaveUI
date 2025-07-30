@@ -162,11 +162,7 @@ const { CustomElement } = customElement("adw-input")
 
       showSuggestions() {
         context.open.dispatch(true);
-        context.selectedOption.dispatch(
-          attribute.suggestionsOrientation.get() === "up"
-            ? context.options.get().length - 1
-            : 0,
-        );
+        context.selectedOption.dispatch(-1);
         this.scrollActiveToView(true);
       },
 
@@ -461,6 +457,10 @@ const { CustomElement } = customElement("adw-input")
     });
 
     wc.onChange([value, suggestions], () => {
+      if (context.selectedOption.get() === -1) {
+        return;
+      }
+
       context.selectedOption.dispatch(
         suggestionsOrientation.get() === "up"
           ? context.options.get().length - 1
