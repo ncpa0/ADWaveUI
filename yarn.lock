@@ -1811,10 +1811,10 @@ uuid@^9.0.0:
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-9.0.1.tgz#e188d4c8853cc722220392c424cd637f32293f30"
   integrity sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==
 
-wc_toolkit@^0.0.4:
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/wc_toolkit/-/wc_toolkit-0.0.4.tgz#2831dd2e9fa2e1ee1b393669a3bf322078ad1d96"
-  integrity sha512-kjf1LsSdPPEgyqmceo7ffz74j87zfPsHcQ0Dw9by/77y4mOanxl4osh4c1TmK/mfHFuSIXmUDopkQwgHhdE5JQ==
+wc_toolkit@^0.0.6:
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/wc_toolkit/-/wc_toolkit-0.0.6.tgz#4296868b9cdc9a1aea626f681c8f8faeebc7962d"
+  integrity sha512-iTS2/JnmfYimSmTG75iWanhroaIorCuNBHtusKN6sPk51tnH9nlI4YT4Whn0nrSfHl97CPP0eIlj8hBdUaC6lg==
 
 which-boxed-primitive@^1.0.2:
   version "1.0.2"

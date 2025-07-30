@@ -1,16 +1,29 @@
 import { minify } from "csso";
+import { buildSync } from "esbuild";
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const p = (...fpath) => path.resolve(__dirname, "..", ...fpath);
+
+export let { outputFiles: [{ text: sharedCss }] } = buildSync({
+  bundle: true,
+  entryPoints: [p("scripts/shared.css")],
+  write: false,
+});
+
+sharedCss = minifyCss(sharedCss);
 
 /**
  * @param {string} stylesheet
  * @param {string} filename
  */
-const minifyCss = (stylesheet, filename) => {
+function minifyCss(stylesheet, filename) {
   return minify(stylesheet, {
     filename,
   }).css;
-};
+}
 
 /**
  * @param {string} inDir
@@ -39,7 +52,7 @@ export const getCssLoaderPlugin = (srcRoot, outRoot, onStyle) => {
           for (const [relPath, styles] of Object.entries(styleSheets)) {
             const outPath = path.join(outRoot, relPath);
             if (fs.existsSync(path.dirname(outPath))) {
-              fs.writeFileSync(outPath, styles);
+              fs.writeFileSync(outPath, sharedCss + "\n" + styles);
             }
           }
         } catch (err) {

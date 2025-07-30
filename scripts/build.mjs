@@ -3,7 +3,7 @@ import { walk } from "node-os-walk";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "url";
-import { getCssLoaderPlugin } from "./css-loader.mjs";
+import { getCssLoaderPlugin, sharedCss } from "./css-loader.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const p = (...fpath) => path.resolve(__dirname, "..", ...fpath);
@@ -35,7 +35,7 @@ async function removeJsxteTypeImports() {
 }
 
 async function onBuildComplete(outDir, allStyles) {
-  let stylesheet = "";
+  let stylesheet = sharedCss + "\n";
   for (const [srcPath, styles] of Object.entries(allStyles)) {
     stylesheet += `/* ${srcPath} */\n` + styles + "\n";
   }
