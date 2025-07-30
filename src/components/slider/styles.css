@@ -1,11 +1,3 @@
-._adw_hidden {
-    display: none;
-}
-
-._adw_col {
-    flex-direction: column;
-}
-
 adw-slider {
     display: flex;
     justify-content: center;
