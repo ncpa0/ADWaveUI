@@ -10,6 +10,33 @@
     </p>
 </p>
 
+## Setup
+
+AdwaveUI requires the AdwaveCSS stylesheet to be present, as well as it's own small stylesheet.
+
+The css files needed can be found in these package paths:
+
+- `adwavecss/dist/styles.css`
+- `adwaveui/dist/styles.css`
+
+The adwave web components need to be imported in the JavaScript files:
+
+```ts
+import "adwaveui";
+```
+
+alternatively each web comoponent can be importted individually:
+
+```ts
+import "adwaveui/dist/esm/components/input/input";
+import "adwaveui/dist/esm/components/selector/selector";
+import "adwaveui/dist/esm/components/slider/slider";
+import "adwaveui/dist/esm/components/switch/switch";
+```
+
+style files for each of these can also be found in their respective directories.
+
+
 ## Components
 
 1. [Input](#input)
