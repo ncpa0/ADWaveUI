@@ -51,7 +51,7 @@ function fuzzySearch(options: string[], query: string): string[] {
 
   for (let i = 0; i < options.length; i++) {
     const option = options[i]!;
-    if (fuzzyCmp(query, option.toLowerCase())) {
+    if (fuzzyCmp(query, option)) {
       results.push(option);
     }
   }

@@ -1,4 +1,7 @@
 export function fuzzyCmp(q: string, text: string): boolean {
+  q = q.toLowerCase();
+  text = text.toLowerCase();
+
   const searchLength = q.length;
   const textLength = text.length;
 
