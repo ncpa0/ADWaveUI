@@ -194,10 +194,10 @@
   optionalDependencies:
     json-to-ts "^1.7.0"
 
-"@ncpa0cpl/vanilla-jsx@0.0.1-alpha.43":
-  version "0.0.1-alpha.43"
-  resolved "https://registry.yarnpkg.com/@ncpa0cpl/vanilla-jsx/-/vanilla-jsx-0.0.1-alpha.43.tgz#722a1d9f660d73e9332a77ce7545caa2ecca882e"
-  integrity sha512-JdZRt9HyZTxz6M5r4/FU0I5zcAjbeo+NhN7Hu0FzhVE+ENiJAjzEMXRNlRpGpNLwHuC7ieiiHaoQXcEUORwxHg==
+"@ncpa0cpl/vanilla-jsx@0.0.1-alpha.44":
+  version "0.0.1-alpha.44"
+  resolved "https://registry.yarnpkg.com/@ncpa0cpl/vanilla-jsx/-/vanilla-jsx-0.0.1-alpha.44.tgz#2feb42232dfaa98482d33638b1ddb512f9917742"
+  integrity sha512-uyuNSCUL3eLueu3K760vMK/Fc7QCq+EwNIzdepWzz6g9cligzTBj+h/zk9N12nY7GLoYNoVBU/gLWmPrqMeNDg==
   dependencies:
     html-element-attributes "^3.4.0"
     immer "^10.1.1"
@@ -316,10 +316,10 @@
   resolved "https://registry.yarnpkg.com/@types/unist/-/unist-3.0.2.tgz#6dd61e43ef60b34086287f83683a5c1b2dc53d20"
   integrity sha512-dqId9J8K/vGi5Zr7oo212BGii5m3q5Hxlkwy3WpYuKPklmBEvsbMYYyLxAQpSffdLl/gdW0XUpKWFvYmyoWCoQ==
 
-adwavecss@>=0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/adwavecss/-/adwavecss-0.1.1.tgz#a9d5500bff60fbc5062e316963675bbcaf41130a"
-  integrity sha512-r0yXOmuDRL4XIif92djBu+MeCNfVksJChracYs2HQ5jN8LPqo6DDPY6Nor1Qvh6fto9rd44iuXJnL9w/9wIb6Q==
+adwavecss@>=0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/adwavecss/-/adwavecss-0.1.2.tgz#491a5150c1b3d48d8f065f942efd3bb2583d14cc"
+  integrity sha512-uvjOPddFBGMdO1MMhVnnkmIiEIKQPETGyFZ8K3BXYFTChhGvobE4ZIGr2vXOXC9rJkHhSsqZqfderI0ICqDPxQ==
 
 ansi-regex@^5.0.1:
   version "5.0.1"

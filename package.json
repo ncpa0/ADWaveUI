@@ -1,6 +1,6 @@
 {
   "name": "adwaveui",
-  "version": "0.0.11",
+  "version": "0.1.0",
   "main": "./dist/esm/index.mjs",
   "types": "./dist/types/index.d.ts",
   "exports": {
@@ -14,7 +14,6 @@
     "./dist/styles.css": {
       "default": "./dist/styles.css"
     },
-
     "./dist/esm/components/input/input": {
       "types": "./dist/types/components/input/input.d.ts",
       "default": "./dist/esm/components/input/input.mjs"
@@ -29,7 +28,6 @@
     "./input/styles.css": {
       "default": "./dist/esm/components/input/styles.css"
     },
-
     "./dist/esm/components/selector/selector": {
       "types": "./dist/types/components/selector/selector.d.ts",
       "default": "./dist/esm/components/selector/selector.mjs"
@@ -44,7 +42,6 @@
     "./selector/styles.css": {
       "default": "./dist/esm/components/selector/styles.css"
     },
-
     "./dist/esm/components/slider/slider": {
       "types": "./dist/types/components/slider/slider.d.ts",
       "default": "./dist/esm/components/slider/slider.mjs"
@@ -59,7 +56,6 @@
     "./slider/styles.css": {
       "default": "./dist/esm/components/slider/styles.css"
     },
-
     "./dist/esm/components/switch/switch": {
       "types": "./dist/types/components/switch/switch.d.ts",
       "default": "./dist/esm/components/switch/switch.mjs"
@@ -74,7 +70,6 @@
     "./switch/styles.css": {
       "default": "./dist/esm/components/switch/styles.css"
     },
-
     "./bundle": {
       "types": "./dist/types/index.d.ts",
       "default": "./dist/bundle/index.js"
@@ -139,8 +134,8 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
-    "@ncpa0cpl/vanilla-jsx": "0.0.1-alpha.43",
-    "adwavecss": ">=0.1.1",
+    "@ncpa0cpl/vanilla-jsx": "0.0.1-alpha.44",
+    "adwavecss": ">=0.1.2",
     "wc_toolkit": "^0.0.6"
   }
 }
