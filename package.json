@@ -137,5 +137,8 @@
     "@ncpa0cpl/vanilla-jsx": "0.0.1-alpha.44",
     "adwavecss": ">=0.1.2",
     "wc_toolkit": "^0.0.6"
-  }
+  },
+  "sideEffects": [
+    "./dist/esm/base-elements.mjs"
+  ]
 }

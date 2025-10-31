@@ -56,11 +56,13 @@ async function main() {
     allStyles[fpath] = style;
   };
 
+  /** @type {import("esbuild").BuildOptions}*/
   const esbuildOptions = {
     keepNames: true,
     sourcemap: isDev ? "inline" : false,
     plugins: [getCssLoaderPlugin(p("src"), p("dist/esm"), onStyle)],
     jsxImportSource: "@ncpa0cpl/vanilla-jsx",
+    treeShaking: !isDev,
   };
 
   /** @type {import("@ncpa0cpl/nodepack").BuildConfig} */

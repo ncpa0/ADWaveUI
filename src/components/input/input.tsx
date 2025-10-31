@@ -236,11 +236,11 @@ const { CustomElement } = customElement("adw-input")
         event.stopPropagation();
 
         const target = event.currentTarget as HTMLElement;
-        const idx = target.dataset.opt
+        const idx = target.dataset.opt != null
           ? Number(target.dataset.opt)
           : undefined;
 
-        const option = idx && context.options.get()[idx] || "";
+        const option = idx != null && context.options.get()[idx] || "";
 
         wc.emitEvent(
           new CustomMouseEvent("optionclick", { option }, event),
