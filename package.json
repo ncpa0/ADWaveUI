@@ -137,13 +137,5 @@
     "@ncpa0cpl/vanilla-jsx": "0.0.1-alpha.44",
     "adwavecss": ">=0.1.2",
     "wc_toolkit": "^0.0.6"
-  },
-  "sideEffects": [
-    "./dist/bundle/index.js",
-    "./dist/esm/base-elements.mjs",
-    "./dist/esm/components/input/input.mjs",
-    "./dist/esm/components/selector/selector.mjs",
-    "./dist/esm/components/slider/slider.mjs",
-    "./dist/esm/components/switch/switch.mjs"
-  ]
+  }
 }
