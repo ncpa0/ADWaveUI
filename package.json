@@ -139,6 +139,11 @@
     "wc_toolkit": "^0.0.6"
   },
   "sideEffects": [
-    "./dist/esm/base-elements.mjs"
+    "./dist/bundle/index.js",
+    "./dist/esm/base-elements.mjs",
+    "./dist/esm/components/input/input.mjs",
+    "./dist/esm/components/selector/selector.mjs",
+    "./dist/esm/components/slider/slider.mjs",
+    "./dist/esm/components/switch/switch.mjs"
   ]
 }
