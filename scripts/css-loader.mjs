@@ -1,6 +1,6 @@
-import { minify } from "csso";
 import { buildSync } from "esbuild";
 import fs from "fs";
+import { transform } from "lightningcss";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -13,17 +13,14 @@ export let { outputFiles: [{ text: sharedCss }] } = buildSync({
   write: false,
 });
 
-sharedCss = minifyCss(sharedCss);
+let { code } = transform({
+  filename: "shared.css",
+  code: Buffer.from(sharedCss),
+  minify: true,
+  sourceMap: false,
+});
 
-/**
- * @param {string} stylesheet
- * @param {string} filename
- */
-function minifyCss(stylesheet, filename) {
-  return minify(stylesheet, {
-    filename,
-  }).css;
-}
+sharedCss = code.toString();
 
 /**
  * @param {string} inDir
@@ -39,7 +36,13 @@ export const getCssLoaderPlugin = (srcRoot, outRoot, onStyle) => {
     setup(build) {
       build.onLoad({ filter: /\.css$/ }, (args) => {
         const contents = fs.readFileSync(args.path, "utf8");
-        const stringified = minifyCss(contents, path.basename(args.path));
+        let { code } = transform({
+          filename: path.basename(args.path),
+          code: Buffer.from(contents),
+          minify: true,
+          sourceMap: false,
+        });
+        const stringified = code;
         const relPath = path.relative(srcRoot, args.path);
         onStyle(relPath, stringified);
         styleSheets[relPath] = stringified;

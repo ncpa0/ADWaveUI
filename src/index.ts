@@ -1,3 +1,4 @@
+export * from "./components/calendar/calendar";
 export * from "./components/input/input";
 export type {
   AdwSelectorOption,

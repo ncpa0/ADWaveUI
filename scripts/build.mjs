@@ -78,7 +78,7 @@ async function main() {
     watch: watch,
     declarations: true,
     esbuildOptions,
-    onBuildComplete,
+    onBuildComplete: () => void onBuildComplete(p("dist"), allStyles),
     exclude: /.+\.css/,
   };
 
@@ -95,9 +95,9 @@ async function main() {
       plugins: [getCssLoaderPlugin(p("src"), p("dist/bundle"), () => {})],
     },
     external: [
-      "@ncpa0cpl/vanilla-jsx",
-      "@ncpa0cpl/vanilla-jsx/signals",
-      "@ncpa0cpl/vanilla-jsx/jsx-runtime",
+      // "@ncpa0cpl/vanilla-jsx",
+      // "@ncpa0cpl/vanilla-jsx/signals",
+      // "@ncpa0cpl/vanilla-jsx/jsx-runtime",
     ],
   };
 
