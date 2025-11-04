@@ -32,10 +32,10 @@ import "adwaveui/dist/esm/components/input/input";
 import "adwaveui/dist/esm/components/selector/selector";
 import "adwaveui/dist/esm/components/slider/slider";
 import "adwaveui/dist/esm/components/switch/switch";
+import "adwaveui/dist/esm/components/calendar/calendar";
 ```
 
 style files for each of these can also be found in their respective directories.
-
 
 ## Components
 
@@ -43,59 +43,52 @@ style files for each of these can also be found in their respective directories.
 2. [Selector](#selector)
 3. [Slider](#slider)
 4. [Switch](#switch)
+5. [Calendar](#calendar)
 
 ## Input
 
 ```html
-<adw-input
-    placeholder="Put in your name"
-></adw-input>
+<adw-input placeholder="Put in your name"></adw-input>
 ```
 
 ### Properties
 
-| Property                 | Description                                                                                                                                                     | Default |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| `disabled`               | If the input is disabled or not.                                                                                                                                | "false" |
-| `form`                   | The form the input belongs to.                                                                                                                                  |         |
-| `maxlength`              | The maximum length of the input.                                                                                                                                |         |
-| `minlength`              | The minimum length of the input.                                                                                                                                |         |
-| `name`                   | The name of the input, used when submitting a form.                                                                                                             |         |
-| `placeholder`            | Text displayed when the input is empty.                                                                                                                         |         |
-| `suggestions`            | List of suggested strings to display when the input is focused.                                                                                                 |         |
-| `suggestionsorientation` | Determines whether the list of suggestions appears above or below the input field. `up` or `down`.                                                              | "down"  |
-| `suggestionsshowall`     | Set to "true" to always display all the suggestions.                                                                                                            | "false" |
-| `fuzzy`                  | When set to "true" the suggestions will be filtered using a fuzzy search algorithm as the user types. By default filtering is done using a simple string match. |         |
-| `type`                   | The type of the input. (text, password, email, etc.)                                                                                                            | "text"  |
-| `value`                  | The current value of the input.                                                                                                                                 |         |
+| Property                 | Description                                                                                                                                   | Default |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| `disabled`               | If the input is disabled or not.                                                                                                              | "false" |
+| `form`                   | The form the input belongs to.                                                                                                                |         |
+| `maxlength`              | The maximum length of the input.                                                                                                              |         |
+| `minlength`              | The minimum length of the input.                                                                                                              |         |
+| `name`                   | The name of the input, used when submitting a form.                                                                                           |         |
+| `placeholder`            | Text displayed when the input is empty.                                                                                                       |         |
+| `suggestions`            | List of suggested strings to display when the input is focused.                                                                               |         |
+| `suggestionsorientation` | Determines whether the list of suggestions appears above or below the input field. `up` or `down`.                                            | "down"  |
+| `suggestionsshowall`     | Set to "true" to always display all the suggestions.                                                                                          | "false" |
+| `fuzzy`                  | When set to "true" the suggestions will be filtered using a fuzzy search algorithm. By default filtering is done using a simple string match. |         |
+| `type`                   | The type of the input. (text, password, email, etc.)                                                                                          | "text"  |
+| `value`                  | The current value of the input.                                                                                                               |         |
 
 ## Selector
 
 ```html
 <adw-selector placeholder="Select option">
-    <adw-option value="1" selected="true">
-        Option 1
-    </adw-option>
-    <adw-option value="2">
-        Option 2
-    </adw-option>
-    <adw-option value="3">
-        Option 3
-    </adw-option>
+  <adw-option value="1" selected="true"> Option 1 </adw-option>
+  <adw-option value="2"> Option 2 </adw-option>
+  <adw-option value="3"> Option 3 </adw-option>
 </adw-selector>
 ```
 
 ### Properties
 
-| Property      | Description                                                                                                                                      | Default |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------- |
-| `disabled`    | If the selector is disabled or not.                                                                                                              | "false" |
-| `form`        | The form the selector belongs to.                                                                                                                |         |
-| `name`        | The name of the selector, used when submitting a form.                                                                                           |         |
-| `orientation` | Determines whether the list of options appears above or below the selector. `up` or `down`.                                                      | "down"  |
-| `reverseorder`| When set to true, the options will be displayed in reverse order.                                                                                | "false" |
-| `placeholder` | Text displayed when no option is selected.                                                                                                       |         |
-| `inert`       | When set to true, this option will appear as non-selectable, this can be used to create separators or headers above or in between other options. | "false" |
+| Property       | Description                                                                                                                                      | Default |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------- |
+| `disabled`     | If the selector is disabled or not.                                                                                                              | "false" |
+| `form`         | The form the selector belongs to.                                                                                                                |         |
+| `name`         | The name of the selector, used when submitting a form.                                                                                           |         |
+| `orientation`  | Determines whether the list of options appears above or below the selector. `up` or `down`.                                                      | "down"  |
+| `reverseorder` | When set to true, the options will be displayed in reverse order.                                                                                | "false" |
+| `placeholder`  | Text displayed when no option is selected.                                                                                                       |         |
+| `inert`        | When set to true, this option will appear as non-selectable, this can be used to create separators or headers above or in between other options. | "false" |
 
 ### adw-option properties
 
@@ -107,11 +100,7 @@ style files for each of these can also be found in their respective directories.
 ## Slider
 
 ```html
-<adw-slider
-    min="0"
-    max="100"
-    value="50"
-></adw-slider>
+<adw-slider min="0" max="100" value="50"></adw-slider>
 ```
 
 ### Properties
@@ -130,9 +119,7 @@ style files for each of these can also be found in their respective directories.
 ## Switch
 
 ```html
-<adw-switch
-    active="true"
-></adw-switch>
+<adw-switch active="true"></adw-switch>
 ```
 
 ### Properties
@@ -143,3 +130,18 @@ style files for each of these can also be found in their respective directories.
 | `form`     | The form the switch belongs to.                      |         |
 | `name`     | The name of the switch, used when submitting a form. |         |
 | `active`   | If the switch is active or not.                      | "false" |
+
+## Calendar
+
+```html
+<adw-calendar value="2025-10-04"></adw-calendar>
+```
+
+### Properties
+
+| Property | Description                                                       | Default            |
+| -------- | ----------------------------------------------------------------- | ------------------ |
+| `form`   | The form the switch belongs to.                                   |                    |
+| `name`   | The name of the switch, used when submitting a form.              |                    |
+| `locale` | The locale that will be used to format the dates.                 | navigator.language |
+| `value`  | The selected date. Must be in a format acceptable by Date.parse() | current date       |
