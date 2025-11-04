@@ -12,12 +12,9 @@
 
 ## Setup
 
-AdwaveUI requires the AdwaveCSS stylesheet to be present, as well as it's own small stylesheet.
+AdwaveUI requires the AdwaveCSS stylesheet to be present.
 
-The css files needed can be found in these package paths:
-
-- `adwavecss/dist/styles.css`
-- `adwaveui/dist/styles.css`
+The css files needed can be found in this package path: `adwavecss/dist/styles.css`
 
 The adwave web components need to be imported in the JavaScript files:
 
