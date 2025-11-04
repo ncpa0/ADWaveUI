@@ -316,10 +316,10 @@
   resolved "https://registry.yarnpkg.com/@types/unist/-/unist-3.0.2.tgz#6dd61e43ef60b34086287f83683a5c1b2dc53d20"
   integrity sha512-dqId9J8K/vGi5Zr7oo212BGii5m3q5Hxlkwy3WpYuKPklmBEvsbMYYyLxAQpSffdLl/gdW0XUpKWFvYmyoWCoQ==
 
-adwavecss@>=0.1.2:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/adwavecss/-/adwavecss-0.1.2.tgz#491a5150c1b3d48d8f065f942efd3bb2583d14cc"
-  integrity sha512-uvjOPddFBGMdO1MMhVnnkmIiEIKQPETGyFZ8K3BXYFTChhGvobE4ZIGr2vXOXC9rJkHhSsqZqfderI0ICqDPxQ==
+adwavecss@>=0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/adwavecss/-/adwavecss-0.2.1.tgz#e0d14f54a42549ee4fd9d14e19d4615b77b6d4f6"
+  integrity sha512-rzWtebwl9zJoYx3DN33dfVAb0jMEArL2AmKpK9EbLINyB3reKtpMCKRjdZOV0NrScSFW2UelaO/ZCAoRLmKi+w==
 
 ansi-regex@^5.0.1:
   version "5.0.1"
