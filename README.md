@@ -4,7 +4,7 @@
         Web Components inspired by the Gtk's Adwaita theme.
     </p>
     <p align="center">
-        <a href="http://adwave.qzz.io/">
+        <a href="https://adwave.qzz.io/">
             Examples
         </a>
     </p>
