@@ -138,7 +138,7 @@ style files for each of these can also be found in their respective directories.
 
 | Property | Description                                                       | Default            |
 | -------- | ----------------------------------------------------------------- | ------------------ |
-| `form`   | The form the switch belongs to.                                   |                    |
-| `name`   | The name of the switch, used when submitting a form.              |                    |
+| `form`   | The form the date input belongs to.                                   |                    |
+| `name`   | The name of the date input, used when submitting a form.              |                    |
 | `locale` | The locale that will be used to format the dates.                 | navigator.language |
 | `value`  | The selected date. Must be in a format acceptable by Date.parse() | current date       |
