@@ -17,7 +17,7 @@ class AdwSliderChangeEvent extends Event {
   declare readonly type: "change";
   public readonly value: number;
 
-  constructor(value: number) {
+  constructor(type: string, value: number) {
     super("change", {
       bubbles: true,
     });
@@ -47,7 +47,11 @@ const { CustomElement } = customElement("adw-slider")
     name: "string",
     form: "string",
   })
-  .events(["pointerdown", "change", "keydown"])
+  .events({
+    "pointerdown": CustomPointerEvent,
+    "change": AdwSliderChangeEvent,
+    "keydown": CustomKeyboardEvent,
+  })
   .context(({ value, min, max }) => {
     const positions = sig.derive(
       value.signal,
@@ -123,7 +127,7 @@ const { CustomElement } = customElement("adw-slider")
 
     const setValue = (v: number) => {
       value.set(v);
-      wc.emitEvent(new AdwSliderChangeEvent(value.get() ?? 0));
+      wc.emitEvent("change", value.get() ?? 0);
     };
 
     const methods = {
@@ -143,14 +147,13 @@ const { CustomElement } = customElement("adw-slider")
       _handlePointerDown(event: PointerEvent) {
         event.stopPropagation();
 
-        wc.emitEvent(
-          new CustomPointerEvent("pointerdown", {}, event),
-        ).onCommit(() => {
-          if (isLmb(event)) {
-            context.isPressed.dispatch(true);
-            handlePointerEventMove(event);
-          }
-        });
+        wc.emitEvent("pointerdown", {}, event)
+          .onCommit(() => {
+            if (isLmb(event)) {
+              context.isPressed.dispatch(true);
+              handlePointerEventMove(event);
+            }
+          });
       },
 
       _handleKeyDown(event: KeyboardEvent) {
@@ -160,7 +163,7 @@ const { CustomElement } = customElement("adw-slider")
           case "ArrowLeft":
             event.stopPropagation();
 
-            wc.emitEvent(new CustomKeyboardEvent("keydown", {}, event))
+            wc.emitEvent("keydown", {}, event)
               .onCommit(() => {
                 this.setValue((value.get() ?? 0) - (step.get() ?? 1));
               });
@@ -168,7 +171,7 @@ const { CustomElement } = customElement("adw-slider")
           case "ArrowRight":
             event.stopPropagation();
 
-            wc.emitEvent(new CustomKeyboardEvent("keydown", {}, event))
+            wc.emitEvent("keydown", {}, event)
               .onCommit(() => {
                 this.setValue((value.get() ?? 0) + (step.get() ?? 1));
               });

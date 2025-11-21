@@ -14,7 +14,7 @@ class AdwInputChangeEvent extends Event {
   value: string;
   t: "select" | "submit";
 
-  constructor(type: "select" | "submit", value: string) {
+  constructor(eventType: string, type: "select" | "submit", value: string) {
     super("change", {
       bubbles: true,
     });
@@ -97,17 +97,17 @@ const { CustomElement } = customElement("adw-input")
      */
     fuzzy: "boolean",
   })
-  .events([
-    "change",
-    "optionclick",
-    "keydown",
-    "input",
-    "cut",
-    "copy",
-    "paste",
-    "focus",
-    "blur",
-  ])
+  .events({
+    "change": AdwInputChangeEvent,
+    "optionclick": CustomMouseEvent,
+    "keydown": CustomKeyboardEvent,
+    "input": InputEvent,
+    "cut": ClipboardEvent,
+    "copy": ClipboardEvent,
+    "paste": ClipboardEvent,
+    "focus": FocusEvent,
+    "blur": FocusEvent,
+  })
   .context(
     (
       { suggestions, suggestionsShowAll, suggestionsOrientation, value, fuzzy },
@@ -344,19 +344,17 @@ const { CustomElement } = customElement("adw-input")
                     this.hideSuggestions();
                     context.hasChanged = false;
                     wc.emitEvent(
-                      new AdwInputChangeEvent(
-                        "select",
-                        attribute.value.get() ?? "",
-                      ),
+                      "change",
+                      "select",
+                      attribute.value.get() ?? "",
                     );
                   }
                 } else if (context.hasChanged) {
                   context.hasChanged = false;
                   wc.emitEvent(
-                    new AdwInputChangeEvent(
-                      "submit",
-                      attribute.value.get() ?? "",
-                    ),
+                    "change",
+                    "submit",
+                    attribute.value.get() ?? "",
                   );
                 }
               })
@@ -399,9 +397,7 @@ const { CustomElement } = customElement("adw-input")
         this.hideSuggestions();
         if (context.hasChanged) {
           context.hasChanged = false;
-          wc.emitEvent(
-            new AdwInputChangeEvent("submit", attribute.value.get() ?? ""),
-          );
+          wc.emitEvent("change", "submit", attribute.value.get() ?? "");
         }
       },
     };

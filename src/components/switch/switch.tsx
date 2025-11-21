@@ -9,7 +9,7 @@ class AdwSwitchChangeEvent extends Event {
   declare readonly type: "change";
   public readonly active: boolean;
 
-  constructor(active: boolean) {
+  constructor(type: string, active: boolean) {
     super("change", {
       bubbles: true,
     });
@@ -24,7 +24,11 @@ const { CustomElement } = customElement("adw-switch")
     name: "string",
     form: "string",
   })
-  .events(["change", "click", "keydown"])
+  .events({
+    "change": AdwSwitchChangeEvent,
+    "click": CustomMouseEvent,
+    "keydown": CustomKeyboardEvent,
+  })
   .context()
   .methods(wc => {
     const { attribute: { active, disabled } } = wc;
@@ -32,12 +36,13 @@ const { CustomElement } = customElement("adw-switch")
     const setActiveValue = (v: boolean | undefined | null) => {
       v = !!v;
       active.set(v);
-      wc.emitEvent(new AdwSwitchChangeEvent(v));
+      wc.emitEvent("change", v);
     };
 
     return {
       toggle() {
-        setActiveValue(!active.get());
+        const v = !active.get();
+        active.set(v);
       },
 
       focus() {
@@ -50,7 +55,7 @@ const { CustomElement } = customElement("adw-switch")
         const nextValue = !active.get();
 
         wc
-          .emitEvent(new CustomMouseEvent("click", { nextValue }, e))
+          .emitEvent("click", { nextValue }, e)
           .onCommit(() => {
             if (disabled.get()) return;
             setActiveValue(nextValue);
@@ -61,7 +66,7 @@ const { CustomElement } = customElement("adw-switch")
         e.stopPropagation();
 
         wc
-          .emitEvent(new CustomKeyboardEvent("keydown", {}, e))
+          .emitEvent("keydown", {}, e)
           .onCommit(() => {
             if (disabled.get()) return;
 

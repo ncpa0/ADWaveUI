@@ -1,5 +1,6 @@
 export * from "./components/calendar/calendar";
 export * from "./components/input/input";
+export * from "./components/selector/events";
 export type {
   AdwSelectorOption,
   AdwSelectorOptionAttributes,

@@ -1,10 +1,8 @@
-import type { AdwSelectorOption, AdwSelectorOptionAttributes } from "./option";
-
 export class AdwSelectorChangeEvent extends Event {
   declare readonly type: "change";
   public readonly value: string | null;
 
-  constructor(value: string | null) {
+  constructor(eventType: string, value: string | null) {
     super("change", {
       bubbles: true,
     });
@@ -15,12 +13,15 @@ export class AdwSelectorChangeEvent extends Event {
 export class OptionContentChangeEvent extends Event {
   static readonly EVNAME = "optioncontentchanged";
 
-  declare readonly target: AdwSelectorOption;
   declare readonly type: typeof OptionContentChangeEvent.EVNAME;
   readonly optionValue: string | null;
   readonly content: string | null;
 
-  constructor(value: string | null, content: string | null) {
+  constructor(
+    eventType: string,
+    value: string | null,
+    content: string | null,
+  ) {
     super(OptionContentChangeEvent.EVNAME, {
       bubbles: true,
     });
@@ -29,16 +30,18 @@ export class OptionContentChangeEvent extends Event {
   }
 }
 
+type SelectorAttributes = "value" | "inert" | "selected";
+
 export class OptionAttributeChangeEvent extends Event {
   static readonly EVNAME = "optionattributechanged";
 
-  declare readonly target: AdwSelectorOption;
   declare readonly type: typeof OptionAttributeChangeEvent.EVNAME;
-  readonly attributeName: keyof AdwSelectorOptionAttributes;
+  readonly attributeName: SelectorAttributes;
   readonly attributeValue: any;
 
   constructor(
-    attributeName: keyof AdwSelectorOptionAttributes,
+    eventType: string,
+    attributeName: SelectorAttributes,
     attributeValue: any,
   ) {
     super(OptionAttributeChangeEvent.EVNAME, {

@@ -58,7 +58,7 @@ class DateChangeEvent extends Event {
   declare readonly type: "change";
   value: Date;
 
-  constructor(value: Date) {
+  constructor(type: string, value: Date) {
     super("change", {
       bubbles: true,
       cancelable: true,
@@ -71,7 +71,7 @@ class DateModeChangeEvent extends Event {
   declare readonly type: "modechange";
   value: "day" | "month" | "year";
 
-  constructor(value: "day" | "month" | "year") {
+  constructor(type: string, value: "day" | "month" | "year") {
     super("modechange", {
       bubbles: true,
       cancelable: true,
@@ -84,7 +84,7 @@ class DateYearSelectEvent extends Event {
   declare readonly type: "yearselected";
   value: number;
 
-  constructor(value: number) {
+  constructor(type: string, value: number) {
     super("yearselected", {
       bubbles: true,
       cancelable: true,
@@ -97,7 +97,7 @@ class DateMonthSelectEvent extends Event {
   declare readonly type: "monthselected";
   value: number;
 
-  constructor(value: number) {
+  constructor(type: string, value: number) {
     super("monthselected", {
       bubbles: true,
       cancelable: true,
@@ -110,7 +110,7 @@ class DateMonthArrowPressEvent extends Event {
   declare readonly type: "montharrowpress";
   value: "prev" | "next";
 
-  constructor(value: "prev" | "next") {
+  constructor(type: string, value: "prev" | "next") {
     super("montharrowpress", {
       bubbles: true,
       cancelable: true,
@@ -126,13 +126,13 @@ const { CustomElement } = customElement("adw-calendar")
     name: "string",
     form: "string",
   })
-  .events([
-    "change",
-    "yearselected",
-    "monthselected",
-    "modechange",
-    "montharrowpress",
-  ])
+  .events({
+    "change": DateChangeEvent,
+    "yearselected": DateYearSelectEvent,
+    "monthselected": DateMonthSelectEvent,
+    "modechange": DateModeChangeEvent,
+    "montharrowpress": DateMonthArrowPressEvent,
+  })
   .context((attr) => {
     const selectedDate = sig.derive(
       attr.value.signal,
@@ -196,7 +196,8 @@ const { CustomElement } = customElement("adw-calendar")
       },
       _showYearSelection(e: Event) {
         api.emitEvent(
-          new DateModeChangeEvent("year"),
+          "modechange",
+          "year",
         ).onCommit(() => {
           (e.target as HTMLElement).blur();
           api.context.yearsPage.dispatch(0);
@@ -204,12 +205,11 @@ const { CustomElement } = customElement("adw-calendar")
         });
       },
       _showMonthSelection(e: Event) {
-        api.emitEvent(
-          new DateModeChangeEvent("month"),
-        ).onCommit(() => {
-          (e.target as HTMLElement).blur();
-          api.context.selectMode.dispatch("month");
-        });
+        api.emitEvent("modechange", "month")
+          .onCommit(() => {
+            (e.target as HTMLElement).blur();
+            api.context.selectMode.dispatch("month");
+          });
       },
       _updateLocale() {
         api.context.visibleDate.dispatch((d) => {
@@ -221,53 +221,45 @@ const { CustomElement } = customElement("adw-calendar")
         });
       },
       _handleDateSelect(date: Dt) {
-        api.emitEvent(
-          new DateChangeEvent(date.jsDate()),
-        ).onCommit(() => {
-          api.attribute.value.set(date.clone().setHour(12, 0, 0).iso());
-        });
+        api.emitEvent("change", date.jsDate())
+          .onCommit(() => {
+            api.attribute.value.set(date.clone().setHour(12, 0, 0).iso());
+          });
       },
       _handleYearSelect(e: Event, y: number) {
-        api.emitEvent(
-          new DateYearSelectEvent(y),
-        ).onCommit(() => {
-          (e.target as HTMLElement).blur();
-          this.setYear(y);
+        api.emitEvent("yearselected", y)
+          .onCommit(() => {
+            (e.target as HTMLElement).blur();
+            this.setYear(y);
 
-          api.emitEvent(
-            new DateModeChangeEvent("day"),
-          ).onCommit(() => {
-            api.context.selectMode.dispatch("day");
+            api.emitEvent("modechange", "day")
+              .onCommit(() => {
+                api.context.selectMode.dispatch("day");
+              });
           });
-        });
       },
       _handleMonthSelect(e: Event, m: number) {
-        api.emitEvent(
-          new DateMonthSelectEvent(m),
-        ).onCommit(() => {
+        api.emitEvent("monthselected", m).onCommit(() => {
           (e.target as HTMLElement).blur();
           this.setMonth(m);
 
-          api.emitEvent(
-            new DateModeChangeEvent("day"),
-          ).onCommit(() => {
-            api.context.selectMode.dispatch("day");
-          });
+          api.emitEvent("modechange", "day")
+            .onCommit(() => {
+              api.context.selectMode.dispatch("day");
+            });
         });
       },
       _handlePrevMonthPress(e: Event) {
-        api.emitEvent(
-          new DateMonthArrowPressEvent("prev"),
-        ).onCommit(() => {
-          this.prevMonth();
-        });
+        api.emitEvent("montharrowpress", "prev")
+          .onCommit(() => {
+            this.prevMonth();
+          });
       },
       _handleNextMonthPress(e: Event) {
-        api.emitEvent(
-          new DateMonthArrowPressEvent("next"),
-        ).onCommit(() => {
-          this.nextMonth();
-        });
+        api.emitEvent("montharrowpress", "next")
+          .onCommit(() => {
+            this.nextMonth();
+          });
       },
     };
   })

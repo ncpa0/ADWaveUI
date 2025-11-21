@@ -64,7 +64,11 @@ const { CustomElement } = customElement("adw-selector")
       htmlName: "scrollintoview",
     },
   })
-  .events(["change", "click", "keydown"])
+  .events({
+    "change": AdwSelectorChangeEvent,
+    "click": CustomMouseEvent,
+    "keydown": CustomKeyboardEvent,
+  })
   .context(({ value }) => {
     const options = sig<AdwSelectorOption[]>([]);
     const optionsDep = sig(0);
@@ -328,7 +332,7 @@ const { CustomElement } = customElement("adw-selector")
         }
 
         wc
-          .emitEvent(new CustomMouseEvent("click", { type: "selector" }, e))
+          .emitEvent("click", { type: "selector" }, e)
           .onCommit(() => {
             this.toggle();
           });
@@ -339,7 +343,7 @@ const { CustomElement } = customElement("adw-selector")
         e.stopPropagation();
 
         wc
-          .emitEvent(new CustomMouseEvent("click", { type: "dialog" }, e))
+          .emitEvent("click", { type: "dialog" }, e)
           .onCommit(() => {
             // close the modal if the click is outside the dialog
             if (
@@ -360,14 +364,12 @@ const { CustomElement } = customElement("adw-selector")
 
         wc
           .emitEvent(
-            new CustomMouseEvent(
-              "click",
-              {
-                type: "option",
-                option: optValue,
-              },
-              e,
-            ),
+            "click",
+            {
+              type: "option",
+              option: optValue,
+            },
+            e,
           )
           .onCommit(() => {
             if (disabled.get() || optValue == null) {
@@ -377,7 +379,7 @@ const { CustomElement } = customElement("adw-selector")
             const success = this.select(optValue);
 
             if (success) {
-              wc.emitEvent(new AdwSelectorChangeEvent(value.get()));
+              wc.emitEvent("change", value.get());
               context.open.dispatch(false);
               this.focus();
             }
@@ -399,7 +401,7 @@ const { CustomElement } = customElement("adw-selector")
             ev.stopPropagation();
             ev.preventDefault();
 
-            wc.emitEvent(new CustomKeyboardEvent("keydown", {}, ev))
+            wc.emitEvent("keydown", {}, ev)
               .onCommit(() => {
                 if (!context.open.get()) {
                   context.open.dispatch(true);
@@ -419,7 +421,7 @@ const { CustomElement } = customElement("adw-selector")
             ev.preventDefault();
 
             this._withFocusChangeEvent(() => {
-              wc.emitEvent(new CustomKeyboardEvent("keydown", {}, ev))
+              wc.emitEvent("keydown", {}, ev)
                 .onCommit(() => {
                   this.focusOption(-1);
                 });
@@ -431,7 +433,7 @@ const { CustomElement } = customElement("adw-selector")
             ev.preventDefault();
 
             this._withFocusChangeEvent(() => {
-              wc.emitEvent(new CustomKeyboardEvent("keydown", {}, ev))
+              wc.emitEvent("keydown", {}, ev)
                 .onCommit(() => {
                   this.focusOption(+1);
                 });
@@ -443,7 +445,7 @@ const { CustomElement } = customElement("adw-selector")
             ev.preventDefault();
 
             this._withFocusChangeEvent(() => {
-              wc.emitEvent(new CustomKeyboardEvent("keydown", {}, ev))
+              wc.emitEvent("keydown", {}, ev)
                 .onCommit(() => {
                   this.focusOption(-10);
                 });
@@ -455,7 +457,7 @@ const { CustomElement } = customElement("adw-selector")
             ev.preventDefault();
 
             this._withFocusChangeEvent(() => {
-              wc.emitEvent(new CustomKeyboardEvent("keydown", {}, ev))
+              wc.emitEvent("keydown", {}, ev)
                 .onCommit(() => {
                   this.focusOption(+10);
                 });
@@ -467,7 +469,7 @@ const { CustomElement } = customElement("adw-selector")
             ev.preventDefault();
 
             this._withFocusChangeEvent(() => {
-              wc.emitEvent(new CustomKeyboardEvent("keydown", {}, ev))
+              wc.emitEvent("keydown", {}, ev)
                 .onCommit(() => {
                   this.focusOption(-context.options.get().length);
                 });
@@ -479,7 +481,7 @@ const { CustomElement } = customElement("adw-selector")
             ev.preventDefault();
 
             this._withFocusChangeEvent(() => {
-              wc.emitEvent(new CustomKeyboardEvent("keydown", {}, ev))
+              wc.emitEvent("keydown", {}, ev)
                 .onCommit(() => {
                   this.focusOption(+context.options.get().length);
                 });
@@ -490,7 +492,7 @@ const { CustomElement } = customElement("adw-selector")
             ev.stopPropagation();
             ev.preventDefault();
 
-            wc.emitEvent(new CustomKeyboardEvent("keydown", {}, ev))
+            wc.emitEvent("keydown", {}, ev)
               .onCommit(() => {
                 if (context.open.get()) {
                   context.open.dispatch(false);
@@ -545,14 +547,14 @@ const { CustomElement } = customElement("adw-selector")
       (event: OptionAttributeChangeEvent) => {
         switch (event.attributeName) {
           case "selected": {
-            const opt = event.target;
+            const opt = event.target as AdwSelectorOption;
             if (opt.selected && opt.value != null) {
               value.set(opt.value);
             }
             break;
           }
           case "value": {
-            const opt = event.target;
+            const opt = event.target as AdwSelectorOption;
             const selectedOpt = method.getSelectedOption();
             if (opt.selected && opt === selectedOpt) {
               value.set(opt.value);
@@ -561,7 +563,7 @@ const { CustomElement } = customElement("adw-selector")
             break;
           }
           case "inert": {
-            const opt = event.target;
+            const opt = event.target as AdwSelectorOption;
             const selectedOpt = method.getSelectedOption();
             if (opt.selected && opt === selectedOpt) {
               value.unset();

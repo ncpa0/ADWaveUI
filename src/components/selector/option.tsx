@@ -14,10 +14,10 @@ const { CustomElement } = customElement("adw-option", {
     inert: "boolean",
     selected: "boolean",
   })
-  .events([
-    OptionAttributeChangeEvent.EVNAME,
-    OptionContentChangeEvent.EVNAME,
-  ])
+  .events({
+    optionattributechanged: OptionAttributeChangeEvent,
+    optioncontentchanged: OptionContentChangeEvent,
+  })
   .context()
   .methods((api) => {
     return {
@@ -51,25 +51,33 @@ const { CustomElement } = customElement("adw-option", {
 
     wc.onChange([selected], () => {
       wc.emitEvent(
-        new OptionAttributeChangeEvent("selected", selected.get()),
+        "optionattributechanged",
+        "selected",
+        selected.get(),
       );
     });
 
     wc.onChange([value], () => {
       wc.emitEvent(
-        new OptionAttributeChangeEvent("value", value.get()),
+        "optionattributechanged",
+        "value",
+        value.get(),
       );
     });
 
     wc.onChange([inert], () => {
       wc.emitEvent(
-        new OptionAttributeChangeEvent("inert", inert.get()),
+        "optionattributechanged",
+        "inert",
+        inert.get(),
       );
     });
 
     wc.onChildrenChange(() => {
       wc.emitEvent(
-        new OptionContentChangeEvent(value.get(), wc.method.getLabel()),
+        "optioncontentchanged",
+        value.get(),
+        wc.method.getLabel(),
       );
     });
   })
