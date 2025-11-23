@@ -8,12 +8,6 @@
       "types": "./dist/types/index.d.ts",
       "default": "./dist/esm/index.mjs"
     },
-    "./styles.css": {
-      "default": "./dist/styles.css"
-    },
-    "./dist/styles.css": {
-      "default": "./dist/styles.css"
-    },
     "./dist/esm/components/input/input": {
       "types": "./dist/types/components/input/input.d.ts",
       "default": "./dist/esm/components/input/input.mjs"
@@ -21,12 +15,6 @@
     "./input": {
       "types": "./dist/types/components/input/input.d.ts",
       "default": "./dist/esm/components/input/input.mjs"
-    },
-    "./dist/esm/components/input/styles.css": {
-      "default": "./dist/esm/components/input/styles.css"
-    },
-    "./input/styles.css": {
-      "default": "./dist/esm/components/input/styles.css"
     },
     "./dist/esm/components/selector/selector": {
       "types": "./dist/types/components/selector/selector.d.ts",
@@ -36,12 +24,6 @@
       "types": "./dist/types/components/selector/selector.d.ts",
       "default": "./dist/esm/components/selector/selector.mjs"
     },
-    "./dist/esm/components/selector/styles.css": {
-      "default": "./dist/esm/components/selector/styles.css"
-    },
-    "./selector/styles.css": {
-      "default": "./dist/esm/components/selector/styles.css"
-    },
     "./dist/esm/components/slider/slider": {
       "types": "./dist/types/components/slider/slider.d.ts",
       "default": "./dist/esm/components/slider/slider.mjs"
@@ -50,12 +32,6 @@
       "types": "./dist/types/components/slider/slider.d.ts",
       "default": "./dist/esm/components/slider/slider.mjs"
     },
-    "./dist/esm/components/slider/styles.css": {
-      "default": "./dist/esm/components/slider/styles.css"
-    },
-    "./slider/styles.css": {
-      "default": "./dist/esm/components/slider/styles.css"
-    },
     "./dist/esm/components/switch/switch": {
       "types": "./dist/types/components/switch/switch.d.ts",
       "default": "./dist/esm/components/switch/switch.mjs"
@@ -63,12 +39,6 @@
     "./switch": {
       "types": "./dist/types/components/switch/switch.d.ts",
       "default": "./dist/esm/components/switch/switch.mjs"
-    },
-    "./dist/esm/components/switch/styles.css": {
-      "default": "./dist/esm/components/switch/styles.css"
-    },
-    "./switch/styles.css": {
-      "default": "./dist/esm/components/switch/styles.css"
     },
     "./bundle": {
       "types": "./dist/types/index.d.ts",
