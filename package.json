@@ -40,6 +40,14 @@
       "types": "./dist/types/components/switch/switch.d.ts",
       "default": "./dist/esm/components/switch/switch.mjs"
     },
+    "./dist/esm/components/calendar/calendar": {
+      "types": "./dist/types/components/calendar/calendar.d.ts",
+      "default": "./dist/esm/components/calendar/calendar.mjs"
+    },
+    "./calendar": {
+      "types": "./dist/types/components/calendar/calendar.d.ts",
+      "default": "./dist/esm/components/calendar/calendar.mjs"
+    },
     "./bundle": {
       "types": "./dist/types/index.d.ts",
       "default": "./dist/bundle/index.js"
