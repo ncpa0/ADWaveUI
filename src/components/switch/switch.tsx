@@ -3,7 +3,6 @@ import { Switch } from "adwavecss";
 import { AttributesOf, customElement, EventNamesOf } from "wc_toolkit";
 import { CustomKeyboardEvent, CustomMouseEvent } from "../../utils/events";
 import { stopEvent } from "../../utils/prevent-default";
-import "./styles.css";
 
 class AdwSwitchChangeEvent extends Event {
   declare readonly type: "change";

@@ -15,7 +15,6 @@ import {
   OptionContentChangeEvent,
 } from "./events";
 import { AdwSelectorOption } from "./option";
-import "./styles.css";
 
 type InnerDialgoElement = HTMLDialogElement & {
   _openEffect?: SignalListenerReference<boolean>;

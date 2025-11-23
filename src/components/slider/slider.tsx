@@ -6,7 +6,6 @@ import { CustomKeyboardEvent, CustomPointerEvent } from "../../utils/events";
 import { isLmb } from "../../utils/is-lmb";
 import { changeWithStep, clamp, toPrecision } from "../../utils/math";
 import { stopEvent } from "../../utils/prevent-default";
-import "./styles.css";
 
 const preventDefault = (e: Event) => {
   e.preventDefault();

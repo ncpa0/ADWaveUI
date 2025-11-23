@@ -1,8 +1,7 @@
 import "../../base-elements";
-import { AttributesOf, customElement, EventNamesOf } from "wc_toolkit";
-import "./styles.css";
 import { ReadonlySignal, sig } from "@ncpa0cpl/vanilla-jsx/signals";
 import { Button, Typography } from "adwavecss";
+import { AttributesOf, customElement, EventNamesOf } from "wc_toolkit";
 import { Dt } from "./date";
 
 function Btn(
@@ -122,6 +121,7 @@ class DateMonthArrowPressEvent extends Event {
 const { CustomElement } = customElement("adw-calendar")
   .attributes({
     value: "string",
+    defaultValue: "string",
     locale: "string",
     name: "string",
     form: "string",
@@ -265,6 +265,16 @@ const { CustomElement } = customElement("adw-calendar")
   })
   .connected((api) => {
     const { selectedDate, visibleDate } = api.context;
+
+    if (
+      api.attribute.value.get() == null
+      && api.attribute.defaultValue.get() != null
+    ) {
+      api.attribute.value.set(api.attribute.defaultValue.get());
+    }
+
+    // on mount assign the current date as the visible one
+    visibleDate.dispatch(selectedDate.get().clone());
 
     api.method._updateLocale();
     api.onChange([api.attribute.locale], () => {
