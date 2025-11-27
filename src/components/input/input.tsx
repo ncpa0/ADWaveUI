@@ -170,6 +170,10 @@ const { CustomElement } = customElement("adw-input")
         context.open.dispatch(false);
       },
 
+      isSuggestionListOpen() {
+        return context.open.get();
+      },
+
       scrollActiveToView(forceInstant = false) {
         setTimeout(() => {
           const suggestionElem = wc.thisElement.querySelector(

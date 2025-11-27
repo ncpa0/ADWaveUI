@@ -67,6 +67,8 @@ const { CustomElement } = customElement("adw-selector")
     "change": AdwSelectorChangeEvent,
     "click": CustomMouseEvent,
     "keydown": CustomKeyboardEvent,
+    "open": Event,
+    "close": Event,
   })
   .context(({ value }) => {
     const options = sig<AdwSelectorOption[]>([]);
@@ -101,6 +103,10 @@ const { CustomElement } = customElement("adw-selector")
     } = wc;
 
     return {
+      isOpen() {
+        return context.open.get();
+      },
+
       /**
        * Open or closes the dropdown, depending on it's current state.
        */
@@ -664,6 +670,12 @@ const { CustomElement } = customElement("adw-selector")
             }
           }
         }
+      }
+
+      if (context.open.get()) {
+        wc.emitEvent("open");
+      } else {
+        wc.emitEvent("close");
       }
     });
 
