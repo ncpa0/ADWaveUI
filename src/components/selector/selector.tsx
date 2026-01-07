@@ -665,7 +665,6 @@ const { CustomElement } = customElement("adw-selector")
           }
         }
 
-        /** When clicking outside of the visible modal, close it. */
         if (!IS_MOBILE) {
           globalClickListener.enable();
 
@@ -678,6 +677,7 @@ const { CustomElement } = customElement("adw-selector")
               if (context.open.get() && selectedButton) {
                 selectedButton.scrollIntoView({
                   behavior: "smooth",
+                  block: "nearest",
                 });
               }
             }, 201);

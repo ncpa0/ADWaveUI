@@ -61,7 +61,7 @@ style files for each of these can also be found in their respective directories.
 | `suggestions`            | List of suggested strings to display when the input is focused.                                                                               |         |
 | `suggestionsorientation` | Determines whether the list of suggestions appears above or below the input field. `up` or `down`.                                            | "down"  |
 | `suggestionsshowall`     | Set to "true" to always display all the suggestions.                                                                                          | "false" |
-| `fuzzy`                  | When set to "true" the suggestions will be filtered using a fuzzy search algorithm. By default filtering is done using a simple string match. |         |
+| `fuzzy`                  | When set to "true" the suggestions will be filtered using a fuzzy search algorithm. By default filtering is done using a simple string match. | "false" |
 | `type`                   | The type of the input. (text, password, email, etc.)                                                                                          | "text"  |
 | `value`                  | The current value of the input.                                                                                                               |         |
 | `defaultvalue`           | The default value, if the `value` is empty on mount, it will be set to this value.                                                            |         |
@@ -78,17 +78,17 @@ style files for each of these can also be found in their respective directories.
 
 ### Properties
 
-| Property         | Description                                                                                        | Default |
-| ---------------- | -------------------------------------------------------------------------------------------------- | ------- |
-| `disabled`       | If the selector is disabled or not.                                                                | "false" |
-| `form`           | The form the selector belongs to.                                                                  |         |
-| `name`           | The name of the selector, used when submitting a form.                                             |         |
-| `orientation`    | Determines whether the list of options appears above or below the selector. `up` or `down`.        | "down"  |
-| `reverseorder`   | When set to true, the options will be displayed in reverse order.                                  | "false" |
-| `placeholder`    | Text displayed when no option is selected.                                                         |         |
-| `scrollintoview` | Determines if the selected option should get scrolled into view when the selector is being opened. |         |
-| `value`          | The current selected value, must match one of the passed options.                                  |         |
-| `defaultvalue`   | The default value, if the `value` is empty on mount, it will be set to this value.                 |         |
+| Property         | Description                                                                                                             | Default |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------- | ------- |
+| `disabled`       | If the selector is disabled or not.                                                                                     | "false" |
+| `form`           | The form the selector belongs to.                                                                                       |         |
+| `name`           | The name of the selector, used when submitting a form.                                                                  |         |
+| `orientation`    | Determines whether the list of options appears above or below the selector. `up` or `down`.                             | "down"  |
+| `reverseorder`   | When set to true, the options will be displayed in reverse order.                                                       | "false" |
+| `placeholder`    | Text displayed when no option is selected.                                                                              |         |
+| `scrollintoview` | If the selector were to open outside the viewport, scroll the whole viewport into view so the select option is visible. | "false" |
+| `value`          | The current selected value, must match one of the passed options.                                                       |         |
+| `defaultvalue`   | The default value, if the `value` is empty on mount, it will be set to this value.                                      |         |
 
 ### adw-option properties
 
