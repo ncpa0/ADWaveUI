@@ -114,6 +114,6 @@
   "dependencies": {
     "@ncpa0cpl/vanilla-jsx": "0.0.1-alpha.44",
     "adwavecss": ">=0.2.1",
-    "wc_toolkit": "^0.1.1"
+    "wc_toolkit": "^0.1.2"
   }
 }

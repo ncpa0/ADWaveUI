@@ -27,6 +27,7 @@ class AdwSliderChangeEvent extends Event {
 const { CustomElement } = customElement("adw-slider")
   .attributes({
     value: "number",
+    defaultValue: "number",
     min: "number",
     max: "number",
     /*
@@ -195,8 +196,16 @@ const { CustomElement } = customElement("adw-slider")
         form,
         step,
         name,
+        defaultValue,
       },
     } = wc;
+
+    if (
+      value.get() == null
+      && defaultValue.get() != null
+    ) {
+      method.setValue(defaultValue.get()!);
+    }
 
     wc.listenWindow("pointerup", method._handlePointerEventUp);
     wc.listenWindow("pointermove", method._handlePointerEventMove);

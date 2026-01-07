@@ -40,6 +40,7 @@ const { CustomElement } = customElement("adw-selector")
     name: "string",
     form: "string",
     value: "string",
+    defaultValue: "string",
     /**
      * In which direction the dropdown should open.
      * - `up` - The dropdown will open above the selector.
@@ -542,6 +543,7 @@ const { CustomElement } = customElement("adw-selector")
         placeholder,
         reverseOrder,
         scrollIntoViewOnOpen,
+        defaultValue,
       },
     } = wc;
 
@@ -590,6 +592,15 @@ const { CustomElement } = customElement("adw-selector")
 
     wc.onChildrenChange((children) => {
       method._updateSelectableOptions(children);
+    });
+
+    wc.onReady(() => {
+      if (
+        value.get() == null
+        && defaultValue.get() != null
+      ) {
+        method.select(defaultValue.get()!);
+      }
     });
 
     const globalClickListener = wc.listenDocument(

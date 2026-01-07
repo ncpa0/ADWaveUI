@@ -61,6 +61,7 @@ function fuzzySearch(options: string[], query: string): string[] {
 const { CustomElement } = customElement("adw-input")
   .attributes({
     value: "string",
+    defaultValue: "string",
     disabled: "boolean",
     name: "string",
     form: "string",
@@ -421,8 +422,16 @@ const { CustomElement } = customElement("adw-input")
         suggestionsOrientation,
         type,
         value,
+        defaultValue,
       },
     } = wc;
+
+    if (
+      value.get() == null
+      && defaultValue.get() != null
+    ) {
+      value.set(defaultValue.get());
+    }
 
     const forcedPosition = sig<"up" | "down">();
 

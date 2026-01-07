@@ -64,6 +64,7 @@ style files for each of these can also be found in their respective directories.
 | `fuzzy`                  | When set to "true" the suggestions will be filtered using a fuzzy search algorithm. By default filtering is done using a simple string match. |         |
 | `type`                   | The type of the input. (text, password, email, etc.)                                                                                          | "text"  |
 | `value`                  | The current value of the input.                                                                                                               |         |
+| `defaultvalue`           | The default value, if the `value` is empty on mount, it will be set to this value.                                                            |         |
 
 ## Selector
 
@@ -77,22 +78,25 @@ style files for each of these can also be found in their respective directories.
 
 ### Properties
 
-| Property       | Description                                                                                                                                      | Default |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------- |
-| `disabled`     | If the selector is disabled or not.                                                                                                              | "false" |
-| `form`         | The form the selector belongs to.                                                                                                                |         |
-| `name`         | The name of the selector, used when submitting a form.                                                                                           |         |
-| `orientation`  | Determines whether the list of options appears above or below the selector. `up` or `down`.                                                      | "down"  |
-| `reverseorder` | When set to true, the options will be displayed in reverse order.                                                                                | "false" |
-| `placeholder`  | Text displayed when no option is selected.                                                                                                       |         |
-| `inert`        | When set to true, this option will appear as non-selectable, this can be used to create separators or headers above or in between other options. | "false" |
+| Property         | Description                                                                                        | Default |
+| ---------------- | -------------------------------------------------------------------------------------------------- | ------- |
+| `disabled`       | If the selector is disabled or not.                                                                | "false" |
+| `form`           | The form the selector belongs to.                                                                  |         |
+| `name`           | The name of the selector, used when submitting a form.                                             |         |
+| `orientation`    | Determines whether the list of options appears above or below the selector. `up` or `down`.        | "down"  |
+| `reverseorder`   | When set to true, the options will be displayed in reverse order.                                  | "false" |
+| `placeholder`    | Text displayed when no option is selected.                                                         |         |
+| `scrollintoview` | Determines if the selected option should get scrolled into view when the selector is being opened. |         |
+| `value`          | The current selected value, must match one of the passed options.                                  |         |
+| `defaultvalue`   | The default value, if the `value` is empty on mount, it will be set to this value.                 |         |
 
 ### adw-option properties
 
-| Property   | Description                       | Default |
-| ---------- | --------------------------------- | ------- |
-| `selected` | If the option is selected or not. | "false" |
-| `value`    | The value of the option.          |         |
+| Property   | Description                                                                                                                                      | Default |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------- |
+| `selected` | If the option is selected or not.                                                                                                                | "false" |
+| `value`    | The value of the option.                                                                                                                         |         |
+| `inert`    | When set to true, this option will appear as non-selectable, this can be used to create separators or headers above or in between other options. | "false" |
 
 ## Slider
 
@@ -102,16 +106,17 @@ style files for each of these can also be found in their respective directories.
 
 ### Properties
 
-| Property    | Description                                                               | Default |
-| ----------- | ------------------------------------------------------------------------- | ------- |
-| `disabled`  | If the slider is disabled or not.                                         | "false" |
-| `form`      | The form the slider belongs to.                                           |         |
-| `max`       | The maximum value on the slider.                                          | 100     |
-| `min`       | The minimum value on the slider.                                          | 0       |
-| `name`      | The name of the slider, used when submitting a form.                      |         |
-| `precision` | The number of decimal places to round the value to.                       | 4       |
-| `step`      | The amount to increment or decrement the value by when moving the slider. | 1       |
-| `value`     | The current value of the slider.                                          |         |
+| Property       | Description                                                                        | Default |
+| -------------- | ---------------------------------------------------------------------------------- | ------- |
+| `disabled`     | If the slider is disabled or not.                                                  | "false" |
+| `form`         | The form the slider belongs to.                                                    |         |
+| `max`          | The maximum value on the slider.                                                   | 100     |
+| `min`          | The minimum value on the slider.                                                   | 0       |
+| `name`         | The name of the slider, used when submitting a form.                               |         |
+| `precision`    | The number of decimal places to round the value to.                                | 4       |
+| `step`         | The amount to increment or decrement the value by when moving the slider.          | 1       |
+| `value`        | The current value of the slider.                                                   |         |
+| `defaultvalue` | The default value, if the `value` is empty on mount, it will be set to this value. |         |
 
 ## Switch
 
@@ -138,7 +143,7 @@ style files for each of these can also be found in their respective directories.
 
 | Property | Description                                                       | Default            |
 | -------- | ----------------------------------------------------------------- | ------------------ |
-| `form`   | The form the date input belongs to.                                   |                    |
-| `name`   | The name of the date input, used when submitting a form.              |                    |
+| `form`   | The form the date input belongs to.                               |                    |
+| `name`   | The name of the date input, used when submitting a form.          |                    |
 | `locale` | The locale that will be used to format the dates.                 | navigator.language |
 | `value`  | The selected date. Must be in a format acceptable by Date.parse() | current date       |
