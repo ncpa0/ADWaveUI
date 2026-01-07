@@ -611,12 +611,38 @@ const { CustomElement } = customElement("adw-selector")
       globalClickListener.disable();
 
       if (context.open.get()) {
+        if (!IS_MOBILE) {
+          if (orientation.get() === "detect") {
+            const rect = rootElem.getBoundingClientRect();
+            const distanceToBottom = window.innerHeight - rect.bottom;
+            const fontSize = getComputedStyle(rootElem).fontSize;
+            const emSize = Number(fontSize.replace("px", ""));
+
+            const maxTargetHeight = Math.min(
+              // 20em
+              20 * emSize,
+              // 80vh
+              0.8 * window.innerHeight,
+            );
+            const targetHeight = Math.min(
+              maxTargetHeight,
+              context.options.get().length * (1.9 * emSize),
+            );
+
+            if (distanceToBottom < targetHeight) {
+              forcedPosition.dispatch("up");
+            } else {
+              forcedPosition.dispatch("down");
+            }
+          }
+        }
+
         /**
          * When opening the selector, scroll into view to the first
          * option.
          */
         if (context.optionsList) {
-          const reverse = orientation.get() === "up";
+          const reverse = (forcedPosition.get() ?? orientation.get()) === "up";
 
           if (value.get() != null) {
             method.scrollToOption(value.get());
@@ -644,30 +670,6 @@ const { CustomElement } = customElement("adw-selector")
                 });
               }
             }, 201);
-          }
-
-          if (orientation.get() === "detect") {
-            const rect = rootElem.getBoundingClientRect();
-            const distanceToBottom = window.innerHeight - rect.bottom;
-            const fontSize = getComputedStyle(rootElem).fontSize;
-            const emSize = Number(fontSize.replace("px", ""));
-
-            const maxTargetHeight = Math.min(
-              // 20em
-              20 * emSize,
-              // 80vh
-              0.8 * window.innerHeight,
-            );
-            const targetHeight = Math.min(
-              maxTargetHeight,
-              context.options.get().length * (1.9 * emSize),
-            );
-
-            if (distanceToBottom < targetHeight) {
-              forcedPosition.dispatch("up");
-            } else {
-              forcedPosition.dispatch("down");
-            }
           }
         }
       }
