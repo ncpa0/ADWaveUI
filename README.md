@@ -78,17 +78,19 @@ style files for each of these can also be found in their respective directories.
 
 ### Properties
 
-| Property         | Description                                                                                                             | Default |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------- | ------- |
-| `disabled`       | If the selector is disabled or not.                                                                                     | "false" |
-| `form`           | The form the selector belongs to.                                                                                       |         |
-| `name`           | The name of the selector, used when submitting a form.                                                                  |         |
-| `orientation`    | Determines whether the list of options appears above or below the selector. `up` or `down`.                             | "down"  |
-| `reverseorder`   | When set to true, the options will be displayed in reverse order.                                                       | "false" |
-| `placeholder`    | Text displayed when no option is selected.                                                                              |         |
-| `scrollintoview` | If the selector were to open outside the viewport, scroll the whole viewport into view so the select option is visible. | "false" |
-| `value`          | The current selected value, must match one of the passed options.                                                       |         |
-| `defaultvalue`   | The default value, if the `value` is empty on mount, it will be set to this value.                                      |         |
+| Property         | Description                                                                                                                          | Default         |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------ | --------------- |
+| `disabled`       | If the selector is disabled or not.                                                                                                  | "false"         |
+| `form`           | The form the selector belongs to.                                                                                                    |                 |
+| `name`           | The name of the selector, used when submitting a form.                                                                               |                 |
+| `orientation`    | Determines whether the list of options appears above or below the selector. `up` or `down`.                                          | "down"          |
+| `reverseorder`   | When set to true, the options will be displayed in reverse order.                                                                    | "false"         |
+| `placeholder`    | Text displayed when no option is selected.                                                                                           |                 |
+| `scrollintoview` | If the selector were to open outside the viewport, scroll the whole viewport into view so the select option is visible.              | "false"         |
+| `value`          | The current selected value, must match one of the passed options.                                                                    |                 |
+| `defaultvalue`   | The default value, if the `value` is empty on mount, it will be set to this value.                                                   |                 |
+| `allowunselect`  | Show an option on top that can be used to deselect (set the current value to null.)                                                  |                 |
+| `unselectlabel`  | The label of the unselect option button, if not provided, placeholder will be used. Only applicable when `allowunselect` is enabled. | "Select option" |
 
 ### adw-option properties
 

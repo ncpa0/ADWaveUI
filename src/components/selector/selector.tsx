@@ -41,6 +41,8 @@ const { CustomElement } = customElement("adw-selector")
     form: "string",
     value: "string",
     defaultValue: "string",
+    allowUnselect: "boolean",
+    unselectLabel: "string",
     /**
      * In which direction the dropdown should open.
      * - `up` - The dropdown will open above the selector.
@@ -74,7 +76,7 @@ const { CustomElement } = customElement("adw-selector")
   .context(({ value }) => {
     const options = sig<AdwSelectorOption[]>([]);
     const optionsDep = sig(0);
-    const label = sig.derive(
+    const optionPreview = sig.derive(
       options,
       value.signal,
       (options, value) => {
@@ -88,7 +90,7 @@ const { CustomElement } = customElement("adw-selector")
       open: sig(false),
       options,
       optionsDep,
-      label,
+      optionPreview,
       uid: getUid(),
       searchInputMemory: "",
       clearSearchInputMemoryTimeout: undefined as number | undefined,
@@ -99,7 +101,7 @@ const { CustomElement } = customElement("adw-selector")
   })
   .methods((wc) => {
     const {
-      attribute: { value, orientation, disabled },
+      attribute: { value, orientation, disabled, allowUnselect },
       context,
     } = wc;
 
@@ -152,13 +154,24 @@ const { CustomElement } = customElement("adw-selector")
       },
 
       select(optionValue?: string): boolean {
+        const options = context.options.get();
+
         if (optionValue == null) {
-          return false;
+          if (allowUnselect.get()) {
+            const prevValue = value.get();
+            for (let i = 0; i < options.length; i++) {
+              const option = options[i]!;
+              option.setSelected(false);
+            }
+            value.set(null);
+            return prevValue != null;
+          } else {
+            return false;
+          }
         }
 
         let success = false;
 
-        const options = context.options.get();
         for (let i = 0; i < options.length; i++) {
           const option = options[i]!;
           const isSelected = option.isEqualTo(optionValue);
@@ -392,6 +405,34 @@ const { CustomElement } = customElement("adw-selector")
           });
       },
 
+      _handleUnselect(e: MouseEvent) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        wc
+          .emitEvent(
+            "click",
+            {
+              type: "option",
+              option: undefined,
+            },
+            e,
+          )
+          .onCommit(() => {
+            if (disabled.get()) {
+              return;
+            }
+
+            const success = this.select(undefined);
+
+            if (success) {
+              wc.emitEvent("change", value.get());
+              context.open.dispatch(false);
+              this.focus();
+            }
+          });
+      },
+
       _handleModalCancel(e: Event) {
         context.open.dispatch(false);
       },
@@ -544,6 +585,8 @@ const { CustomElement } = customElement("adw-selector")
         reverseOrder,
         scrollIntoViewOnOpen,
         defaultValue,
+        allowUnselect,
+        unselectLabel,
       },
     } = wc;
 
@@ -728,6 +771,29 @@ const { CustomElement } = customElement("adw-selector")
       return elem;
     };
 
+    const UnselectOption = () => {
+      const isSelected = value.signal.derive(v => v == null);
+
+      return (
+        <button
+          class={{
+            [Selector.option]: true,
+            selected: isSelected,
+            unselect: true,
+          }}
+          onclick={method._handleUnselect}
+          role="option"
+          aria-selected={isSelected}
+        >
+          {sig.nuc(
+            unselectLabel.signal,
+            placeholder.signal,
+            "Select option",
+          )}
+        </button>
+      );
+    };
+
     const OptionsListMobile = () => {
       context.optionsList = (
         <div
@@ -735,6 +801,10 @@ const { CustomElement } = customElement("adw-selector")
           class={[Selector.optionsList, Selector.noPosition]}
           role="listbox"
         >
+          {allowUnselect.signal.derive(allowUnselect => {
+            if (!allowUnselect) return null;
+            return <UnselectOption />;
+          })}
           {sig.derive(
             context.options,
             reverseOrder.signal,
@@ -791,6 +861,10 @@ const { CustomElement } = customElement("adw-selector")
           }}
           role="listbox"
         >
+          {allowUnselect.signal.derive(allowUnselect => {
+            if (!allowUnselect) return null;
+            return <UnselectOption />;
+          })}
           {sig.derive(
             context.options,
             reverseOrder.signal,
@@ -853,10 +927,10 @@ const { CustomElement } = customElement("adw-selector")
         <span
           class={{
             [Selector.selectedOption]: true,
-            "with-placeholder": sig.not(context.label),
+            "with-placeholder": sig.not(context.optionPreview),
           }}
         >
-          {sig.nuc(context.label, placeholder.signal)}
+          {sig.nuc(context.optionPreview, placeholder.signal)}
         </span>
         <span class={Selector.downButton}></span>
         {IS_MOBILE ? <OptionsListMobile /> : <OptionsListDesktop />}
