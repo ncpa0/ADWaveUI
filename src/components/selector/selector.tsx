@@ -248,12 +248,16 @@ const { CustomElement } = customElement("adw-selector")
         context.optionsDep.dispatch(v => v + 1 % 128);
       }),
 
-      _setSelectedByValue(options: AdwSelectorOption[], value: string) {
+      _setSelectedByValue(options: AdwSelectorOption[], value: string | null) {
         let selected: AdwSelectorOption | undefined;
 
         for (let i = 0; i < options.length; i++) {
           const opt = options[i]!;
-          if (opt.isEqualTo(value)) {
+          if (value != null && opt.isEqualTo(value)) {
+            if (selected) {
+              // we have two options matching the same value
+              selected.selected = false;
+            }
             selected = opt;
           } else {
             opt.selected = false;
@@ -268,8 +272,10 @@ const { CustomElement } = customElement("adw-selector")
 
       _updateSelectableOptions(
         children: Array<Element | Text>,
-        forceDispatch = false,
+        params?: { forceDispatch?: boolean; prioritize?: "children" | "value" },
       ) {
+        const { forceDispatch = false, prioritize = "value" } = params ?? {};
+
         const currentValue = value.get();
 
         const options = children.filter(
@@ -277,40 +283,33 @@ const { CustomElement } = customElement("adw-selector")
             child instanceof AdwSelectorOption,
         );
 
-        const selected = options.filter(opt => opt.selected && !opt.inert);
-
-        if (!(selected.length === 0 && currentValue == null)) {
-          // both value and option with selected attr are present
-          if (selected.length > 0 && currentValue != null) {
-            if (
-              !(selected.length === 1 && selected[0]!.isEqualTo(currentValue))
-            ) {
-              const selectedOpt = this._setSelectedByValue(
-                options,
-                currentValue,
-              );
-              if (!selectedOpt) {
-                value.unset();
-              }
-            }
-          } // value is set but not a single option is selected
-          else if (selected.length === 0 && currentValue != null) {
-            const selectedOpt = this._setSelectedByValue(
-              options,
-              currentValue,
-            );
-            if (!selectedOpt) {
-              value.unset();
-            }
-          } // an option is selected but value is not set
-          else if (selected.length > 0 && currentValue == null) {
-            const selectedOpt = selected.pop()!;
-
-            for (let i = 0; i < selected.length; i++) {
-              selected[i]!.selected = false;
-            }
-
-            value.set(selectedOpt.value);
+        if (prioritize === "value") {
+          // value attribute is the source of truth
+          if (currentValue == null) {
+            // value is undefined, we need to unselect all options
+            this._setSelectedByValue(options, null);
+          } else {
+            // value is defined, we need to select the option matching the value
+            this._setSelectedByValue(options, currentValue);
+          }
+        } else if (prioritize === "children") {
+          // children selected attribute is the source of truth
+          const selectedOpts = options.filter(opt =>
+            opt.selected && !opt.inert
+          );
+          if (selectedOpts.length === 0) {
+            // none of the options is selected, set value to null
+            value.unset();
+          } else if (selectedOpts.length === 1) {
+            // exactly one of options is selected, we just need to update the value
+            value.set(selectedOpts[0]!.getValue());
+          } else {
+            // we have multiple options selected
+            const o = selectedOpts.pop()!;
+            const v = o.getValue();
+            value.set(v);
+            // set selected attribute on all other options to false
+            this._setSelectedByValue(selectedOpts, null);
           }
         }
 
@@ -609,7 +608,10 @@ const { CustomElement } = customElement("adw-selector")
             if (opt.selected && opt === selectedOpt) {
               value.set(opt.value);
             }
-            method._updateSelectableOptions(wc.getChildren(), true);
+            method._updateSelectableOptions(wc.getChildren(), {
+              forceDispatch: true,
+              prioritize: "children",
+            });
             break;
           }
           case "inert": {
@@ -634,7 +636,7 @@ const { CustomElement } = customElement("adw-selector")
     );
 
     wc.onChildrenChange((children) => {
-      method._updateSelectableOptions(children);
+      method._updateSelectableOptions(children, { prioritize: "children" });
     });
 
     wc.onReady(() => {
@@ -658,7 +660,9 @@ const { CustomElement } = customElement("adw-selector")
     );
 
     wc.onChange([value], () => {
-      method._updateSelectableOptions(wc.getChildren());
+      method._updateSelectableOptions(wc.getChildren(), {
+        prioritize: "value",
+      });
     });
 
     wc.onChange([context.open], () => {
