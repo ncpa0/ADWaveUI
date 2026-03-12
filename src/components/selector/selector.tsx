@@ -635,8 +635,14 @@ const { CustomElement } = customElement("adw-selector")
       },
     );
 
+    let isFirstChildChange = true;
     wc.onChildrenChange((children) => {
-      method._updateSelectableOptions(children, { prioritize: "children" });
+      method._updateSelectableOptions(children, {
+        prioritize: isFirstChildChange && value.get() != null
+          ? "value"
+          : "children",
+      });
+      isFirstChildChange = false;
     });
 
     wc.onReady(() => {
