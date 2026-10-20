@@ -1,13 +1,13 @@
 <p align="center">
-    <h1 align="center">ADWave UI</h1>
-    <p align="center">
-        Web Components inspired by the Gtk's Adwaita theme.
-    </p>
-    <p align="center">
-        <a href="https://adwave.qzz.io/">
-            Examples
-        </a>
-    </p>
+  <h1 align="center">ADWave UI</h1>
+  <p align="center">
+    Web Components inspired by the Gtk's Adwaita theme.
+  </p>
+  <p align="center">
+    <a href="https://adwave.qzz.io/">
+      Examples
+    </a>
+  </p>
 </p>
 
 ## Setup
