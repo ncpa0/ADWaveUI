@@ -478,8 +478,11 @@ const { CustomElement } = customElement("adw-calendar")
           {api.attribute.locale.signal.derive(locale => {
             return Array.from({ length: 12 }, (_, idx) => {
               const d = new Dt(undefined, locale).setMonth(idx + 1);
-              const selected = selectedDate.derive(s =>
-                s.month() == d.month()
+              const selected = sig.derive(
+                selectedDate,
+                visibleDate,
+                (s, visibleDate) =>
+                  s.month() == d.month() && s.year() === visibleDate.year(),
               );
               return (
                 <Btn
@@ -534,7 +537,9 @@ const { CustomElement } = customElement("adw-calendar")
 
             return Array.from({ length: 16 }, (_, idx) => {
               const year = pageStart + idx;
-              const selected = selectedDate.derive(s => s.year() == year);
+              const selected = selectedDate.derive(s =>
+                s.year() == year
+              );
               return (
                 <Btn
                   class={{

@@ -2,11 +2,9 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "ES6",
-    "moduleResolution": "node",
     "declaration": true,
     "outDir": "./dist",
     "rootDir": "./src",
-    "downlevelIteration": true,
     "strict": true,
     "noUnusedLocals": true,
     "noUncheckedIndexedAccess": true,
@@ -17,7 +15,8 @@
     "noImplicitAny": true,
     "jsxImportSource": "@ncpa0cpl/vanilla-jsx",
     "jsx": "react-jsx",
-    "useDefineForClassFields": false
+    "useDefineForClassFields": false,
+    "moduleResolution": "bundler",
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*"],
 }

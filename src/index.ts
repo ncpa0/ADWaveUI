@@ -14,4 +14,5 @@ export type {
   CustomMouseEvent,
   CustomPointerEvent,
 } from "./utils/events";
+export { fuzzyCmp } from "./utils/fuzzy-search";
 export type { AttributeBool, InputType } from "./utils/types";
