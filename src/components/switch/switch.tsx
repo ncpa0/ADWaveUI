@@ -18,9 +18,22 @@ class AdwSwitchChangeEvent extends Event {
 
 const { CustomElement } = customElement("adw-switch")
   .attributes({
+    /**
+     * Whether the switch is turned on.
+     */
     active: "boolean",
+    /**
+     * When `true`, the switch cannot be interacted with.
+     */
     disabled: "boolean",
+    /**
+     * Name of the element, used when submitting the switch
+     * as a part of a form.
+     */
     name: "string",
+    /**
+     * The ID of the form the switch is associated with.
+     */
     form: "string",
   })
   .events({
@@ -39,11 +52,17 @@ const { CustomElement } = customElement("adw-switch")
     };
 
     return {
+      /**
+       * Switches to the opposite state. Does not emit a `change` event.
+       */
       toggle() {
         const v = !active.get();
         active.set(v);
       },
 
+      /**
+       * Moves focus to the underlying switch element.
+       */
       focus() {
         // @ts-expect-error
         wc.thisElement.querySelector(`.${Switch.switch}`)?.focus();

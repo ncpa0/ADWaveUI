@@ -26,11 +26,28 @@ class AdwSliderChangeEvent extends Event {
 
 const { CustomElement } = customElement("adw-slider")
   .attributes({
+    /**
+     * The current value of the slider.
+     */
     value: "number",
+    /**
+     * The initial value of the slider. Has no effect if
+     * `value` is already set.
+     */
     defaultValue: "number",
+    /**
+     * The minimum value the slider can have.
+     *
+     * Default: `0`
+     */
     min: "number",
+    /**
+     * The maximum value the slider can have.
+     *
+     * Default: `100`
+     */
     max: "number",
-    /*
+    /**
      * Determines by how much the value will be incremented or
      * decremented when the user interacts with the slider.
      *
@@ -43,8 +60,18 @@ const { CustomElement } = customElement("adw-slider")
      * @default 4
      */
     precision: "number",
+    /**
+     * When enabled, the slider cannot be interacted with.
+     */
     disabled: "boolean",
+    /**
+     * Name of the element, used when submitting the slider
+     * as a part of a form.
+     */
     name: "string",
+    /**
+     * The ID of the form the slider is associated with.
+     */
     form: "string",
   })
   .events({
@@ -131,6 +158,10 @@ const { CustomElement } = customElement("adw-slider")
     };
 
     const methods = {
+      /**
+       * Sets the slider value, clamped to `min` and `max`, and emits
+       * a `change` event. Has no effect if the value is unchanged.
+       */
       setValue(newValue: number) {
         newValue = clamp(newValue, min.get() ?? 0, max.get() ?? 100);
 
@@ -139,6 +170,9 @@ const { CustomElement } = customElement("adw-slider")
         setValue(newValue);
       },
 
+      /**
+       * Moves focus to the underlying slider element.
+       */
       focus() {
         // @ts-expect-error
         wc.thisElement.querySelector(`.${Slider.slider}`)?.focus();

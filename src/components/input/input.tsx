@@ -60,16 +60,55 @@ function fuzzySearch(options: string[], query: string): string[] {
 
 const { CustomElement } = customElement("adw-input")
   .attributes({
+    /**
+     * The current value of the input field.
+     */
     value: "string",
+    /**
+     * The initial value of the input field. Has no effect if
+     * `value` is already set.
+     */
     defaultValue: "string",
+    /**
+     * When enabled, the input field cannot be interacted with.
+     */
     disabled: "boolean",
+    /**
+     * Name of the element, used when submitting the input field
+     * as a part of a form.
+     */
     name: "string",
+    /**
+     * The ID of the form the input field is associated with.
+     */
     form: "string",
+    /**
+     * The type of the underlying `<input>` element, e.g. `text`
+     * or `password`.
+     *
+     * Default: `text`
+     */
     type: "string",
+    /**
+     * Text to show inside the input field when it is empty.
+     */
     placeholder: "string",
+    /**
+     * Minimum number of characters allowed in the input field.
+     */
     minLength: "number",
+    /**
+     * Maximum number of characters allowed in the input field.
+     */
     maxLength: "number",
+    /**
+     * When set, marks the input as being in an error state
+     * (sets `aria-invalid` on the underlying input element).
+     */
     errorLabel: "string",
+    /**
+     * Declared but not yet used by the component.
+     */
     alertLabel: "string",
     /**
      * List of suggestions to show below the input field. Only "matching"
@@ -156,25 +195,42 @@ const { CustomElement } = customElement("adw-input")
     const { attribute, context } = wc;
 
     return {
+      /**
+       * Moves focus to the underlying input element.
+       */
       focus() {
         wc.thisElement.querySelector("input")?.focus();
       },
 
+      /**
+       * Opens the suggestion list.
+       */
       showSuggestions() {
         context.open.dispatch(true);
         context.selectedOption.dispatch(-1);
         this.scrollActiveToView(true);
       },
 
+      /**
+       * Closes the suggestion list.
+       */
       hideSuggestions() {
         context.selectedOption.dispatch(-1);
         context.open.dispatch(false);
       },
 
+      /**
+       * Returns whether the suggestion list is currently open.
+       */
       isSuggestionListOpen() {
         return context.open.get();
       },
 
+      /**
+       * Scrolls the highlighted suggestion into view.
+       *
+       * @param forceInstant - Scroll instantly instead of smoothly.
+       */
       scrollActiveToView(forceInstant = false) {
         setTimeout(() => {
           const suggestionElem = wc.thisElement.querySelector(

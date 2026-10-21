@@ -35,13 +35,39 @@ const FOCUS_CHANGE_EVENT_THROTTLE = 60;
 
 const { CustomElement } = customElement("adw-selector")
   .attributes({
+    /**
+     * Text to show in the selector when no option is selected.
+     */
     placeholder: "string",
+    /**
+     * When `true`, the selector cannot be interacted with.
+     */
     disabled: "boolean",
+    /**
+     * Name of the element, used when submitting the selector
+     * as a part of a form.
+     */
     name: "string",
+    /**
+     * The ID of the form the selector is associated with.
+     */
     form: "string",
+    /**
+     * The value of the currently selected option.
+     */
     value: "string",
+    /**
+     * The initially selected option value. Has no effect if
+     * `value` is already set.
+     */
     defaultValue: "string",
+    /**
+     * When `true`, the currently selected option can be unselected.
+     */
     allowUnselect: "boolean",
+    /**
+     * Text of the unselect option (shown when `allowUnselect` is enabled).
+     */
     unselectLabel: "string",
     /**
      * In which direction the dropdown should open.
@@ -106,22 +132,32 @@ const { CustomElement } = customElement("adw-selector")
     } = wc;
 
     return {
+      /**
+       * Returns whether the dropdown is currently open.
+       */
       isOpen() {
         return context.open.get();
       },
 
       /**
-       * Open or closes the dropdown, depending on it's current state.
+       * Opens or closes the dropdown, depending on its current state.
        */
       toggle() {
         context.open.dispatch((open) => !open);
       },
 
+      /**
+       * Returns the option matching the current value.
+       */
       getSelectedOption(): AdwSelectorOption | undefined {
         const currentValue = value.get();
         return context.options.get().find(opt => opt.isEqualTo(currentValue));
       },
 
+      /**
+       * Scrolls the option with the given value into the center of
+       * the dropdown and focuses it.
+       */
       scrollToOption(
         value: string | null,
         behavior: ScrollBehavior = "instant",
@@ -148,11 +184,22 @@ const { CustomElement } = customElement("adw-selector")
         }
       },
 
+      /**
+       * Moves focus to the underlying selector element.
+       */
       focus() {
         // @ts-expect-error
         wc.thisElement.querySelector(`.${Selector.selector}`)?.focus();
       },
 
+      /**
+       * Selects the option with the given value, or unselects the
+       * currently selected option when called without an argument
+       * (only possible when `allowUnselect` is enabled).
+       *
+       * @returns Whether the option with the given value was found,
+       *   or, when unselecting, whether there was a selection to remove.
+       */
       select(optionValue?: string): boolean {
         const options = context.options.get();
 

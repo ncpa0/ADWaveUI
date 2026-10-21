@@ -120,10 +120,30 @@ class DateMonthArrowPressEvent extends Event {
 
 const { CustomElement } = customElement("adw-calendar")
   .attributes({
+    /**
+     * The currently selected date, as a date string parsable
+     * with `Date.parse`.
+     */
     value: "string",
+    /**
+     * The initially selected date, as a date string parsable
+     * with `Date.parse`. Has no effect if `value` is already set.
+     */
     defaultValue: "string",
+    /**
+     * The locale to use for formatting the dates and month names.
+     *
+     * Default: `navigator.language`
+     */
     locale: "string",
+    /**
+     * Name of the element, used when submitting the calendar
+     * as a part of a form.
+     */
     name: "string",
+    /**
+     * The ID of the form the calendar is associated with.
+     */
     form: "string",
   })
   .events({
@@ -154,6 +174,10 @@ const { CustomElement } = customElement("adw-calendar")
   })
   .methods((api) => {
     return {
+      /**
+       * Sets the year of the currently visible date, without changing
+       * the selected date.
+       */
       setYear(y: number) {
         api.context.visibleDate.dispatch(d => {
           d = d.clone();
@@ -161,6 +185,12 @@ const { CustomElement } = customElement("adw-calendar")
           return d;
         });
       },
+      /**
+       * Sets the month of the currently visible date, without
+       * changing the selected date.
+       *
+       * @param m - The month, where 1 is January and 12 is December.
+       */
       setMonth(m: number) {
         api.context.visibleDate.dispatch(d => {
           d = d.clone();
@@ -168,6 +198,10 @@ const { CustomElement } = customElement("adw-calendar")
           return d;
         });
       },
+      /**
+       * Shows the next month, rolling over to January of the next
+       * year when crossing a year boundary.
+       */
       nextMonth() {
         const m = api.context.visibleDate.get().month();
         if (m === 12) {
@@ -178,6 +212,10 @@ const { CustomElement } = customElement("adw-calendar")
         }
         this.setMonth(m + 1);
       },
+      /**
+       * Shows the previous month, rolling over to December of the
+       * previous year when crossing a year boundary.
+       */
       prevMonth() {
         const m = api.context.visibleDate.get().month();
         if (m === 1) {
@@ -188,9 +226,15 @@ const { CustomElement } = customElement("adw-calendar")
         }
         this.setMonth(m - 1);
       },
+      /**
+       * Shows the next page of years in the year selection view.
+       */
       nextYearPage() {
         api.context.yearsPage.dispatch(p => p + 1);
       },
+      /**
+       * Shows the previous page of years in the year selection view.
+       */
       prevYearPage() {
         api.context.yearsPage.dispatch(p => p - 1);
       },
