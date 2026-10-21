@@ -11,7 +11,7 @@ const { CustomElement } = customElement("adw-option", {
 })
   .attributes({
     value: "string",
-    inert: "boolean",
+    header: "boolean",
     selected: "boolean",
   })
   .events({
@@ -47,7 +47,7 @@ const { CustomElement } = customElement("adw-option", {
     };
   })
   .connected((wc) => {
-    const { attribute: { selected, value, inert } } = wc;
+    const { attribute: { selected, value, header } } = wc;
 
     wc.onChange([selected], () => {
       wc.emitEvent(
@@ -65,11 +65,11 @@ const { CustomElement } = customElement("adw-option", {
       );
     });
 
-    wc.onChange([inert], () => {
+    wc.onChange([header], () => {
       wc.emitEvent(
         "optionattributechanged",
-        "inert",
-        inert.get(),
+        "header",
+        header.get(),
       );
     });
 

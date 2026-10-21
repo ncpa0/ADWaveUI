@@ -81,7 +81,7 @@ const { CustomElement } = customElement("adw-selector")
       value.signal,
       (options, value) => {
         return options.find((option) =>
-          !option.inert && option.isEqualTo(value)
+          !option.header && option.isEqualTo(value)
         )?.getLabel();
       },
     );
@@ -213,8 +213,8 @@ const { CustomElement } = customElement("adw-selector")
           const reverse = orientation.get() === "up";
           const firstOption = context.optionsList.querySelector(
             reverse
-              ? `.${Selector.option}:nth-last-child(1 of :not(.inert))`
-              : `.${Selector.option}:nth-child(1 of :not(.inert))`,
+              ? `.${Selector.option}:nth-last-child(1 of :not(.header))`
+              : `.${Selector.option}:nth-child(1 of :not(.header))`,
           ) as HTMLButtonElement | undefined;
           firstOption?.focus();
           return;
@@ -230,7 +230,7 @@ const { CustomElement } = customElement("adw-selector")
           if (!next) {
             break;
           }
-          while (next.classList.contains("inert")) {
+          while (next.classList.contains("header")) {
             next = next[direction] as HTMLButtonElement | undefined;
             if (!next) {
               break mainloop;
@@ -295,7 +295,7 @@ const { CustomElement } = customElement("adw-selector")
         } else if (prioritize === "children") {
           // children selected attribute is the source of truth
           const selectedOpts = options.filter(opt =>
-            opt.selected && !opt.inert
+            opt.selected && !opt.header
           );
           if (selectedOpts.length === 0) {
             // none of the options is selected, set value to null
@@ -614,7 +614,7 @@ const { CustomElement } = customElement("adw-selector")
             });
             break;
           }
-          case "inert": {
+          case "header": {
             const opt = event.target as AdwSelectorOption;
             const selectedOpt = method.getSelectedOption();
             if (opt.selected && opt === selectedOpt) {
@@ -747,12 +747,12 @@ const { CustomElement } = customElement("adw-selector")
 
     const Option = (props: { option: AdwSelectorOption }) => {
       const isSelected = value.signal.derive(v => props.option.isEqualTo(v));
-      const isInert = props.option.inert;
+      const isInert = props.option.header;
 
       if (isInert) {
         return (
           <button
-            class={[Selector.option, "inert"]}
+            class={[Selector.option, "opt-header"]}
             role="presentation"
             onclick={stopEvent}
           >

@@ -30,7 +30,7 @@ export class OptionContentChangeEvent extends Event {
   }
 }
 
-type SelectorAttributes = "value" | "inert" | "selected";
+type SelectorAttributes = "value" | "header" | "selected";
 
 export class OptionAttributeChangeEvent extends Event {
   static readonly EVNAME = "optionattributechanged";
