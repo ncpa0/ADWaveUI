@@ -1,6 +1,6 @@
 {
   "name": "adwaveui",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "description": "Interactive Web Components inspired by the Gtk Adwaita theme.",
   "keywords": [
     "adwaita",
