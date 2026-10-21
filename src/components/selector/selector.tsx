@@ -646,6 +646,10 @@ const { CustomElement } = customElement("adw-selector")
             const opt = event.target as AdwSelectorOption;
             if (opt.selected && opt.value != null) {
               value.set(opt.value);
+            } else if (
+              !opt.selected && opt.value != null && opt.value === value.get()
+            ) {
+              value.unset();
             }
             break;
           }
