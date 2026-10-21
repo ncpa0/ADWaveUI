@@ -104,12 +104,18 @@ const { CustomElement } = customElement("adw-option", {
       );
     });
 
+    let lastSeenContent = wc.method.getLabel();
     wc.onChildrenChange(() => {
-      wc.emitEvent(
-        "optioncontentchanged",
-        value.get(),
-        wc.method.getLabel(),
-      );
+      const currentLabel = wc.method.getLabel();
+
+      if (currentLabel !== lastSeenContent) {
+        lastSeenContent = currentLabel;
+        wc.emitEvent(
+          "optioncontentchanged",
+          value.get(),
+          currentLabel,
+        );
+      }
     });
   })
   .register();
