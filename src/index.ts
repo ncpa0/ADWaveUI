@@ -15,4 +15,4 @@ export type {
   CustomPointerEvent,
 } from "./utils/events";
 export { fuzzyCmp } from "./utils/fuzzy-search";
-export type { AttributeBool, InputType } from "./utils/types";
+export type { AttributeBool, InpurAutoFill, InputType } from "./utils/types";

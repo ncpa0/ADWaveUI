@@ -1,12 +1,18 @@
 import "../../base-elements";
 import { sig } from "@ncpa0cpl/vanilla-jsx/signals";
 import { Input, Suggestions } from "adwavecss";
-import { AttributesOf, customElement, EventNamesOf } from "wc_toolkit";
+import {
+  AttributeParser,
+  AttributesOf,
+  customElement,
+  EventNamesOf,
+} from "wc_toolkit";
 import { Enum } from "../../utils/enum-attribute";
 import { CustomKeyboardEvent, CustomMouseEvent } from "../../utils/events";
 import { fuzzyCmp } from "../../utils/fuzzy-search";
 import { getUid } from "../../utils/get-uid";
 import { preventDefault, stopEvent } from "../../utils/prevent-default";
+import { InpurAutoFill } from "../../utils/types";
 
 class AdwInputChangeEvent extends Event {
   declare readonly type: "change";
@@ -135,6 +141,8 @@ const { CustomElement } = customElement("adw-input")
      * ones to show. By default only a exact substring match is considered as "matching".
      */
     fuzzy: "boolean",
+    autoComplete: "string" as any as AttributeParser<InpurAutoFill>,
+    readOnly: "boolean",
   })
   .events({
     "change": AdwInputChangeEvent,
@@ -479,6 +487,8 @@ const { CustomElement } = customElement("adw-input")
         type,
         value,
         defaultValue,
+        autoComplete,
+        readOnly,
       },
     } = wc;
 
@@ -583,6 +593,8 @@ const { CustomElement } = customElement("adw-input")
         placeholder={placeholder.signal}
         attribute:minlength={minLength.signal}
         attribute:maxlength={maxLength.signal}
+        property:readOnly={readOnly.signal}
+        autocomplete={autoComplete.signal}
         aria-placeholder={placeholder.signal}
         aria-label={placeholder.signal}
         aria-invalid={errorLabel.signal.derive(err => !!err)}
