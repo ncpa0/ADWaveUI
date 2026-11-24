@@ -25,6 +25,17 @@ const IS_MOBILE = typeof navigator !== "undefined"
     navigator.userAgent,
   );
 
+const CLIPPING_OVERFLOW = /^(hidden|clip|scroll|auto)$/;
+
+// without anchor positioning the popover would have nothing to place
+// it relative to the selector box
+const SUPPORTS_POPOVER_ANCHOR = typeof HTMLElement !== "undefined"
+  && "popover" in HTMLElement.prototype
+  && typeof CSS !== "undefined"
+  && typeof CSS.supports === "function"
+  && CSS.supports("anchor-name: --a")
+  && CSS.supports("position-area: bottom center");
+
 const SEARCHABLE_CHARS =
   "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+=-[]\\{}|;':\",./<>?"
     .split(
@@ -85,11 +96,14 @@ const { CustomElement } = customElement("adw-selector")
     reverseOrder: "boolean",
     /**
      * When enabled, the selected option will be scrolled into view when the dropdown opens.
+     *
+     * @default true
      */
     scrollIntoViewOnOpen: "boolean",
   }, {
     scrollIntoViewOnOpen: {
       htmlName: "scrollintoview",
+      default: true,
     },
   })
   .events({
@@ -118,6 +132,8 @@ const { CustomElement } = customElement("adw-selector")
       optionsDep,
       optionPreview,
       uid: getUid(),
+      // uid contains ":" which is invalid in a dashed ident
+      anchorName: `--adw-selector-${getUid().replace(/[^a-zA-Z0-9-]/g, "")}`,
       searchInputMemory: "",
       clearSearchInputMemoryTimeout: undefined as number | undefined,
       optionsList: undefined as HTMLDivElement | undefined,
@@ -483,6 +499,30 @@ const { CustomElement } = customElement("adw-selector")
         context.open.dispatch(false);
       },
 
+      _findClipper(): Element | undefined {
+        let el: Element | null = wc.thisElement;
+
+        while (el) {
+          const { overflowX, overflowY } = getComputedStyle(el);
+          if (
+            CLIPPING_OVERFLOW.test(overflowX)
+            || CLIPPING_OVERFLOW.test(overflowY)
+          ) {
+            return el;
+          }
+          el = el.parentElement;
+        }
+
+        return undefined;
+      },
+
+      _handlePopoverToggle(e: ToggleEvent) {
+        // the popover can also be dismissed on its own (light dismiss, esc)
+        if (e.newState === "closed" && context.open.get()) {
+          context.open.dispatch(false);
+        }
+      },
+
       _handleKeyDown(ev: KeyboardEvent) {
         if (disabled.get()) {
           return;
@@ -725,14 +765,40 @@ const { CustomElement } = customElement("adw-selector")
     wc.onChange([context.open], () => {
       globalClickListener.disable();
 
+      if (SUPPORTS_POPOVER_ANCHOR && context.optionsList) {
+        if (context.open.get()) {
+          if (!context.optionsList.matches(":popover-open")) {
+            context.optionsList.showPopover();
+          }
+        } else if (context.optionsList.matches(":popover-open")) {
+          context.optionsList.hidePopover();
+        }
+      }
+
       if (context.open.get()) {
         if (!IS_MOBILE) {
-          if (orientation.get() === "detect") {
-            const rect = rootElem.getBoundingClientRect();
-            const distanceToBottom = window.innerHeight - rect.bottom;
-            const fontSize = getComputedStyle(rootElem).fontSize;
-            const emSize = Number(fontSize.replace("px", ""));
+          const rect = rootElem.getBoundingClientRect();
+          const fontSize = getComputedStyle(rootElem).fontSize;
+          const emSize = Number(fontSize.replace("px", ""));
 
+          /**
+           * A list taken out of the document flow can only overflow
+           * the viewport, an absolutely positioned list is clipped by
+           * the nearest ancestor with a non-visible vertical overflow.
+           */
+          let clipBounds = { top: 0, bottom: window.innerHeight };
+          if (!SUPPORTS_POPOVER_ANCHOR) {
+            const clipper = method._findClipper();
+            if (clipper) {
+              const clipRect = clipper.getBoundingClientRect();
+              clipBounds = { top: clipRect.top, bottom: clipRect.bottom };
+            }
+          }
+
+          const spaceBelow = clipBounds.bottom - rect.bottom;
+          const spaceAbove = rect.top - clipBounds.top;
+
+          if (orientation.get() === "detect") {
             const maxTargetHeight = Math.min(
               // 20em
               20 * emSize,
@@ -744,11 +810,29 @@ const { CustomElement } = customElement("adw-selector")
               context.options.get().length * (1.9 * emSize),
             );
 
-            if (distanceToBottom < targetHeight) {
+            if (spaceBelow < targetHeight && spaceAbove > spaceBelow) {
               forcedPosition.dispatch("up");
             } else {
               forcedPosition.dispatch("down");
             }
+          }
+
+          if (context.optionsList) {
+            // a list taller than the space left in the direction it
+            // opens either overflows the viewport or gets cut off by
+            // the clipping ancestor — it scrolls internally instead
+            const listGap = 1.8 * emSize;
+            const opensUp =
+              (forcedPosition.get() ?? orientation.get()) === "up";
+            const openSpace = opensUp
+              ? spaceAbove
+              : spaceBelow;
+            context.optionsList.style.maxHeight = `${
+              Math.max(
+                0,
+                Math.min(20 * emSize, openSpace - listGap),
+              )
+            }px`;
           }
         }
 
@@ -757,9 +841,10 @@ const { CustomElement } = customElement("adw-selector")
          * option.
          */
         if (context.optionsList) {
-          const reverse = (forcedPosition.get() ?? orientation.get()) === "up";
+          const reverse = reverseOrder.get();
+          const scrollIntoView = scrollIntoViewOnOpen.get();
 
-          if (value.get() != null) {
+          if (value.get() != null && scrollIntoView) {
             method.scrollToOption(value.get());
           } else {
             context.optionsList.scrollTo({
@@ -771,27 +856,13 @@ const { CustomElement } = customElement("adw-selector")
 
         if (!IS_MOBILE) {
           globalClickListener.enable();
-
-          if (scrollIntoViewOnOpen.get() && context.optionsList) {
-            // wait for animation to finish
-            setTimeout(() => {
-              const selectedButton = context.optionsList?.querySelector(
-                ".option.selected",
-              );
-              if (context.open.get() && selectedButton) {
-                selectedButton.scrollIntoView({
-                  behavior: "smooth",
-                  block: "nearest",
-                });
-              }
-            }, 201);
-          }
         }
       }
 
       if (context.open.get()) {
         wc.emitEvent("open");
       } else {
+        context.optionsList?.style.removeProperty("max-height");
         wc.emitEvent("close");
       }
     });
@@ -825,7 +896,9 @@ const { CustomElement } = customElement("adw-selector")
           role="option"
           aria-selected={isSelected}
         >
-          {props.option.getLabel()}
+          <span>
+            {props.option.getLabel()}
+          </span>
         </button>
       ) as HTMLButtonElement;
 
@@ -921,6 +994,10 @@ const { CustomElement } = customElement("adw-selector")
             [Selector.top]: isTop,
           }}
           role="listbox"
+          popover={SUPPORTS_POPOVER_ANCHOR ? "auto" : undefined}
+          ontoggle={SUPPORTS_POPOVER_ANCHOR
+            ? method._handlePopoverToggle
+            : undefined}
         >
           {allowUnselect.signal.derive(allowUnselect => {
             if (!allowUnselect) return null;
@@ -940,6 +1017,14 @@ const { CustomElement } = customElement("adw-selector")
           )}
         </div>
       ) as HTMLDivElement;
+
+      if (SUPPORTS_POPOVER_ANCHOR) {
+        context.optionsList.style.setProperty(
+          "position-anchor",
+          context.anchorName,
+        );
+      }
+
       return context.optionsList;
     };
 
@@ -997,7 +1082,11 @@ const { CustomElement } = customElement("adw-selector")
         {IS_MOBILE ? <OptionsListMobile /> : <OptionsListDesktop />}
         <HiddenSelect />
       </div>
-    );
+    ) as HTMLDivElement;
+
+    if (SUPPORTS_POPOVER_ANCHOR) {
+      rootElem.style.setProperty("anchor-name", context.anchorName);
+    }
 
     wc.attach(rootElem);
   })

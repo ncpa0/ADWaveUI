@@ -2,50 +2,50 @@
   "format_on_save": "on",
   "languages": {
     "JavaScript": {
-      "language_servers": ["vtsls"],
+      "language_servers": ["typescript-ls"],
       "formatter": {
         "external": {
           "command": "dprint",
-          "arguments": ["fmt", "--stdin", "{buffer_path}"]
-        }
-      }
+          "arguments": ["fmt", "--stdin", "{buffer_path}"],
+        },
+      },
     },
     "TypeScript": {
-      "language_servers": ["vtsls"],
+      "language_servers": ["typescript-ls"],
       "formatter": {
         "external": {
           "command": "dprint",
-          "arguments": ["fmt", "--stdin", "{buffer_path}"]
-        }
-      }
+          "arguments": ["fmt", "--stdin", "{buffer_path}"],
+        },
+      },
     },
     "TSX": {
-      "language_servers": ["vtsls"],
+      "language_servers": ["typescript-ls"],
       "formatter": {
         "external": {
           "command": "dprint",
-          "arguments": ["fmt", "--stdin", "{buffer_path}"]
-        }
-      }
+          "arguments": ["fmt", "--stdin", "{buffer_path}"],
+        },
+      },
     },
     "CSS": {
       "formatter": {
         "external": {
           "command": "dprint",
-          "arguments": ["fmt", "--stdin", "{buffer_path}"]
-        }
-      }
+          "arguments": ["fmt", "--stdin", "{buffer_path}"],
+        },
+      },
     },
     "JSON": {
       "formatter": {
         "external": {
           "command": "dprint",
-          "arguments": ["fmt", "--stdin", "{buffer_path}"]
-        }
-      }
-    }
+          "arguments": ["fmt", "--stdin", "{buffer_path}"],
+        },
+      },
+    },
   },
   "lsp": {
-    "eslint": {}
-  }
+    "eslint": {},
+  },
 }

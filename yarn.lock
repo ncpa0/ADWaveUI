@@ -254,10 +254,10 @@
   optionalDependencies:
     json-to-ts "^2.1.0"
 
-"@ncpa0cpl/vanilla-jsx@0.0.1-alpha.54":
-  version "0.0.1-alpha.54"
-  resolved "https://registry.yarnpkg.com/@ncpa0cpl/vanilla-jsx/-/vanilla-jsx-0.0.1-alpha.54.tgz#e5c2b2c3cd74719af24040a37998f6f5ea028717"
-  integrity sha512-ij5zmn33EUVxz2OrtfCZxBdS3LGyXa1sLE6Tul3EFv1YDSWLwQcKCieoX2iTqQtnJWLju1oVoG+c38r6OYplAQ==
+"@ncpa0cpl/vanilla-jsx@0.0.1-alpha.56":
+  version "0.0.1-alpha.56"
+  resolved "https://registry.yarnpkg.com/@ncpa0cpl/vanilla-jsx/-/vanilla-jsx-0.0.1-alpha.56.tgz#4245b6cc1882eed8723a32c222adc4c4b2ffcede"
+  integrity sha512-udCpepJchXkA44qqFCyrPj4ZsqhBX4FR10a2LmGoWOu7NqlEr/exxCO9o30NS4/rigD/90HjGo0rg34F1gAqVw==
   dependencies:
     html-element-attributes "^3.4.0"
     immer "^10.1.1"
@@ -485,10 +485,10 @@
   resolved "https://registry.yarnpkg.com/@typescript/typescript-win32-x64/-/typescript-win32-x64-7.0.2.tgz#cf3b7b0d6ce5635daca4c8e01c189cdcde47ec3c"
   integrity sha512-0BQ3HkAHHlKLSp1qRvf3SUhGpGsDuhB/jgFw75guyqbxJqEaS0Cw/VFO8i2nHglJUzQCRtMMR/IBAKE3ETMC4g==
 
-adwavecss@>=0.4.0:
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/adwavecss/-/adwavecss-0.4.0.tgz#4a1d705220a08fedd0b3f2a2aa69f5547c85bae7"
-  integrity sha512-VSCHVgT3si0R0q3wUhiupe/zZDBGDQQc9K0VGPEG5yCZGhLWpTLgB0elRms71cTV9PyJ+DQtU7Xw6zGfsGc2sQ==
+adwavecss@>=0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/adwavecss/-/adwavecss-0.5.0.tgz#64e32a905af2d25224a3cb19307384fa3aed806b"
+  integrity sha512-geCShm3uDMhV/znQO7qNN6LkfpoVI07z37VuCHnEdVGotEJJi+qmCmfUtYm3CLi+ia7jy5DZakEXrsnUyu4HCQ==
 
 ansi-regex@^5.0.1:
   version "5.0.1"
@@ -1763,10 +1763,10 @@ utila@~0.4:
   resolved "https://registry.yarnpkg.com/utila/-/utila-0.4.0.tgz#8a16a05d445657a3aea5eecc5b12a4fa5379772c"
   integrity sha512-Z0DbgELS9/L/75wZbro8xAnT50pBVFQZ+hUEueGDU5FN51YSCYM+jdxsfCiHjwNP/4LCDD0i/graKpeBnOXKRA==
 
-wc_toolkit@^0.1.4:
-  version "0.1.4"
-  resolved "https://registry.yarnpkg.com/wc_toolkit/-/wc_toolkit-0.1.4.tgz#ee09a96a61b67485d6b759db82db0a55cdd9e6ba"
-  integrity sha512-PfkpjiUntdaY4yiFVB75OE6wOGwQAKmWvvrvPrpSQZElgExMywhRet1nH31ZvFRVzW797IqdZRP6J46ar9RZsw==
+wc_toolkit@^0.1.5:
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/wc_toolkit/-/wc_toolkit-0.1.5.tgz#c597bcb6145597df05de721b984796a1abc7ed75"
+  integrity sha512-gMmSVf+uibRXO2Bqm5JfhtEG7JgMy5JU5AvPjMrddutvQHWvsLMKBHeG6zOWa7slgixHmyOir0zhNAriVBhdlw==
 
 which-boxed-primitive@^1.0.2:
   version "1.0.2"
