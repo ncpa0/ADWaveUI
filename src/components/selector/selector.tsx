@@ -933,6 +933,13 @@ const { CustomElement } = customElement("adw-selector")
         <div
           id={context.uid}
           class={[Selector.optionsList, Selector.noPosition]}
+          style={{
+            flexDirection: sig.when(
+              reverseOrder.signal,
+              "column-reverse",
+              "column",
+            ),
+          }}
           role="listbox"
         >
           {allowUnselect.signal.derive(allowUnselect => {
@@ -941,13 +948,8 @@ const { CustomElement } = customElement("adw-selector")
           })}
           {sig.derive(
             context.options,
-            reverseOrder.signal,
             context.optionsDep,
-            (options, reverse) => {
-              if (reverse) {
-                options = options.slice().reverse();
-              }
-
+            (options) => {
               return options.map((option) => <Option option={option} />);
             },
           )}
@@ -993,6 +995,13 @@ const { CustomElement } = customElement("adw-selector")
             [Selector.optionsList]: true,
             [Selector.top]: isTop,
           }}
+          style={{
+            flexDirection: sig.when(
+              reverseOrder.signal,
+              "column-reverse",
+              "column",
+            ),
+          }}
           role="listbox"
           popover={SUPPORTS_POPOVER_ANCHOR ? "auto" : undefined}
           ontoggle={SUPPORTS_POPOVER_ANCHOR
@@ -1005,13 +1014,8 @@ const { CustomElement } = customElement("adw-selector")
           })}
           {sig.derive(
             context.options,
-            reverseOrder.signal,
             context.optionsDep,
             (options, reverse) => {
-              if (reverse) {
-                options = options.slice().reverse();
-              }
-
               return options.map((option) => <Option option={option} />);
             },
           )}
